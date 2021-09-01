@@ -1,9 +1,9 @@
 import { CeloContract } from '@celo/contractkit'
 import { currencyEquals } from '@ubeswap/sdk'
 import { ContractTransaction } from 'ethers'
-import { AToken__factory } from 'generated/factories/AToken__factory'
+//import { AToken__factory } from 'generated/factories/AToken__factory'
 
-import { LendingPool__factory } from '../../../../generated'
+//import { LendingPool__factory } from '../../../../generated'
 import { TradeExecutor } from '..'
 import { MoolaDirectTrade } from './MoolaDirectTrade'
 import { moolaLendingPools } from './useMoola'
@@ -23,7 +23,7 @@ export const executeMoolaDirectTrade: TradeExecutor<MoolaDirectTrade> = async ({
   const { mcUSD, mCELO } = chainCfg
   const CELO = chainCfg[CeloContract.GoldToken]
 
-  const pool = LendingPool__factory.connect(chainCfg.lendingPool, signer)
+  //const pool = LendingPool__factory.connect(chainCfg.lendingPool, signer)
 
   const { inputAmount } = trade
   const token = inputAmount.token
@@ -38,7 +38,7 @@ export const executeMoolaDirectTrade: TradeExecutor<MoolaDirectTrade> = async ({
       : currencyEquals(token, mCELO)
       ? 'mCELO'
       : token.symbol ?? null
-
+    /*
     if (symbol?.startsWith('m')) {
       const aToken = AToken__factory.connect(inputAmount.token.address, signer)
       return await doTransaction(aToken, 'redeem', {
@@ -60,7 +60,7 @@ export const executeMoolaDirectTrade: TradeExecutor<MoolaDirectTrade> = async ({
         args: [inputAmount.token.address, inputAmount.raw.toString(), 0x0421],
         summary: `Deposit ${inputAmount.toSignificant(2)} ${symbol} into Moola`,
       })
-    }
+    }*/
     throw new Error(`unknown currency: ${token.address}`)
   }
 
