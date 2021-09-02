@@ -16,8 +16,8 @@ import { TYPE } from 'theme'
 import { ExternalLink } from 'theme/components'
 import { CountUp } from 'use-count-up'
 
-import Logo from '../../assets/svg/logo.svg'
-import LogoDark from '../../assets/svg/logo-dark.svg'
+import Logo from '../../assets/images/logo_with_name.JPG'
+import LogoDark from '../../assets/images/logo_dark.JPG'
 import { useDarkModeManager } from '../../state/user/hooks'
 import { YellowCard } from '../Card'
 import Menu from '../Menu'
@@ -162,7 +162,7 @@ const Title = styled(NavLink)`
   }
 `
 
-const UbeIcon = styled.div`
+const TradegenIcon = styled.div`
   transition: transform 0.3s ease;
   :hover {
     transform: rotate(-5deg);
@@ -282,35 +282,49 @@ export default function Header() {
       </Modal>
       <HeaderRow>
         <Title to="/">
-          <UbeIcon>
+          <TradegenIcon>
             <img width={'140px'} src={darkMode ? LogoDark : Logo} alt="logo" />
-          </UbeIcon>
+          </TradegenIcon>
         </Title>
         <HeaderLinks>
           {isMobile && chainId && NETWORK_LABELS[chainId] && (
             <NetworkCard title={NETWORK_LABELS[chainId]}>{NETWORK_LABELS[chainId]}</NetworkCard>
           )}
-          <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
-            {t('swap')}
+          <StyledNavLink
+            id={`pool-nav-link`}
+            to={'/pools'}
+            isActive={(match, { pathname }) =>
+              Boolean(match) ||
+              pathname.startsWith('/pool') ||
+              pathname.startsWith('/manage_pool') ||
+              pathname == 'create_pool'
+            }
+          >
+            Pools
           </StyledNavLink>
           <StyledNavLink
             id={`pool-nav-link`}
-            to={'/pool'}
+            to={'/NFTpools'}
             isActive={(match, { pathname }) =>
               Boolean(match) ||
-              pathname.startsWith('/add') ||
-              pathname.startsWith('/remove') ||
-              pathname.startsWith('/create') ||
-              pathname.startsWith('/find')
+              pathname.startsWith('/NFTpool') ||
+              pathname.startsWith('/manage_NFTpool') ||
+              pathname == 'create_NFTpool'
             }
           >
-            {t('pool')}
+            NFT Pools
           </StyledNavLink>
           <StyledNavLink id="farm-nav-link" to="/farm">
             Farm
           </StyledNavLink>
+          <StyledNavLink id="farm-nav-link" to="/stake">
+            Stake
+          </StyledNavLink>
           <StyledExternalLink id={`stake-nav-link`} href={'https://info.ubeswap.org'}>
             Charts <span style={{ fontSize: '11px' }}>↗</span>
+          </StyledExternalLink>
+          <StyledExternalLink id={`stake-nav-link`} href={'https://info.ubeswap.org'}>
+            Marketplace <span style={{ fontSize: '11px' }}>↗</span>
           </StyledExternalLink>
         </HeaderLinks>
       </HeaderRow>

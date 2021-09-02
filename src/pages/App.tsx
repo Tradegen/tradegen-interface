@@ -118,6 +118,19 @@ export default function App() {
               <Route exact strict path="/farm" component={Earn} />
               <Route exact strict path="/farm/:currencyIdA/:currencyIdB/:stakingAddress" component={Manage} />
               <Route exact strict path="/dualfarm/:currencyIdA/:currencyIdB/:stakingAddress" component={Manage} />
+              <Route exact strict path="/stake" component={Earn} />
+              <Route exact strict path="/pools" component={Swap} />
+              <Route exact strict path="/NFTpools" component={AddLiquidity} />
+              <Route exact strict path="/dashboard" component={Swap} />
+              <Route exact strict path="/manage_pool_investment" component={Earn} />
+              <Route exact strict path="/manage_NFTpool_investment" component={Earn} />
+              <Route exact strict path="/NFTpools" component={Earn} />
+              <Route exact strict path="/manage_pool/:id" component={Earn} />
+              <Route exact strict path="/manage_NFTpool/:id" component={Earn} />
+              <Route exact strict path="/NFTpool/:id" component={Earn} />
+              <Route exact strict path="/pool/:id" component={Earn} />
+              <Route exact strict path="/create_pool" component={AddLiquidity} />
+              <Route exact strict path="/create_NFTpool" component={AddLiquidity} />
               <Route component={RedirectPathToSwapOnly} />
             </Switch>
           </ErrorBoundary>
