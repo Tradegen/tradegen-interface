@@ -6,7 +6,7 @@ import { X } from 'react-feather'
 import styled from 'styled-components'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
-import tokenLogo from '../../assets/images/token-logo.png'
+import tokenLogo from '../../assets/images/token.JPG'
 import { UBE } from '../../constants'
 import { useTotalSupply } from '../../data/TotalSupply'
 import { useTotalUbeEarned } from '../../state/stake/hooks'
@@ -59,7 +59,7 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
         <CardNoise />
         <CardSection gap="md">
           <RowBetween>
-            <TYPE.white color="white">Your UBE Breakdown</TYPE.white>
+            <TYPE.white color="white">Your TGEN Breakdown</TYPE.white>
             <StyledClose stroke="white" onClick={() => setShowUbeBalanceModal(false)} />
           </RowBetween>
         </CardSection>
@@ -97,11 +97,11 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
         <CardSection gap="sm">
           <AutoColumn gap="md">
             <RowBetween>
-              <TYPE.white color="white">UBE price:</TYPE.white>
+              <TYPE.white color="white">TGEN price:</TYPE.white>
               <TYPE.white color="white">${ubePrice?.toFixed(2) ?? '-'}</TYPE.white>
             </RowBetween>
             <RowBetween>
-              <TYPE.white color="white">UBE in circulation:</TYPE.white>
+              <TYPE.white color="white">TGEN in circulation:</TYPE.white>
               <TYPE.white color="white">{circulation?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
             </RowBetween>
             <RowBetween>
@@ -109,7 +109,7 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
               <TYPE.white color="white">{totalSupply?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
             </RowBetween>
             {ube && ube.chainId === ChainId.MAINNET ? (
-              <ExternalLink href={`https://info.ubeswap.org/token/${ube.address}`}>View UBE Analytics</ExternalLink>
+              <ExternalLink href={`https://info.ubeswap.org/token/${ube.address}`}>View TGEN Analytics</ExternalLink>
             ) : null}
           </AutoColumn>
         </CardSection>
