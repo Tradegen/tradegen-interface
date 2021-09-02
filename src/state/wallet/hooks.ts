@@ -1,6 +1,6 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
-import { UBE } from 'constants/tokens'
+import { UBE, cUSD } from 'constants/tokens'
 import { useMemo } from 'react'
 
 import ERC20_INTERFACE from '../../constants/abis/erc20'
@@ -105,4 +105,20 @@ export function useAggregateUbeBalance(): TokenAmount | undefined {
   if (!ube) return undefined
 
   return ubeBalance
+}
+
+// get the total cUSD for account
+export function useAggregateCUSDBalance(): TokenAmount | undefined {
+  const {
+    address,
+    network: { chainId },
+  } = useContractKit()
+
+  const cusd = chainId ? cUSD[chainId] : undefined
+
+  const cUSDBalance: TokenAmount | undefined = useTokenBalance(address ?? undefined, cusd)
+
+  if (!cusd) return undefined
+
+  return cUSDBalance
 }

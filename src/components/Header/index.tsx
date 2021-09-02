@@ -10,7 +10,7 @@ import { Moon, Sun } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
-import { useAggregateUbeBalance, useTokenBalance } from 'state/wallet/hooks'
+import { useAggregateUbeBalance, useAggregateCUSDBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 import { ExternalLink } from 'theme/components'
@@ -272,6 +272,7 @@ export default function Header() {
   const [darkMode, toggleDarkMode] = useDarkModeManager()
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
   const aggregateBalance: TokenAmount | undefined = useAggregateUbeBalance()
+  const cUSDBalance: TokenAmount | undefined = useAggregateCUSDBalance()
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
 
@@ -357,7 +358,34 @@ export default function Header() {
                     </TYPE.white>
                   </HideSmall>
                 )}
-                UBE
+                TGEN
+              </UBEAmount>
+              <CardNoise />
+            </UBEWrapper>
+          )}
+
+          {cUSDBalance && (
+            <UBEWrapper>
+              <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
+                {account && (
+                  <HideSmall>
+                    <TYPE.white
+                      style={{
+                        paddingRight: '.4rem',
+                      }}
+                    >
+                      <CountUp
+                        key={countUpValue}
+                        isCounting
+                        start={parseFloat(countUpValuePrevious)}
+                        end={parseFloat(countUpValue)}
+                        thousandsSeparator={','}
+                        duration={1}
+                      />
+                    </TYPE.white>
+                  </HideSmall>
+                )}
+                cUSD
               </UBEAmount>
               <CardNoise />
             </UBEWrapper>

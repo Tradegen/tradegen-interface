@@ -22,3 +22,14 @@ export const UBE = makeTokens(
   'UBE',
   'Ubeswap'
 )
+
+export const cUSD = makeTokens(
+  {
+    [ChainId.MAINNET]: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+    [ChainId.ALFAJORES]: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+    [ChainId.BAKLAVA]: '0x62492A644A588FD904270BeD06ad52B9abfEA1aE',
+  },
+  18,
+  'cUSD',
+  'Celo Dollar'
+)
