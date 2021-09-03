@@ -120,18 +120,6 @@ export default function Menu() {
             <Layout size={14} />
             Dashboard
           </MenuItemInternal>
-          <MenuItemInternal id="link" to="/invested_pools">
-            <Droplet size={14} />
-            Invested Pools
-          </MenuItemInternal>
-          <MenuItemInternal id="link" to="/invested_NFTpools">
-            <Layers size={14} />
-            Invested NFT Pools
-          </MenuItemInternal>
-          <MenuItemInternal id="link" to="/settings">
-            <Settings size={14} />
-            Settings
-          </MenuItemInternal>
           <MenuItem id="link" href="https://www.tradegen.io/about">
             <Info size={14} />
             About

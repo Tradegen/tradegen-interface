@@ -131,9 +131,8 @@ export default function App() {
               <Route exact strict path="/pool/:id" component={Earn} />
               <Route exact strict path="/create_pool" component={AddLiquidity} />
               <Route exact strict path="/create_NFTpool" component={AddLiquidity} />
-              <Route exact strict path="/invested_pools" component={AddLiquidity} />
-              <Route exact strict path="/invested_NFTpools" component={AddLiquidity} />
-              <Route exact strict path="/settings" component={AddLiquidity} />
+              <Route exact strict path="/investments" component={AddLiquidity} />
+              <Route exact strict path="/dashboard" component={AddLiquidity} />
               <Route component={RedirectPathToSwapOnly} />
             </Switch>
           </ErrorBoundary>

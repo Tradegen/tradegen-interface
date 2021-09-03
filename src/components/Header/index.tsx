@@ -293,27 +293,9 @@ export default function Header() {
           )}
           <StyledNavLink
             id={`pool-nav-link`}
-            to={'/pools'}
-            isActive={(match, { pathname }) =>
-              Boolean(match) ||
-              pathname.startsWith('/pool') ||
-              pathname.startsWith('/manage_pool') ||
-              pathname == 'create_pool'
-            }
+            to={'/investments'}
           >
-            Pools
-          </StyledNavLink>
-          <StyledNavLink
-            id={`pool-nav-link`}
-            to={'/NFTpools'}
-            isActive={(match, { pathname }) =>
-              Boolean(match) ||
-              pathname.startsWith('/NFTpool') ||
-              pathname.startsWith('/manage_NFTpool') ||
-              pathname == 'create_NFTpool'
-            }
-          >
-            NFT Pools
+            Investments
           </StyledNavLink>
           <StyledNavLink id="farm-nav-link" to="/farm">
             Farm
