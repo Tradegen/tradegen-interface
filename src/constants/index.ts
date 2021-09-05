@@ -146,3 +146,6 @@ export const BETTER_TRADE_LESS_HOPS_THRESHOLD = new Percent(JSBI.BigInt(50), JSB
 
 export const ZERO_PERCENT = new Percent('0')
 export const ONE_HUNDRED_PERCENT = new Percent('1')
+
+export const POOL_FACTORY_ADDRESS = '0xC71Ff58Efa2bffaE0f120BbfD7C64893aA20bDE0'
+export const NFT_POOL_FACTORY_ADDRESS = '0x2dB13ac7A21F42bcAaFC71C1f1F8c647AEBC9750'

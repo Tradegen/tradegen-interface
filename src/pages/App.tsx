@@ -4,6 +4,7 @@ import React, { Suspense } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
+import Investments from './Investments'
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
 import Header from '../components/Header'
 import Polling from '../components/Header/Polling'
@@ -131,7 +132,7 @@ export default function App() {
               <Route exact strict path="/pool/:id" component={Earn} />
               <Route exact strict path="/create_pool" component={AddLiquidity} />
               <Route exact strict path="/create_NFTpool" component={AddLiquidity} />
-              <Route exact strict path="/investments" component={AddLiquidity} />
+              <Route exact strict path="/investments" component={Investments} />
               <Route exact strict path="/dashboard" component={AddLiquidity} />
               <Route component={RedirectPathToSwapOnly} />
             </Switch>

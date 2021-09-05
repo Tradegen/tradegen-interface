@@ -4,6 +4,9 @@ import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
+import POOL_FACTORY_ABI from '../constants/abis/PoolFactory.json'
+import NFT_POOL_FACTORY_ABI from '../constants/abis/NFTPoolFactory.json'
+
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import DUAL_REWARDS_ABI from '../constants/abis/moola/MoolaStakingRewards.json'
@@ -11,7 +14,7 @@ import POOL_MANAGER_ABI from '../constants/abis/pool-manager.json'
 import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
-import { Erc20, MoolaStakingRewards, PoolManager, StakingRewards } from '../generated'
+import { Erc20, MoolaStakingRewards, PoolManager, StakingRewards, PoolFactory, NFTPoolFactory } from '../generated'
 import { getContract } from '../utils'
 
 // returns null on errors
@@ -82,4 +85,12 @@ export function useDualStakingContract(
   withSignerIfPossible?: boolean
 ): MoolaStakingRewards | null {
   return useContract(stakingAddress, DUAL_REWARDS_ABI, withSignerIfPossible) as MoolaStakingRewards | null
+}
+
+export function usePoolFactoryContract(poolFactoryAddress?: string, withSignerIfPossible?: boolean): PoolFactory | null {
+  return useContract(poolFactoryAddress, POOL_FACTORY_ABI, withSignerIfPossible) as PoolFactory | null
+}
+
+export function useNFTPoolFactoryContract(NFTPoolFactoryAddress?: string, withSignerIfPossible?: boolean): NFTPoolFactory | null {
+  return useContract(NFTPoolFactoryAddress, NFT_POOL_FACTORY_ABI, withSignerIfPossible) as NFTPoolFactory | null
 }
