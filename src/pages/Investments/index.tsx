@@ -1,6 +1,6 @@
 import InvestmentMenu from '../../features/investments/InvestmentMenu'
+import { InvestmentList } from '../../features/investments/InvestmentList'
 import styled from 'styled-components'
-import { useInvestments } from '../../features/investments/hooks'
 
 const Container = styled.div`
   display: grid;
@@ -20,14 +20,14 @@ const MenuWrapper = styled.div`
 `
 
 export default function Investments() {
-    const investments = useInvestments();
-    console.log(investments);
-    
     return (
-        <Container>
-            <MenuWrapper>
-                <InvestmentMenu></InvestmentMenu>
-            </MenuWrapper>
-        </Container>
+        <>
+            <Container>
+                <MenuWrapper>
+                    <InvestmentMenu></InvestmentMenu>
+                </MenuWrapper>
+            </Container>
+            <InvestmentList></InvestmentList>
+        </>
     )
 }
