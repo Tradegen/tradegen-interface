@@ -4,14 +4,11 @@ import { InvestmentListItem } from './InvestmentListItem'
 import styled from 'styled-components'
 import { useInvestments, Investment } from '../../features/investments/hooks'
 import { useEffect, useMemo } from 'react'
-import { POOL_FACTORY_ADDRESS, NFT_POOL_FACTORY_ADDRESS } from '../../constants'
-import { POOL_INTERFACE } from '../../constants/abis/pool'
-import { NFT_POOL_INTERFACE } from '../../constants/abis/NFTpool'
-import { usePoolFactoryContract, useNFTPoolFactoryContract } from '../../hooks/useContract'
-import { useSingleCallResult, NEVER_RELOAD, useMultipleContractSingleData } from '../../state/multicall/hooks'
 import { ErrorBoundary } from '@sentry/react'
 import Loader from '../../components/Loader'
 import { formatNumber, formatPercent } from '../../functions/format'
+import { StyledInternalLink, TYPE } from '../../theme'
+import { ButtonPrimary } from '../../components/Button'
 
 const Wrapper = styled.div`
   display: grid;
@@ -52,52 +49,6 @@ const NoResults = styled.div`
 `
 
 let numDisplayed = 10;
-/*
-function loadData()
-{
-    const poolFactoryContract = usePoolFactoryContract(POOL_FACTORY_ADDRESS);
-    const NFTPoolFactoryContract = useNFTPoolFactoryContract(NFT_POOL_FACTORY_ADDRESS);
-    
-    let poolAddresses = useSingleCallResult(poolFactoryContract ? poolFactoryContract : null, 'getAvailablePools', undefined)?.result?.[0];
-    let NFTPoolAddresses = useSingleCallResult(NFTPoolFactoryContract ? NFTPoolFactoryContract : null, 'getAvailablePools', undefined)?.result?.[0];
-    poolAddresses = poolAddresses ?? [];
-    NFTPoolAddresses = NFTPoolAddresses ?? [];
-
-    const poolTokenPrices = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'tokenPrice')?.map((element:any) => (element?.result ? element?.result[0] : null));
-    const NFTPoolTokenPrices = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'tokenPrice')?.map((element:any) => (element?.result ? element?.result[0] : null));
-
-    const poolValues = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'getPoolValue')?.map((element:any) => (element?.result ? element?.result[0] : null));
-    const NFTPoolValues = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'getPoolValue')?.map((element:any) => (element?.result ? element?.result[0] : null));
-
-    const poolNames = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
-    const NFTPoolNames = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
-
-    const NFTPoolSeedPrices = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'seedPrice')?.map((element:any) => (element?.result ? element?.result[0] : null));
-    
-    for (var i = 0; i < poolAddresses.length; i++)
-    {
-        investments.push({
-        type: "Pool",
-        address: poolAddresses[i],
-        tokenPrice: poolTokenPrices[i],
-        TVL: poolValues[i],
-        name: poolNames[i],
-        totalReturn: (poolTokenPrices[i] === null || BigInt(poolTokenPrices[i]) == BigInt(0)) ? BigInt(0) : (BigInt(poolTokenPrices[i]) - BigInt(1e18)) * BigInt(100) / BigInt(1e18)
-        });
-    }
-    
-    for (var i = 0; i < NFTPoolAddresses.length; i++)
-    {
-        investments.push({
-        type: "NFTPool",
-        address: NFTPoolAddresses[i],
-        tokenPrice: NFTPoolTokenPrices[i],
-        TVL: NFTPoolValues[i],
-        name: NFTPoolNames[i],
-        totalReturn: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(BigInt(NFTPoolSeedPrices[i]) - BigInt(NFTPoolTokenPrices[i])) * BigInt(100) / BigInt(NFTPoolSeedPrices[i]) 
-        });
-    }
-}*/
 
 export function InvestmentList() {
     let data = useInvestments();
@@ -137,6 +88,14 @@ export function InvestmentList() {
                             <p>Token price: {formatNumber(Number(investment.tokenPrice), true, true, 18)}</p>
                             <p>TVL: {formatNumber(Number(investment.TVL), true, true, 18)}</p>
                             <p>Total Return: {formatPercent(Number(investment.totalReturn))}</p>
+                            <StyledInternalLink
+                            to={`/pool/${investment.address}`}
+                            style={{ width: '100%' }}
+                            >
+                            <ButtonPrimary padding="8px" borderRadius="8px">
+                                {'Deposit'}
+                            </ButtonPrimary>
+                            </StyledInternalLink>
                             <p>...</p>
                         </ErrorBoundary>
                     )))}

@@ -78,8 +78,8 @@ export function useInvestments(): Investment[] {
     investments.push({
       type: "Pool",
       address: poolAddresses[i],
-      tokenPrice: BigInt(poolTokenPrices[i]) / BigInt(1e18),
-      TVL: BigInt(poolValues[i]) / BigInt(1e18),
+      tokenPrice: (poolTokenPrices[i] === null) ? BigInt(0) : BigInt(poolTokenPrices[i]) / BigInt(1e18),
+      TVL: (poolValues[i] === null) ? BigInt(0) : BigInt(poolValues[i]) / BigInt(1e18),
       name: poolNames[i],
       totalReturn: (poolTokenPrices[i] === null || BigInt(poolTokenPrices[i]) == BigInt(0)) ? BigInt(0) : (BigInt(poolTokenPrices[i]) - BigInt(1e18)) * BigInt(100) / BigInt(1e18)
     });
@@ -90,8 +90,8 @@ export function useInvestments(): Investment[] {
     investments.push({
       type: "NFTPool",
       address: NFTPoolAddresses[i],
-      tokenPrice: BigInt(NFTPoolTokenPrices[i]) / BigInt(1e18),
-      TVL: BigInt(NFTPoolValues[i]) / BigInt(1e18),
+      tokenPrice: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(NFTPoolTokenPrices[i]) / BigInt(1e18),
+      TVL: (NFTPoolValues[i] === null) ? BigInt(0) : BigInt(NFTPoolValues[i]) / BigInt(1e18),
       name: NFTPoolNames[i],
       totalReturn: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(BigInt(NFTPoolSeedPrices[i]) - BigInt(NFTPoolTokenPrices[i])) * BigInt(100) / BigInt(NFTPoolSeedPrices[i]) 
     });
