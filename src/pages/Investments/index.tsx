@@ -22,11 +22,6 @@ const MenuWrapper = styled.div`
 export default function Investments() {
     return (
         <>
-            <Container>
-                <MenuWrapper>
-                    <InvestmentMenu></InvestmentMenu>
-                </MenuWrapper>
-            </Container>
             <InvestmentList></InvestmentList>
         </>
     )

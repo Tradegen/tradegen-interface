@@ -20,7 +20,9 @@ import {
 } from './AddLiquidity/redirects'
 import Earn from './Earn'
 import Manage from './Earn/Manage'
-import Pool from './Pool'
+import Pool from './UbeswapPool'
+import PoolPage from './Pool'
+import NFTPoolPage from './NFTPool'
 import PoolFinder from './PoolFinder'
 import RemoveLiquidity from './RemoveLiquidity'
 import { RedirectOldRemoveLiquidityPathStructure } from './RemoveLiquidity/redirects'
@@ -128,8 +130,8 @@ export default function App() {
               <Route exact strict path="/NFTpools" component={Earn} />
               <Route exact strict path="/manage_pool/:id" component={Earn} />
               <Route exact strict path="/manage_NFTpool/:id" component={Earn} />
-              <Route exact strict path="/NFTpool/:id" component={Earn} />
-              <Route exact strict path="/pool/:id" component={Earn} />
+              <Route exact strict path="/NFTpool/:id" component={NFTPoolPage} />
+              <Route exact strict path="/pool/:id" component={PoolPage} />
               <Route exact strict path="/create_pool" component={AddLiquidity} />
               <Route exact strict path="/create_NFTpool" component={AddLiquidity} />
               <Route exact strict path="/investments" component={Investments} />

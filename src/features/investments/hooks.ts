@@ -16,6 +16,14 @@ export interface Investment {
   type: string
 }
 
+export interface UserInvestment {
+  name: string,
+  type: string,
+  address: string,
+  balance: bigint,
+  USDBalance: bigint
+}
+
 /*
   Currently expensive to render farm list item. The infinite scroll is used to
   to minimize this impact. This hook pairs with it, keeping track of visible
@@ -72,6 +80,8 @@ export function useInvestments(): Investment[] {
   const NFTPoolSeedPrices = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'seedPrice')?.map((element:any) => (element?.result ? element?.result[0] : null));
   
   let investments:Investment[] = [];
+  poolAddresses = poolAddresses ?? [];
+  NFTPoolAddresses = NFTPoolAddresses ?? [];
   
   for (var i = 0; i < poolAddresses.length; i++)
   {
@@ -88,12 +98,57 @@ export function useInvestments(): Investment[] {
   for (var i = 0; i < NFTPoolAddresses.length; i++)
   {
     investments.push({
-      type: "NFTPool",
+      type: "NFT Pool",
       address: NFTPoolAddresses[i],
       tokenPrice: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(NFTPoolTokenPrices[i]) / BigInt(1e18),
       TVL: (NFTPoolValues[i] === null) ? BigInt(0) : BigInt(NFTPoolValues[i]) / BigInt(1e18),
       name: NFTPoolNames[i],
       totalReturn: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(BigInt(NFTPoolSeedPrices[i]) - BigInt(NFTPoolTokenPrices[i])) * BigInt(100) / BigInt(NFTPoolSeedPrices[i]) 
+    });
+  }
+
+  return investments;
+}
+
+export function useUserInvestments(userAddress:string): UserInvestment[] {
+  const poolFactoryContract = usePoolFactoryContract(POOL_FACTORY_ADDRESS);
+  const NFTPoolFactoryContract = useNFTPoolFactoryContract(NFT_POOL_FACTORY_ADDRESS);
+  
+  let poolAddresses = usePoolAddresses(poolFactoryContract);
+  let NFTPoolAddresses = useNFTPoolAddresses(NFTPoolFactoryContract);
+  poolAddresses = poolAddresses ?? [];
+  NFTPoolAddresses = NFTPoolAddresses ?? [];
+
+  const poolBalances = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'balanceOf', [userAddress])?.map((element:any) => (element?.result ? element?.result : null));
+  const NFTPoolBalances = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'balance', [userAddress])?.map((element:any) => (element?.result ? element?.result : null));
+
+  const poolNames = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
+  const NFTPoolNames = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
+
+  const poolUSDBalances = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'getUSDBalance', [userAddress])?.map((element:any) => (element?.result ? element?.result : null));
+  const NFTPoolUSDBalances = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'getUSDBalance', [userAddress])?.map((element:any) => (element?.result ? element?.result : null));
+  
+  let investments:UserInvestment[] = [];
+  
+  for (var i = 0; i < poolAddresses.length; i++)
+  {
+    investments.push({
+      name: poolNames[i],
+      type: "Pool",
+      address: poolAddresses[i],
+      balance: (!poolBalances[i]) ? BigInt(0) : BigInt(poolBalances[i]),
+      USDBalance: (!poolUSDBalances[i]) ? BigInt(0) : BigInt(poolUSDBalances[i])
+    });
+  }
+  
+  for (var i = 0; i < NFTPoolAddresses.length; i++)
+  {
+    investments.push({
+      name: NFTPoolNames[i],
+      type: "NFT Pool",
+      address: NFTPoolAddresses[i],
+      balance: (!NFTPoolBalances[i]) ? BigInt(0) : BigInt(NFTPoolBalances[i]),
+      USDBalance: (!NFTPoolUSDBalances[i]) ? BigInt(0) : BigInt(NFTPoolUSDBalances[i])
     });
   }
 

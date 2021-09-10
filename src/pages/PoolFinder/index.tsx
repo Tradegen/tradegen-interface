@@ -18,7 +18,7 @@ import { useTokenBalance } from '../../state/wallet/hooks'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { currencyId } from '../../utils/currencyId'
 import AppBody from '../AppBody'
-import { Dots } from '../Pool/styleds'
+import { Dots } from '../UbeswapPool/styleds'
 
 enum Fields {
   TOKEN0 = 0,

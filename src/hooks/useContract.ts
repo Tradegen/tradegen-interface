@@ -6,6 +6,8 @@ import { useMemo } from 'react'
 
 import POOL_FACTORY_ABI from '../constants/abis/PoolFactory.json'
 import NFT_POOL_FACTORY_ABI from '../constants/abis/NFTPoolFactory.json'
+import POOL_ABI from '../constants/abis/Pool.json'
+import NFT_POOL_ABI from '../constants/abis/NFTPool.json'
 
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
@@ -14,7 +16,7 @@ import POOL_MANAGER_ABI from '../constants/abis/pool-manager.json'
 import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
-import { Erc20, MoolaStakingRewards, PoolManager, StakingRewards, PoolFactory, NFTPoolFactory } from '../generated'
+import { Erc20, MoolaStakingRewards, PoolManager, StakingRewards, PoolFactory, NFTPoolFactory, Pool } from '../generated'
 import { getContract } from '../utils'
 
 // returns null on errors
@@ -93,4 +95,12 @@ export function usePoolFactoryContract(poolFactoryAddress?: string, withSignerIf
 
 export function useNFTPoolFactoryContract(NFTPoolFactoryAddress?: string, withSignerIfPossible?: boolean): NFTPoolFactory | null {
   return useContract(NFTPoolFactoryAddress, NFT_POOL_FACTORY_ABI, withSignerIfPossible) as NFTPoolFactory | null
+}
+
+export function usePoolContract(poolAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(poolAddress, POOL_ABI, withSignerIfPossible) as Pool | null
+}
+
+export function useNFTPoolContract(NFTPoolAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(NFTPoolAddress, NFT_POOL_ABI, withSignerIfPossible) as Pool | null
 }
