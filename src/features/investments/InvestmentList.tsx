@@ -99,7 +99,7 @@ export function UserInvestments(props:any) {
                     <p>Type: {investment.type}</p>
                     <p>Address: {investment.address}</p>
                     <p>Your balance: {formatBalance(investment.balance, 3)}</p>
-                    <p>Your USD value: {formatNumber(investment.USDBalance / BigInt(1e18), true, true, 18)}</p>
+                    <p>Your USD value: {formatNumber(Number(investment.USDBalance / BigInt(1e18)), true, true, 18)}</p>
                     <StyledInternalLink
                         to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
                         style={{ width: '100%' }}

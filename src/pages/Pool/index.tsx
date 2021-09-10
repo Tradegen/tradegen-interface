@@ -1,12 +1,18 @@
 import { PoolInfo } from '../../features/pools/PoolInfo'
 import { UserInvestmentInfo } from '../../features/pools/UserInvestmentInfo'
+import { useUserInvestmentInfo, useStableCoinBalance } from '../../features/pools/hooks'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import StakingModal from '../../components/pools/DepositModal'
+import UnstakingModal from '../../components/pools/WithdrawModal'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import React, { useCallback, useState } from 'react'
 import { ButtonPrimary } from '../../components/Button'
+import { cUSD } from '@ubeswap/sdk'
+import { ZERO_ADDRESS } from '../../constants'
+import { formatBalance } from '../../functions/format'
+
 
 const Container = styled.div`
   display: grid;
@@ -32,10 +38,16 @@ export default function PoolPage({
     }: RouteComponentProps<{ id: string }>) {
 
     let { network, account } = useContractKit();
+    const { chainId } = network
     console.log(account);
-    account = account ?? null;
+    account = account ?? ZERO_ADDRESS;
 
     const [showStakingModal, setShowStakingModal] = useState(false)
+    const [showUnstakingModal, setShowUnstakingModal] = useState(false)
+
+    const investmentInfo = useUserInvestmentInfo(id, account)
+    const tokenBalance = investmentInfo ? investmentInfo.userBalance.toString() : '0'
+    const cUSDBalance = useStableCoinBalance(cUSD[chainId].address, account).toString()
 
     const toggleWalletModal = useWalletModalToggle()
 
@@ -57,7 +69,7 @@ export default function PoolPage({
             <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
                 {'Deposit'}
             </ButtonPrimary>
-            <ButtonPrimary padding="8px" borderRadius="8px">
+            <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
                 {'Withdraw'}
             </ButtonPrimary>
 
@@ -65,7 +77,13 @@ export default function PoolPage({
                 isOpen={showStakingModal}
                 onDismiss={() => setShowStakingModal(false)}
                 poolAddress={id}
-                cUSDBalance={'1000000000000000000'}
+                cUSDBalance={cUSDBalance}
+            />
+            <UnstakingModal
+                isOpen={showUnstakingModal}
+                onDismiss={() => setShowUnstakingModal(false)}
+                poolAddress={id}
+                tokenBalance={tokenBalance}
             />
         </>
     )

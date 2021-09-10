@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { usePoolContract } from '../../hooks/useContract'
+import { usePoolContract, useTokenContract } from '../../hooks/useContract'
 import { useSingleCallResult, NEVER_RELOAD } from '../../state/multicall/hooks'
 
 export interface PoolInfo {
@@ -69,7 +69,7 @@ export function useManager(
     poolContract: any,
   ): string {
   
-    const manager = useSingleCallResult(poolContract, 'getManagerAddress', undefined, NEVER_RELOAD);
+    const manager = useSingleCallResult(poolContract, 'getManagerAddress', undefined);
   
     return useMemo(() => {
       return !manager || manager.loading
@@ -109,7 +109,7 @@ export function usePerformanceFee(
     poolContract: any,
   ): bigint {
   
-    const fee = useSingleCallResult(poolContract, 'getPerformanceFee', undefined, NEVER_RELOAD);
+    const fee = useSingleCallResult(poolContract, 'getPerformanceFee', undefined);
   
     return useMemo(() => {
       return !fee || fee.loading
@@ -122,7 +122,7 @@ export function usePositionsAndTotal(
     poolContract: any,
   ): any[] {
   
-    const data = useSingleCallResult(poolContract, 'getPositionsAndTotal', undefined, NEVER_RELOAD);
+    const data = useSingleCallResult(poolContract, 'getPositionsAndTotal', undefined);
 
     console.log(data);
   
@@ -165,4 +165,12 @@ export function useUserInvestmentInfo(poolAddress:string, userAddress:string): U
     userBalance: (!userTokenBalance) ? BigInt(0) : BigInt(userTokenBalance),
     userUSDBalance: (!userUSDBalance) ? BigInt(0) : BigInt(userUSDBalance)
   }
+}
+
+export function useStableCoinBalance(cUSD:string, userAddress:string): bigint {
+  const cUSDContract = useTokenContract(cUSD);
+
+  const balance = useBalanceOf(cUSDContract, userAddress);
+
+  return balance ?? BigInt(0)
 }
