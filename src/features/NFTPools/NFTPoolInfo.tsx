@@ -51,6 +51,8 @@ export function NFTPoolInfo(props:any) {
         return data;
     }, [data]);
 
+    console.log(info.tokenBalancesPerClass);
+
     return info ? (
         <>
             <div>
@@ -66,7 +68,7 @@ export function NFTPoolInfo(props:any) {
                         <p>Total Return: {formatPercent(Number(info.totalReturn))}</p>
                         <p>Available tokens per class:</p>
                         <ItemWrapper>
-                            {info.tokenBalancesPerClass?.length === 0 ? (
+                            {info.tokenBalancesPerClass?.length === 0 || info.tokenBalancesPerClass[0] === undefined ? (
                                 <div>No tokens available.</div>
                             ) : (
                             info.tokenBalancesPerClass?.map((balance:bigint, index:number) => (
@@ -97,12 +99,6 @@ export function NFTPoolInfo(props:any) {
                                 </ErrorBoundary>
                             )))}
                         </ItemWrapper>
-                        <ButtonPrimary padding="8px" borderRadius="8px">
-                            {'Deposit'}
-                        </ButtonPrimary>
-                        <ButtonPrimary padding="8px" borderRadius="8px">
-                            {'Withdraw'}
-                        </ButtonPrimary>
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>

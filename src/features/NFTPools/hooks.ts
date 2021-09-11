@@ -1,5 +1,5 @@
 import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react'
-import { useNFTPoolContract } from '../../hooks/useContract'
+import { useNFTPoolContract, useTokenContract } from '../../hooks/useContract'
 import { useSingleCallResult, NEVER_RELOAD } from '../../state/multicall/hooks'
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 
@@ -19,7 +19,7 @@ export interface NFTPoolInfo {
 
 export interface UserInvestmentInfo {
     userBalances: bigint[],
-    userUSDBalance: bigint | null
+    userUSDBalance: bigint
 }
 
 export interface PositionsAndTotal {
@@ -32,7 +32,7 @@ export function useTokenPrice(
     NFTPoolContract: any,
   ): bigint {
   
-    const tokenPrice = useSingleCallResult(NFTPoolContract, 'tokenPrice', undefined, NEVER_RELOAD);
+    const tokenPrice = useSingleCallResult(NFTPoolContract, 'tokenPrice', undefined);
   
     return useMemo(() => {
       return !tokenPrice || tokenPrice.loading
@@ -45,7 +45,9 @@ export function useAvailableTokensPerClass(
     NFTPoolContract: any,
   ): bigint[] {
 
-    const balances = useSingleCallResult(NFTPoolContract, 'getAvailableTokensPerClass', undefined, NEVER_RELOAD);
+    const balances = useSingleCallResult(NFTPoolContract, 'getAvailableTokensPerClass', undefined);
+
+    console.log(balances);
   
     return useMemo(() => {
       return !balances || balances.loading
@@ -69,7 +71,7 @@ export function useUserBalance(
     return useMemo(() => {
       return !balances || balances.loading
         ? []
-        : balances?.result?.[0];
+        : [balances?.result?.[0], balances?.result?.[1], balances?.result?.[2], balances?.result?.[3]];
     }, [balances])
 }
 
@@ -96,7 +98,7 @@ export function useName(
     NFTPoolContract: any,
   ): string {
   
-    const name = useSingleCallResult(NFTPoolContract, 'name', undefined, NEVER_RELOAD);
+    const name = useSingleCallResult(NFTPoolContract, 'name', undefined);
   
     return useMemo(() => {
       return !name || name.loading
@@ -109,7 +111,7 @@ export function useManager(
     NFTPoolContract: any,
   ): string {
   
-    const manager = useSingleCallResult(NFTPoolContract, 'manager', undefined, NEVER_RELOAD);
+    const manager = useSingleCallResult(NFTPoolContract, 'manager', undefined);
   
     return useMemo(() => {
       return !manager || manager.loading
@@ -141,7 +143,7 @@ export function useTotalSupply(
     NFTPoolContract: any,
   ): bigint {
   
-    const totalSupply = useSingleCallResult(NFTPoolContract, 'totalSupply', undefined, NEVER_RELOAD);
+    const totalSupply = useSingleCallResult(NFTPoolContract, 'totalSupply', undefined);
   
     return useMemo(() => {
       return !totalSupply || totalSupply.loading
@@ -154,7 +156,7 @@ export function useMaxSupply(
     NFTPoolContract: any,
   ): bigint {
   
-    const maxSupply = useSingleCallResult(NFTPoolContract, 'maxSupply', undefined, NEVER_RELOAD);
+    const maxSupply = useSingleCallResult(NFTPoolContract, 'maxSupply', undefined);
   
     return useMemo(() => {
       return !maxSupply || maxSupply.loading
@@ -167,7 +169,7 @@ export function useSeedPrice(
     NFTPoolContract: any,
   ): bigint {
   
-    const price = useSingleCallResult(NFTPoolContract, 'seedPrice', undefined, NEVER_RELOAD);
+    const price = useSingleCallResult(NFTPoolContract, 'seedPrice', undefined);
   
     return useMemo(() => {
       return !price || price.loading
@@ -223,6 +225,14 @@ export function useUserInvestmentInfo(NFTPoolAddress:string, userAddress:string)
   
     return {
         userBalances: (!userTokenBalance) ? [BigInt(0), BigInt(0), BigInt(0), BigInt(0)] : userTokenBalance,
-        userUSDBalance: (!userUSDBalance) ? BigInt(0) : BigInt(userUSDBalance) / BigInt(1e18)
+        userUSDBalance: (!userUSDBalance) ? BigInt(0) : BigInt(userUSDBalance)
     }
+}
+
+export function useTotalBalance(NFTPoolAddress:string, userAddress:string): bigint {
+  const NFTPoolContract = useNFTPoolContract(NFTPoolAddress);
+
+  const balance = useOwnerBalance(NFTPoolContract, userAddress);
+
+  return balance ?? BigInt(0)
 }
