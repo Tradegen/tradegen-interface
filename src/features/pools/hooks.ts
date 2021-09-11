@@ -43,7 +43,7 @@ export function useBalanceOf(
     user: string
   ): bigint {
 
-    const balanceOf = useSingleCallResult(poolContract, 'balanceOf', [user], NEVER_RELOAD);
+    const balanceOf = useSingleCallResult(poolContract, 'balanceOf', [user]);
 
     return useMemo(() => {
       return !balanceOf || balanceOf.loading

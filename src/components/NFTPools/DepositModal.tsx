@@ -19,6 +19,7 @@ import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import ProgressCircles from '../ProgressSteps'
 import { AutoRow, RowBetween } from '../Row'
+import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -41,13 +42,18 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
   const { chainId } = network
 
   const remainingTokens = BigInt(maxSupply - totalSupply);
-  const maxTokensFromBalance = (tokenPrice == BigInt(0)) ? BigInt(0) : BigInt(cUSDBalance) / tokenPrice;
+  const maxTokensFromBalance = (BigInt(tokenPrice) == BigInt(0)) ? BigInt(0) : BigInt(BigInt(cUSDBalance) / BigInt(tokenPrice));
   const maxAvailableTokens = remainingTokens < maxTokensFromBalance ? remainingTokens : maxTokensFromBalance;
+
+  console.log(cUSDBalance);
+  console.log(remainingTokens);
+  console.log(maxTokensFromBalance);
+  console.log(maxAvailableTokens);
 
   // track and parse user input
   const [typedValue, setTypedValue] = useState('')
   const { parsedAmount, error } = useDerivedStakeInfo(typedValue, cUSD[chainId], new TokenAmount(cUSD[chainId], maxAvailableTokens))
-  const positionValue = new TokenAmount(cUSD[chainId], (BigInt(typedValue) * tokenPrice).toString())
+  const positionValue = new TokenAmount(cUSD[chainId], (BigInt(typedValue) * BigInt(tokenPrice)).toString())
 
   // state for pending and submitted txn views
   const [attempting, setAttempting] = useState<boolean>(false)
@@ -109,12 +115,13 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
             <TYPE.mediumHeader>Deposit</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
+          <p>Cost: {formatNumber((BigInt(positionValue.raw.toString()) / BigInt(1e18)).toString(), true, true, 18)}</p>
           <CurrencyInputPanel
             value={typedValue}
             onUserInput={onUserInput}
             onMax={handleMax}
             showMaxButton={!atMaxAmount}
-            currency={undefined}
+            currency={cUSD[chainId]}
             pair={undefined}
             label={''}
             disableCurrencySelect={true}

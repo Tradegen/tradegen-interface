@@ -3,7 +3,6 @@ import { useNFTPoolInfo } from '../../features/NFTPools/hooks'
 import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
-import { ButtonPrimary } from '../../components/Button'
 
 const Wrapper = styled.div`
   display: grid;
@@ -50,8 +49,6 @@ export function NFTPoolInfo(props:any) {
         console.log(data);
         return data;
     }, [data]);
-
-    console.log(info.tokenBalancesPerClass);
 
     return info ? (
         <>

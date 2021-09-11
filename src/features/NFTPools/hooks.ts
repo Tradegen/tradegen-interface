@@ -46,8 +46,6 @@ export function useAvailableTokensPerClass(
   ): bigint[] {
 
     const balances = useSingleCallResult(NFTPoolContract, 'getAvailableTokensPerClass', undefined);
-
-    console.log(balances);
   
     return useMemo(() => {
       return !balances || balances.loading

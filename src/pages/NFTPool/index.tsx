@@ -12,6 +12,8 @@ import React, { useCallback, useState } from 'react'
 import { ButtonPrimary } from '../../components/Button'
 import { cUSD } from '@ubeswap/sdk'
 import { ZERO_ADDRESS } from '../../constants'
+import { useNFTPoolContract } from '../../hooks/useContract'
+
 
 const Container = styled.div`
   display: grid;
@@ -47,9 +49,14 @@ export default function NFTPoolPage({
     const tokenBalance = useTotalBalance(id, account);
     const cUSDBalance = useStableCoinBalance(cUSD[chainId].address, account).toString()
 
-    const totalSupply = useTotalSupply(id) ?? BigInt(0);
-    const maxSupply = useMaxSupply(id) ?? BigInt(0);
-    const tokenPrice = useTokenPrice(id) ?? BigInt(0);
+    const NFTPoolContract = useNFTPoolContract(id);
+
+    let totalSupply = useTotalSupply(NFTPoolContract);
+    let maxSupply = useMaxSupply(NFTPoolContract);
+    let tokenPrice = useTokenPrice(NFTPoolContract);
+    totalSupply = totalSupply ?? BigInt(0);
+    maxSupply = maxSupply ?? BigInt(0);
+    tokenPrice = tokenPrice ?? BigInt(0);
 
     const toggleWalletModal = useWalletModalToggle()
 
