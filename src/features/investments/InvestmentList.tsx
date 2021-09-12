@@ -132,6 +132,22 @@ export function InvestmentList() {
     return investments ? (
         <>
             <div>
+                <StyledInternalLink
+                    to={"/create_pool"}
+                    style={{ width: '100%' }}
+                >
+                    <ButtonPrimary padding="8px" borderRadius="8px">
+                        {'Create Pool'}
+                    </ButtonPrimary>
+                </StyledInternalLink>
+                <StyledInternalLink
+                    to={"/create_NFTpool"}
+                    style={{ width: '100%' }}
+                >
+                    <ButtonPrimary padding="8px" borderRadius="8px">
+                        {'Create NFT Pool'}
+                    </ButtonPrimary>
+                </StyledInternalLink>
                 <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("all")}}>
                     {'All Investments'}
                 </ButtonPrimary>
