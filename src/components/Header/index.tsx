@@ -275,6 +275,8 @@ export default function Header() {
   const cUSDBalance: TokenAmount | undefined = useAggregateCUSDBalance()
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
+  const countUpValue2 = cUSDBalance?.toFixed(0) ?? '0'
+  const countUpValuePrevious2 = usePrevious(countUpValue2) ?? '0'
 
   return (
     <HeaderFrame>
@@ -357,10 +359,10 @@ export default function Header() {
                       }}
                     >
                       <CountUp
-                        key={countUpValue}
+                        key={countUpValue2}
                         isCounting
-                        start={parseFloat(countUpValuePrevious)}
-                        end={parseFloat(countUpValue)}
+                        start={parseFloat(countUpValuePrevious2)}
+                        end={parseFloat(countUpValue2)}
                         thousandsSeparator={','}
                         duration={1}
                       />

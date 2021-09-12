@@ -98,7 +98,7 @@ export function UserInvestments(props:any) {
                     <p>Name: {investment.name}</p>
                     <p>Type: {investment.type}</p>
                     <p>Address: {investment.address}</p>
-                    <p>Your balance: {formatBalance(investment.balance, 3)}</p>
+                    <p>Your balance: {investment.type == "NFT Pool" ? investment.balance.toString() : formatBalance(BigInt(BigInt(investment.balance) / BigInt(1e18)).toString(), 0)}</p>
                     <p>Your USD value: {formatNumber(Number(investment.USDBalance / BigInt(1e18)), true, true, 18)}</p>
                     <StyledInternalLink
                         to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
