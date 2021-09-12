@@ -48,8 +48,12 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
 
   // track and parse user input
   const [typedValue, setTypedValue] = useState('')
-  const { parsedAmount, error } = useDerivedStakeInfo(typedValue, cUSD[chainId], new TokenAmount(cUSD[chainId], maxAvailableTokens))
+  const parsedAmount = (BigInt(typedValue) > BigInt(maxAvailableTokens) || BigInt(typedValue) == BigInt(0)) ? BigInt(0) : BigInt(typedValue);
+  const error = (BigInt(typedValue) > BigInt(maxAvailableTokens) || BigInt(typedValue) == BigInt(0)) ? 'Enter an amount' : undefined;
   const positionValue = new TokenAmount(cUSD[chainId], (BigInt(typedValue) * BigInt(tokenPrice)).toString())
+
+  console.log(parsedAmount);
+  console.log(error);
 
   // state for pending and submitted txn views
   const [attempting, setAttempting] = useState<boolean>(false)
@@ -72,7 +76,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
     if (poolContract && parsedAmount && deadline) {
       if (approval === ApprovalState.APPROVED) {
         const response = await doTransaction(poolContract, 'deposit', {
-          args: [`0x${positionValue.raw.toString(16)}`],
+          args: [`0x${parsedAmount.toString(16)}`],
           summary: `Deposited into pool`,
         })
         setHash(response.hash)
@@ -89,10 +93,10 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
   }, [])
 
   // used for max input button
-  const maxAmountInput = maxAmountSpend(new TokenAmount(cUSD[chainId], (BigInt(maxAvailableTokens) * BigInt(1e18)).toString()))
-  const atMaxAmount = Boolean(maxAmountInput && parsedAmount?.equalTo(maxAmountInput))
+  const maxAmountInput = BigInt(maxAvailableTokens)
+  const atMaxAmount = Boolean(maxAmountInput && parsedAmount == BigInt(maxAmountInput))
   const handleMax = useCallback(() => {
-    maxAmountInput && onUserInput(maxAmountInput.toExact())
+    maxAmountInput && onUserInput(maxAmountInput.toString())
   }, [maxAmountInput, onUserInput])
 
   async function onAttemptToApprove() {
@@ -156,7 +160,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
         <LoadingView onDismiss={wrappedOnDismiss}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Depositing into Pool</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>{parsedAmount?.toSignificant(1)} pool tokens</TYPE.body>
+            <TYPE.body fontSize={20}>{parsedAmount.toString()} pool tokens</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -164,7 +168,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
         <SubmittedView onDismiss={wrappedOnDismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Purchased {parsedAmount?.toSignificant(1)} pool tokens</TYPE.body>
+            <TYPE.body fontSize={20}>Purchased {parsedAmount.toString()} pool tokens</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

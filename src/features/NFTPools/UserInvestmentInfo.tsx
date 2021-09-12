@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { useUserInvestmentInfo } from '../../features/NFTPools/hooks'
 import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
-import { formatNumber } from '../../functions/format'
+import { formatNumber, formatBalance } from '../../functions/format'
 
 const Wrapper = styled.div`
   display: grid;
@@ -43,13 +43,13 @@ const NoResults = styled.div`
 `
 
 export function UserInvestmentInfo(props:any) {
-    console.log(props.poolAddress);
-    console.log(props.userAddress);
     let data = useUserInvestmentInfo(props.poolAddress, props.userAddress);
     const info = useMemo(() => {
         console.log(data);
         return data;
     }, [data]);
+
+    console.log(info.userBalances);
 
     return info ? (
         <>
@@ -57,12 +57,12 @@ export function UserInvestmentInfo(props:any) {
                 <ItemWrapper>
                     <ErrorBoundary>
                         {
-                        info.userBalances.map((balance:bigint) => (
+                        info.userBalances.map((balance:bigint, index:number) => (
                             <ErrorBoundary>
-                                <p>{balance}</p>
+                                <p>C{index + 1}: {formatBalance(Number(balance), 0)}</p>
                             </ErrorBoundary>
                         ))}
-                        <p>Your USD balance: {formatNumber(Number(info.userUSDBalance), true, true, 18)}</p>
+                        <p>Your USD balance: {formatNumber(BigInt(BigInt(info.userUSDBalance) / BigInt(1e18)).toString(), true, true, 18)}</p>
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>

@@ -58,6 +58,7 @@ const estimateGas = async (call: ContractCall): Promise<BigNumber> => {
     } catch (callError: any) {
       console.debug('Call threw error', call, callError)
       let errorMessage: string
+      console.log(callError);
       switch (callError.reason) {
         case 'UniswapV2Router: INSUFFICIENT_OUTPUT_AMOUNT':
         case 'UniswapV2Router: EXCESSIVE_INPUT_AMOUNT':

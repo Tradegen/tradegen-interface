@@ -92,7 +92,7 @@ export function NFTPoolInfo(props:any) {
                             ) : (
                             info.positionBalances?.map((balance:bigint) => (
                                 <ErrorBoundary>
-                                    <p>{formatBalance(Number(balance), 1)}</p>
+                                    <p>{formatBalance(BigInt(BigInt(balance)), 18)}</p>
                                 </ErrorBoundary>
                             )))}
                         </ItemWrapper>

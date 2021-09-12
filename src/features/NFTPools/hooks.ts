@@ -64,7 +64,7 @@ export function useUserBalance(
         return [BigInt(0), BigInt(0), BigInt(0), BigInt(0)];
     }
   
-    const balances = useSingleCallResult(NFTPoolContract, 'getTokenBalancePerClass', [user], NEVER_RELOAD);
+    const balances = useSingleCallResult(NFTPoolContract, 'getTokenBalancePerClass', [user]);
   
     return useMemo(() => {
       return !balances || balances.loading
@@ -128,7 +128,7 @@ export function useUSDBalance(
         return BigInt(0);
     }
   
-    const balanceOf = useSingleCallResult(NFTPoolContract, 'getUSDBalance', [user], NEVER_RELOAD);
+    const balanceOf = useSingleCallResult(NFTPoolContract, 'getUSDBalance', [user]);
   
     return useMemo(() => {
       return !balanceOf || balanceOf.loading
@@ -180,12 +180,12 @@ export function usePositionsAndTotal(
     NFTpoolContract: any,
   ): any[] {
   
-    const data = useSingleCallResult(NFTpoolContract, 'getPositionsAndTotal', undefined, NEVER_RELOAD);
+    const data = useSingleCallResult(NFTpoolContract, 'getPositionsAndTotal', undefined);
   
     return useMemo(() => {
       return !data || data.loading
         ? []
-        : data?.result?.[0];
+        : [data?.result?.[0], data?.result?.[1], data?.result?.[2]];
     }, [data])
 }
 
