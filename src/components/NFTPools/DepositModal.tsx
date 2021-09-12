@@ -159,8 +159,8 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOnDismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.largeHeader>Depositing into Pool</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>{parsedAmount.toString()} pool tokens</TYPE.body>
+            <TYPE.largeHeader>Depositing into NFT Pool</TYPE.largeHeader>
+            <TYPE.body fontSize={20}>{parsedAmount.toString()} NFT pool tokens</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -168,7 +168,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
         <SubmittedView onDismiss={wrappedOnDismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Purchased {parsedAmount.toString()} pool tokens</TYPE.body>
+            <TYPE.body fontSize={20}>Purchased {parsedAmount.toString()} NFT pool tokens</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

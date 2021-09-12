@@ -58,11 +58,6 @@ export function useUserBalance(
     NFTPoolContract: any,
     user: string
   ): bigint[] {
-
-    if (user == "")
-    {
-        return [BigInt(0), BigInt(0), BigInt(0), BigInt(0)];
-    }
   
     const balances = useSingleCallResult(NFTPoolContract, 'getTokenBalancePerClass', [user]);
   
@@ -77,11 +72,6 @@ export function useOwnerBalance(
     NFTPoolContract: any,
     user: string
   ): bigint {
-
-    if (user == "")
-    {
-        return BigInt(0);
-    }
   
     const balance = useSingleCallResult(NFTPoolContract, 'balance', [user], NEVER_RELOAD);
   
@@ -122,12 +112,7 @@ export function useUSDBalance(
     NFTPoolContract: any,
     user: string
   ): bigint {
-
-    if (user == "")
-    {
-        return BigInt(0);
-    }
-  
+    
     const balanceOf = useSingleCallResult(NFTPoolContract, 'getUSDBalance', [user]);
   
     return useMemo(() => {

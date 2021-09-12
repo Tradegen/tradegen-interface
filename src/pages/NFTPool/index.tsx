@@ -1,6 +1,6 @@
 import { NFTPoolInfo } from '../../features/NFTPools/NFTPoolInfo'
 import { UserInvestmentInfo } from '../../features/NFTPools/UserInvestmentInfo'
-import { useTotalBalance, useTotalSupply, useMaxSupply, useTokenPrice } from '../../features/NFTPools/hooks'
+import { useUserBalance, useTotalSupply, useMaxSupply, useTokenPrice } from '../../features/NFTPools/hooks'
 import { useStableCoinBalance } from '../../features/pools/hooks'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
@@ -13,7 +13,6 @@ import { ButtonPrimary } from '../../components/Button'
 import { cUSD } from '@ubeswap/sdk'
 import { ZERO_ADDRESS } from '../../constants'
 import { useNFTPoolContract } from '../../hooks/useContract'
-import { useCurrencyBalance } from '../../state/wallet/hooks'
 
 const Container = styled.div`
   display: grid;
@@ -46,10 +45,15 @@ export default function NFTPoolPage({
     const [showStakingModal, setShowStakingModal] = useState(false)
     const [showUnstakingModal, setShowUnstakingModal] = useState(false)
 
-    const tokenBalance = useTotalBalance(id, account);
     const cUSDBalance = useStableCoinBalance(cUSD[chainId].address, account).toString()
 
     const NFTPoolContract = useNFTPoolContract(id);
+
+    const tokenBalances = useUserBalance(NFTPoolContract, account);
+    const availableC1 = tokenBalances[0] ?? BigInt(0);
+    const availableC2 = tokenBalances[1] ?? BigInt(0);
+    const availableC3 = tokenBalances[2] ?? BigInt(0);
+    const availableC4 = tokenBalances[3] ?? BigInt(0);
 
     let totalSupply = useTotalSupply(NFTPoolContract);
     let maxSupply = useMaxSupply(NFTPoolContract);
@@ -95,7 +99,10 @@ export default function NFTPoolPage({
                 isOpen={showUnstakingModal}
                 onDismiss={() => setShowUnstakingModal(false)}
                 poolAddress={id}
-                tokenBalance={tokenBalance.toString()}
+                availableC1={availableC1.toString()}
+                availableC2={availableC2.toString()}
+                availableC3={availableC3.toString()}
+                availableC4={availableC4.toString()}
             />
         </>
     )
