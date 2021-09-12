@@ -20,6 +20,7 @@ import { LoadingView, SubmittedView } from '../ModalViews'
 import ProgressCircles from '../ProgressSteps'
 import { AutoRow, RowBetween } from '../Row'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
+import InputPanel from './InputPanel'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -44,11 +45,6 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
   const remainingTokens = BigInt(maxSupply - totalSupply);
   const maxTokensFromBalance = (BigInt(tokenPrice) == BigInt(0)) ? BigInt(0) : BigInt(BigInt(cUSDBalance) / BigInt(tokenPrice));
   const maxAvailableTokens = remainingTokens < maxTokensFromBalance ? remainingTokens : maxTokensFromBalance;
-
-  console.log(cUSDBalance);
-  console.log(remainingTokens);
-  console.log(maxTokensFromBalance);
-  console.log(maxAvailableTokens);
 
   // track and parse user input
   const [typedValue, setTypedValue] = useState('')
@@ -93,7 +89,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
   }, [])
 
   // used for max input button
-  const maxAmountInput = maxAmountSpend(new TokenAmount(cUSD[chainId], maxAvailableTokens.toString()))
+  const maxAmountInput = maxAmountSpend(new TokenAmount(cUSD[chainId], (BigInt(maxAvailableTokens) * BigInt(1e18)).toString()))
   const atMaxAmount = Boolean(maxAmountInput && parsedAmount?.equalTo(maxAmountInput))
   const handleMax = useCallback(() => {
     maxAmountInput && onUserInput(maxAmountInput.toExact())
@@ -116,17 +112,18 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
           <p>Cost: {formatNumber((BigInt(positionValue.raw.toString()) / BigInt(1e18)).toString(), true, true, 18)}</p>
-          <CurrencyInputPanel
+          <InputPanel
             value={typedValue}
             onUserInput={onUserInput}
             onMax={handleMax}
             showMaxButton={!atMaxAmount}
-            currency={cUSD[chainId]}
+            currency={undefined}
             pair={undefined}
             label={''}
             disableCurrencySelect={true}
             customBalanceText={undefined}
             id="stake-liquidity-token"
+            availableTokens={maxAvailableTokens.toString()}
           />
 
           <RowBetween>

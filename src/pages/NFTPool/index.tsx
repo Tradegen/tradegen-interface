@@ -13,7 +13,7 @@ import { ButtonPrimary } from '../../components/Button'
 import { cUSD } from '@ubeswap/sdk'
 import { ZERO_ADDRESS } from '../../constants'
 import { useNFTPoolContract } from '../../hooks/useContract'
-
+import { useCurrencyBalance } from '../../state/wallet/hooks'
 
 const Container = styled.div`
   display: grid;
