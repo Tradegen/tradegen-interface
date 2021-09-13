@@ -9,6 +9,7 @@ import { StyledInternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../../components/Button'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import CreatePoolModal from '../../components/investments/CreatePoolModal'
+import CreateNFTPoolModal from '../../components/investments/CreateNFTPoolModal'
 import { useWalletModalToggle } from '../../state/application/hooks'
 
 const Wrapper = styled.div`
@@ -132,10 +133,11 @@ export function InvestmentList() {
     investments = filterInvestments(investments);
 
     const [showCreatePoolModal, setShowCreatePoolModal] = useState(false)
+    const [showCreateNFTPoolModal, setShowCreateNFTPoolModal] = useState(false)
 
     const toggleWalletModal = useWalletModalToggle()
 
-    const handleDepositClick = useCallback(() => {
+    const handleCreatePoolClick = useCallback(() => {
     if (account) {
         setShowCreatePoolModal(true)
     } else {
@@ -143,20 +145,23 @@ export function InvestmentList() {
     }
     }, [account, toggleWalletModal])
 
+    const handleCreateNFTPoolClick = useCallback(() => {
+        if (account) {
+            setShowCreateNFTPoolModal(true)
+        } else {
+            toggleWalletModal()
+        }
+        }, [account, toggleWalletModal])
+
     return investments ? (
         <>
             <div>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
+                <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreatePoolClick}>
                     {'Create Pool'}
                 </ButtonPrimary>
-                <StyledInternalLink
-                    to={"/create_NFTpool"}
-                    style={{ width: '100%' }}
-                >
-                    <ButtonPrimary padding="8px" borderRadius="8px">
-                        {'Create NFT Pool'}
-                    </ButtonPrimary>
-                </StyledInternalLink>
+                <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreateNFTPoolClick}>
+                    {'Create NFT Pool'}
+                </ButtonPrimary>
                 <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("all")}}>
                     {'All Investments'}
                 </ButtonPrimary>
@@ -179,7 +184,7 @@ export function InvestmentList() {
                                 <p>Name: {investment.name}</p>
                                 <p>Type: {investment.type}</p>
                                 <p>Address: {investment.address}</p>
-                                <p>Token price: {formatNumber(Number(investment.tokenPrice), true, true, 18)}</p>
+                                <p>Token price: {formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}</p>
                                 <p>TVL: {formatNumber(Number(investment.TVL), true, true, 18)}</p>
                                 <p>Total Return: {formatPercent(Number(investment.totalReturn))}</p>
                                 <StyledInternalLink
@@ -207,6 +212,11 @@ export function InvestmentList() {
             <CreatePoolModal
                 isOpen={showCreatePoolModal}
                 onDismiss={() => setShowCreatePoolModal(false)}
+            />
+
+            <CreateNFTPoolModal
+                isOpen={showCreateNFTPoolModal}
+                onDismiss={() => setShowCreateNFTPoolModal(false)}
             />
         </>
     ) : (

@@ -213,7 +213,7 @@ export default function CurrencyInputPanel({
                   fontSize={14}
                   style={{ display: 'inline', cursor: 'pointer' }}
                 >
-                  {('Max performance fee: ') + availableTokens}
+                  {(customBalanceText ?? "Max performance fee: ") + availableTokens}
                 </TYPE.body>
               )}
             </RowBetween>

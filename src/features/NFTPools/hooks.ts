@@ -112,7 +112,7 @@ export function useUSDBalance(
     NFTPoolContract: any,
     user: string
   ): bigint {
-    
+
     const balanceOf = useSingleCallResult(NFTPoolContract, 'getUSDBalance', [user]);
   
     return useMemo(() => {
@@ -189,11 +189,11 @@ export function useNFTPoolInfo(NFTPoolAddress:string): NFTPoolInfo {
     TVL: (!positionsAndTotal || positionsAndTotal[2] === undefined) ? BigInt(0) : BigInt(positionsAndTotal[2]) / BigInt(1e18),
     address: NFTPoolAddress,
     name: name,
-    tokenPrice: (!tokenPrice) ? BigInt(0) : BigInt(tokenPrice) / BigInt(1e18),
+    tokenPrice: (!tokenPrice) ? BigInt(0) : BigInt(tokenPrice) / BigInt(1e16),
     totalReturn: (!tokenPrice || BigInt(tokenPrice) == BigInt(0)) ? BigInt(0) : (BigInt(tokenPrice) - BigInt(seedPrice)) * BigInt(100) / BigInt(seedPrice),
     manager: manager,
     maxSupply: (!maxSupply) ? BigInt(0) : BigInt(maxSupply),
-    seedPrice: (!seedPrice) ? BigInt(0) : BigInt(seedPrice) / BigInt(1e18),
+    seedPrice: (!seedPrice) ? BigInt(0) : BigInt(seedPrice) / BigInt(1e16),
     positionAddresses: (!positionsAndTotal || positionsAndTotal[0] === undefined) ? [] : positionsAndTotal[0],
     positionBalances: (!positionsAndTotal || positionsAndTotal[1] === undefined) ? [] : positionsAndTotal[1],
     tokenBalancesPerClass: (!tokenBalancesPerClass) ? [BigInt(0), BigInt(0), BigInt(0), BigInt(0)] : tokenBalancesPerClass
