@@ -1,6 +1,6 @@
 import { InvestmentListItem } from './InvestmentListItem'
 import styled from 'styled-components'
-import { useInvestments, Investment, useUserInvestments, UserInvestment } from '../../features/investments/hooks'
+import { useInvestments, Investment, useUserInvestments, UserInvestment, useManagedInvestments, ManagedInvestment } from '../../features/investments/hooks'
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import Loader from '../../components/Loader'
@@ -78,6 +78,10 @@ function filterInvestments(investments:Investment[])
     {
         return investments;
     }
+    else if (filter == "managedInvestments")
+    {
+        return investments;
+    }
 
     return [];
 }
@@ -110,6 +114,44 @@ export function UserInvestments(props:any) {
                     <ButtonPrimary padding="8px" borderRadius="8px">
                         {'View Details'}
                     </ButtonPrimary>
+                    </StyledInternalLink>
+                </ErrorBoundary>
+            )))}
+        </ItemWrapper>
+    ) : (
+        <NoResults>No positions.</NoResults>
+    )
+}
+
+export function ManagedInvestments(props:any) {
+    console.log(props.userAddress);
+
+    let data = useManagedInvestments();
+    let investments = useMemo(() => {
+        console.log(data);
+        return data;
+    }, [data]);
+
+    console.log(investments);
+
+    return investments ? (
+        <ItemWrapper>
+            {investments?.length === 0 ? (
+                <Loader style={{ margin: 'auto' }} />
+            ) : (
+            investments.filter((x): x is ManagedInvestment => x.manager==props.userAddress).map((investment:ManagedInvestment) => (
+                <ErrorBoundary key={investment.address}>
+                    <p>Name: {investment.name}</p>
+                    <p>Type: {investment.type}</p>
+                    <p>Address: {investment.address}</p>
+                    <p>TVL: {formatNumber(Number(investment.TVL / BigInt(1e18)), true, true, 18)}</p>
+                    <StyledInternalLink
+                        to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
+                        style={{ width: '100%' }}
+                    >
+                        <ButtonPrimary padding="8px" borderRadius="8px">
+                            {'View Details'}
+                        </ButtonPrimary>
                     </StyledInternalLink>
                 </ErrorBoundary>
             )))}
@@ -174,7 +216,10 @@ export function InvestmentList() {
                 <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("myInvestments")}}>
                     {'My Investments'}
                 </ButtonPrimary>
-                {filter != "myInvestments" &&
+                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("managedInvestments")}}>
+                    {'Managed Investments'}
+                </ButtonPrimary>
+                {filter != "myInvestments" && filter != "managedInvestments" &&
                     <ItemWrapper>
                         {investments?.length === 0 ? (
                             <Loader style={{ margin: 'auto' }} />
@@ -206,6 +251,14 @@ export function InvestmentList() {
 
                 {!account && filter == "myInvestments" &&
                     <NoResults>No positions.</NoResults>
+                }
+
+                {account && filter == "managedInvestments" &&
+                    <ManagedInvestments userAddress={account}></ManagedInvestments>
+                }
+
+                {!account && filter == "managedInvestments" &&
+                    <NoResults>No managed investments.</NoResults>
                 }
             </div>
 

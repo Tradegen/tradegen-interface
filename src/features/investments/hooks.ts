@@ -24,6 +24,14 @@ export interface UserInvestment {
   USDBalance: bigint
 }
 
+export interface ManagedInvestment {
+  name: string,
+  type: string,
+  address: string,
+  TVL: bigint,
+  manager: string
+}
+
 /*
   Currently expensive to render farm list item. The infinite scroll is used to
   to minimize this impact. This hook pairs with it, keeping track of visible
@@ -113,20 +121,24 @@ export function useInvestments(): Investment[] {
 export function useUserInvestments(userAddress:string): UserInvestment[] {
   const poolFactoryContract = usePoolFactoryContract(POOL_FACTORY_ADDRESS);
   const NFTPoolFactoryContract = useNFTPoolFactoryContract(NFT_POOL_FACTORY_ADDRESS);
+
+  console.log(userAddress);
   
   let poolAddresses = usePoolAddresses(poolFactoryContract);
   let NFTPoolAddresses = useNFTPoolAddresses(NFTPoolFactoryContract);
   poolAddresses = poolAddresses ?? [];
   NFTPoolAddresses = NFTPoolAddresses ?? [];
 
-  const poolBalances = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'balanceOf', [userAddress])?.map((element:any) => (element?.result ? element?.result : null));
-  const NFTPoolBalances = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'balance', [userAddress])?.map((element:any) => (element?.result ? element?.result : null));
+  const poolBalances = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'balanceOf', [userAddress])?.map((element:any) => (element?.result ? element?.result[0] : null));
+  const NFTPoolBalances = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'balance', [userAddress])?.map((element:any) => (element?.result ? element?.result[0] : null));
 
   const poolNames = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
   const NFTPoolNames = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
 
-  const poolUSDBalances = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'getUSDBalance', [userAddress])?.map((element:any) => (element?.result ? element?.result : null));
-  const NFTPoolUSDBalances = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'getUSDBalance', [userAddress])?.map((element:any) => (element?.result ? element?.result : null));
+  const poolUSDBalances = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'getUSDBalance', [userAddress])?.map((element:any) => (element?.result ? element?.result[0] : null));
+  const NFTPoolUSDBalances = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'getUSDBalance', [userAddress])?.map((element:any) => (element?.result ? element?.result[0] : null));
+  
+  console.log(useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'balanceOf', [userAddress]));
   
   let investments:UserInvestment[] = [];
   
@@ -149,6 +161,51 @@ export function useUserInvestments(userAddress:string): UserInvestment[] {
       address: NFTPoolAddresses[i],
       balance: (!NFTPoolBalances[i]) ? BigInt(0) : BigInt(NFTPoolBalances[i]),
       USDBalance: (!NFTPoolUSDBalances[i]) ? BigInt(0) : BigInt(NFTPoolUSDBalances[i])
+    });
+  }
+
+  return investments;
+}
+
+export function useManagedInvestments(): ManagedInvestment[] {
+  const poolFactoryContract = usePoolFactoryContract(POOL_FACTORY_ADDRESS);
+  const NFTPoolFactoryContract = useNFTPoolFactoryContract(NFT_POOL_FACTORY_ADDRESS);
+  
+  let poolAddresses = usePoolAddresses(poolFactoryContract);
+  let NFTPoolAddresses = useNFTPoolAddresses(NFTPoolFactoryContract);
+  poolAddresses = poolAddresses ?? [];
+  NFTPoolAddresses = NFTPoolAddresses ?? [];
+
+  const poolNames = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
+  const NFTPoolNames = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
+
+  const poolManagers = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'getManagerAddress')?.map((element:any) => (element?.result ? element?.result[0] : null));
+  const NFTPoolManagers = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'manager')?.map((element:any) => (element?.result ? element?.result[0] : null));
+
+  const poolValues = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'getPoolValue')?.map((element:any) => (element?.result ? element?.result[0] : null));
+  const NFTPoolValues = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'getPoolValue')?.map((element:any) => (element?.result ? element?.result[0] : null));
+  
+  let investments:ManagedInvestment[] = [];
+  
+  for (var i = 0; i < poolAddresses.length; i++)
+  {
+    investments.push({
+      name: poolNames[i],
+      type: "Pool",
+      address: poolAddresses[i],
+      TVL: (!poolValues[i]) ? BigInt(0) : BigInt(poolValues[i]),
+      manager: poolManagers[i]
+    });
+  }
+  
+  for (var i = 0; i < NFTPoolAddresses.length; i++)
+  {
+    investments.push({
+      name: NFTPoolNames[i],
+      type: "NFT Pool",
+      address: NFTPoolAddresses[i],
+      TVL: (!NFTPoolValues[i]) ? BigInt(0) : BigInt(NFTPoolValues[i]),
+      manager: NFTPoolManagers[i]
     });
   }
 
