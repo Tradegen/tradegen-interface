@@ -13,7 +13,6 @@ import { cUSD } from '@ubeswap/sdk'
 import { ZERO_ADDRESS } from '../../constants'
 import { formatBalance } from '../../functions/format'
 
-
 const Container = styled.div`
   display: grid;
   height: 100%;

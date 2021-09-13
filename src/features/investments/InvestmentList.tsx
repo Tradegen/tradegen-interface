@@ -1,13 +1,15 @@
 import { InvestmentListItem } from './InvestmentListItem'
 import styled from 'styled-components'
 import { useInvestments, Investment, useUserInvestments, UserInvestment } from '../../features/investments/hooks'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import Loader from '../../components/Loader'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../../components/Button'
 import { useContractKit } from '@celo-tools/use-contractkit'
+import CreatePoolModal from '../../components/investments/CreatePoolModal'
+import { useWalletModalToggle } from '../../state/application/hooks'
 
 const Wrapper = styled.div`
   display: grid;
@@ -129,17 +131,24 @@ export function InvestmentList() {
 
     investments = filterInvestments(investments);
 
+    const [showCreatePoolModal, setShowCreatePoolModal] = useState(false)
+
+    const toggleWalletModal = useWalletModalToggle()
+
+    const handleDepositClick = useCallback(() => {
+    if (account) {
+        setShowCreatePoolModal(true)
+    } else {
+        toggleWalletModal()
+    }
+    }, [account, toggleWalletModal])
+
     return investments ? (
         <>
             <div>
-                <StyledInternalLink
-                    to={"/create_pool"}
-                    style={{ width: '100%' }}
-                >
-                    <ButtonPrimary padding="8px" borderRadius="8px">
-                        {'Create Pool'}
-                    </ButtonPrimary>
-                </StyledInternalLink>
+                <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
+                    {'Create Pool'}
+                </ButtonPrimary>
                 <StyledInternalLink
                     to={"/create_NFTpool"}
                     style={{ width: '100%' }}
@@ -194,6 +203,11 @@ export function InvestmentList() {
                     <NoResults>No positions.</NoResults>
                 }
             </div>
+
+            <CreatePoolModal
+                isOpen={showCreatePoolModal}
+                onDismiss={() => setShowCreatePoolModal(false)}
+            />
         </>
     ) : (
         <NoResults>No results.</NoResults>
