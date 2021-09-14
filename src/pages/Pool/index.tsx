@@ -11,23 +11,16 @@ import React, { useCallback, useState } from 'react'
 import { ButtonPrimary } from '../../components/Button'
 import { cUSD } from '@ubeswap/sdk'
 import { ZERO_ADDRESS } from '../../constants'
-import { formatBalance } from '../../functions/format'
 
-const Container = styled.div`
-  display: grid;
-  height: 100%;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 80rem;
+const Buffer = styled.div`
+  width: 100%;
+  background-color: none;
+  height: 15px;
 `
 
-const MenuWrapper = styled.div`
-    position: sticky;
-    top: 0;
-    max-height: 40rem;
+const ButtonWrapper = styled.div`
+  width: 25%;
+  background-color: none;
 `
 
 export default function PoolPage({
@@ -65,12 +58,16 @@ export default function PoolPage({
 
             {account && <UserInvestmentInfo poolAddress={id} userAddress={account}></UserInvestmentInfo>}
 
-            <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
-                {'Deposit'}
-            </ButtonPrimary>
-            <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
-                {'Withdraw'}
-            </ButtonPrimary>
+            <ButtonWrapper>
+                <Buffer/>
+                <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
+                    {'Deposit'}
+                </ButtonPrimary>
+                <Buffer/>
+                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
+                    {'Withdraw'}
+                </ButtonPrimary>
+            </ButtonWrapper>
 
             <StakingModal
                 isOpen={showStakingModal}

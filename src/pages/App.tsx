@@ -19,6 +19,7 @@ import {
   RedirectToAddLiquidity,
 } from './AddLiquidity/redirects'
 import Earn from './Earn'
+import Stake from './Stake'
 import Manage from './Earn/Manage'
 import Pool from './UbeswapPool'
 import PoolPage from './Pool'
@@ -123,7 +124,7 @@ export default function App() {
               <Route exact strict path="/farm" component={Earn} />
               <Route exact strict path="/farm/:currencyIdA/:currencyIdB/:stakingAddress" component={Manage} />
               <Route exact strict path="/dualfarm/:currencyIdA/:currencyIdB/:stakingAddress" component={Manage} />
-              <Route exact strict path="/stake" component={Earn} />
+              <Route exact strict path="/stake" component={Stake} />
               <Route exact strict path="/pools" component={Swap} />
               <Route exact strict path="/NFTpools" component={AddLiquidity} />
               <Route exact strict path="/dashboard" component={Swap} />

@@ -12,35 +12,10 @@ import CreatePoolModal from '../../components/investments/CreatePoolModal'
 import CreateNFTPoolModal from '../../components/investments/CreateNFTPoolModal'
 import { useWalletModalToggle } from '../../state/application/hooks'
 
-const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 700;
-  color: rgba(191, 191, 191, 1);
-`
-
-const ColumnWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  grid-column: span 2/span 2;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  cursor: pointer;
-`
-
-const ColumnWrapper2 = styled.div`
-  display: flex;
-  align-items: center;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  cursor: pointer;
-`
-
 const ItemWrapper = styled.div`
   margin-top: 1rem;
   margin-bottom: 1rem;
+  min-width:700px;
 `
 
 const NoResults = styled.div`
@@ -48,6 +23,42 @@ const NoResults = styled.div`
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
   text-align: center;
+`
+
+const InvestmentCard = styled.div`
+  width: 100%;
+  background-color:none;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  margin-top: 30px;
+  border: 1px solid #5271FF;
+  border-radius: 8px;
+`
+
+const InvestmentCardContent = styled.div`
+  width: 24%;
+  text-align: center;
+`
+
+const TitleRow = styled.div`
+  width: 100%;
+  color: white;
+  display: flex;
+  background-color: none;
+  margin-top: 30px;
+`
+
+const ButtonWrapper = styled.div`
+  width: 50%;
+  background-color: none;
+  margin-left: 25%;
+`
+
+const Buffer = styled.div`
+  width: 100%;
+  background-color: none;
+  height: 15px;
 `
 
 let filter:string = "all";
@@ -93,7 +104,7 @@ export function UserInvestments(props:any) {
     let investments = useMemo(() => {
         console.log(data);
         return data;
-    }, [data]);
+    }, [data, filter]);
 
     return investments ? (
         <ItemWrapper>
@@ -102,19 +113,21 @@ export function UserInvestments(props:any) {
             ) : (
             investments.map((investment:UserInvestment) => (
                 <ErrorBoundary key={investment.address}>
-                    <p>Name: {investment.name}</p>
-                    <p>Type: {investment.type}</p>
-                    <p>Address: {investment.address}</p>
-                    <p>Your balance: {investment.type == "NFT Pool" ? investment.balance.toString() : formatBalance(BigInt(BigInt(investment.balance) / BigInt(1e18)).toString(), 0)}</p>
-                    <p>Your USD value: {formatNumber(Number(investment.USDBalance / BigInt(1e18)), true, true, 18)}</p>
-                    <StyledInternalLink
-                        to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
-                        style={{ width: '100%' }}
-                    >
-                    <ButtonPrimary padding="8px" borderRadius="8px">
-                        {'View Details'}
-                    </ButtonPrimary>
-                    </StyledInternalLink>
+                    <InvestmentCard>
+                        <p>Name: {investment.name}</p>
+                        <p>Type: {investment.type}</p>
+                        <p>Address: {investment.address}</p>
+                        <p>Your balance: {investment.type == "NFT Pool" ? investment.balance.toString() : formatBalance(BigInt(BigInt(investment.balance) / BigInt(1e18)).toString(), 0)}</p>
+                        <p>Your USD value: {formatNumber(Number(investment.USDBalance / BigInt(1e18)), true, true, 18)}</p>
+                        <StyledInternalLink
+                            to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
+                            style={{ width: '100%' }}
+                        >
+                            <ButtonPrimary padding="8px" borderRadius="8px">
+                                {'View Details'}
+                            </ButtonPrimary>
+                        </StyledInternalLink>
+                    </InvestmentCard>
                 </ErrorBoundary>
             )))}
         </ItemWrapper>
@@ -141,17 +154,25 @@ export function ManagedInvestments(props:any) {
             ) : (
             investments.filter((x): x is ManagedInvestment => x.manager==props.userAddress).map((investment:ManagedInvestment) => (
                 <ErrorBoundary key={investment.address}>
-                    <p>Name: {investment.name}</p>
-                    <p>Type: {investment.type}</p>
-                    <p>Address: {investment.address}</p>
-                    <p>TVL: {formatNumber(Number(investment.TVL / BigInt(1e18)), true, true, 18)}</p>
                     <StyledInternalLink
                         to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
                         style={{ width: '100%' }}
                     >
-                        <ButtonPrimary padding="8px" borderRadius="8px">
-                            {'View Details'}
-                        </ButtonPrimary>
+                        <InvestmentCard>
+                            <InvestmentCardContent>
+                                <p>{investment.name}</p>
+                                <p>{investment.type}</p>
+                            </InvestmentCardContent>
+                            <InvestmentCardContent>
+                                <p>{formatNumber(Number(investment.TVL), true, true, 18)}</p>
+                            </InvestmentCardContent>
+                            <InvestmentCardContent>
+                                <p>{formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}/token</p>
+                            </InvestmentCardContent>
+                            <InvestmentCardContent>
+                                <p>{formatPercent(Number(investment.totalReturn))}</p>
+                            </InvestmentCardContent>
+                        </InvestmentCard>
                     </StyledInternalLink>
                 </ErrorBoundary>
             )))}
@@ -198,27 +219,49 @@ export function InvestmentList() {
     return investments ? (
         <>
             <div>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreatePoolClick}>
-                    {'Create Pool'}
-                </ButtonPrimary>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreateNFTPoolClick}>
-                    {'Create NFT Pool'}
-                </ButtonPrimary>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("all")}}>
-                    {'All Investments'}
-                </ButtonPrimary>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("pools")}}>
-                    {'Pools'}
-                </ButtonPrimary>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("NFTPools")}}>
-                    {'NFT Pools'}
-                </ButtonPrimary>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("myInvestments")}}>
-                    {'My Investments'}
-                </ButtonPrimary>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("managedInvestments")}}>
-                    {'Managed Investments'}
-                </ButtonPrimary>
+                <ButtonWrapper>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreatePoolClick}>
+                        {'Create Pool'}
+                    </ButtonPrimary>
+                    <Buffer/>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreateNFTPoolClick}>
+                        {'Create NFT Pool'}
+                    </ButtonPrimary>
+                    <Buffer/>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("all")}}>
+                        {'All Investments'}
+                    </ButtonPrimary>
+                    <Buffer/>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("pools")}}>
+                        {'Pools'}
+                    </ButtonPrimary>
+                    <Buffer/>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("NFTPools")}}>
+                        {'NFT Pools'}
+                    </ButtonPrimary>
+                    <Buffer/>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("all")}}>
+                        {'My Investments'}
+                    </ButtonPrimary>
+                    <Buffer/>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("managedInvestments")}}>
+                        {'Managed Investments'}
+                    </ButtonPrimary>
+                </ButtonWrapper>
+                <TitleRow>
+                    <InvestmentCardContent>
+                        Name
+                    </InvestmentCardContent>
+                    <InvestmentCardContent>
+                        TVL
+                    </InvestmentCardContent>
+                    <InvestmentCardContent>
+                        Token price
+                    </InvestmentCardContent>
+                    <InvestmentCardContent>
+                        Total return
+                    </InvestmentCardContent>
+                </TitleRow>
                 {filter != "myInvestments" && filter != "managedInvestments" &&
                     <ItemWrapper>
                         {investments?.length === 0 ? (
@@ -226,19 +269,25 @@ export function InvestmentList() {
                         ) : (
                         investments.map((investment:Investment) => (
                             <ErrorBoundary key={investment.address}>
-                                <p>Name: {investment.name}</p>
-                                <p>Type: {investment.type}</p>
-                                <p>Address: {investment.address}</p>
-                                <p>Token price: {formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}</p>
-                                <p>TVL: {formatNumber(Number(investment.TVL), true, true, 18)}</p>
-                                <p>Total Return: {formatPercent(Number(investment.totalReturn))}</p>
                                 <StyledInternalLink
                                     to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
                                     style={{ width: '100%' }}
                                 >
-                                <ButtonPrimary padding="8px" borderRadius="8px">
-                                    {'View Details'}
-                                </ButtonPrimary>
+                                    <InvestmentCard>
+                                        <InvestmentCardContent>
+                                            <p>{investment.name}</p>
+                                            <p>{investment.type}</p>
+                                        </InvestmentCardContent>
+                                        <InvestmentCardContent>
+                                            <p>{formatNumber(Number(investment.TVL), true, true, 18)}</p>
+                                        </InvestmentCardContent>
+                                        <InvestmentCardContent>
+                                            <p>{formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}/token</p>
+                                        </InvestmentCardContent>
+                                        <InvestmentCardContent>
+                                            <p>{formatPercent(Number(investment.totalReturn))}</p>
+                                        </InvestmentCardContent>
+                                    </InvestmentCard>
                                 </StyledInternalLink>
                             </ErrorBoundary>
                         )))}
