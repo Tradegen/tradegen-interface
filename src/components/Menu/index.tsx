@@ -116,10 +116,6 @@ export default function Menu() {
 
       {open && (
         <MenuFlyout>
-          <MenuItemInternal id="link" to="/dashboard">
-            <Layout size={14} />
-            Dashboard
-          </MenuItemInternal>
           <MenuItem id="link" href="https://www.tradegen.io/about">
             <Info size={14} />
             About
