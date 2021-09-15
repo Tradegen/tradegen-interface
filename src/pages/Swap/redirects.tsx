@@ -6,8 +6,8 @@ import { AppDispatch } from '../../state'
 import { ApplicationModal, setOpenModal } from '../../state/application/actions'
 
 // Redirects to swap but only replace the pathname
-export function RedirectPathToSwapOnly({ location }: RouteComponentProps) {
-  return <Redirect to={{ ...location, pathname: '/swap' }} />
+export function RedirectPathToInvestmentsOnly({ location }: RouteComponentProps) {
+  return <Redirect to={{ ...location, pathname: '/investments' }} />
 }
 
 // Redirects from the /swap/:outputCurrency path to the /swap?outputCurrency=:outputCurrency format
@@ -38,5 +38,5 @@ export function OpenClaimAddressModalAndRedirectToSwap(props: RouteComponentProp
   useEffect(() => {
     dispatch(setOpenModal(ApplicationModal.ADDRESS_CLAIM))
   }, [dispatch])
-  return <RedirectPathToSwapOnly {...props} />
+  return <RedirectPathToInvestmentsOnly {...props} />
 }

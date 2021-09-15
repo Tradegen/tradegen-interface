@@ -42,7 +42,7 @@ const GOOGLE_ANALYTICS_IDS = {
 
 const environment = window.location.hostname.includes('app-staging')
   ? 'staging'
-  : window.location.hostname.includes('ubeswap.org')
+  : window.location.hostname.includes('tradegen.io')
   ? 'production'
   : process.env.REACT_APP_VERCEL_ENV ?? null
 
@@ -108,11 +108,11 @@ ReactDOM.render(
     <ContractKitProvider
       networks={[NETWORK]}
       dapp={{
-        name: 'Ubeswap',
+        name: 'Tradegen',
         description:
-          'The interface for Ubeswap, a decentralized exchange and automated market maker protocol for Celo assets.',
-        url: 'https://app.ubeswap.org',
-        icon: 'https://info.ubeswap.org/favicon.png',
+          'The interface for Tradegen, a decentralized asset management and algo trading platform on Celo.',
+        url: 'https://tradegen.io',
+        icon: 'https://tradegen.io/favicon.png',
       }}
       connectModal={{
         reactModalProps: {

@@ -31,7 +31,7 @@ import RemoveLiquidity from './RemoveLiquidity'
 import { RedirectOldRemoveLiquidityPathStructure } from './RemoveLiquidity/redirects'
 import Send from './Send'
 import Swap from './Swap'
-import { OpenClaimAddressModalAndRedirectToSwap, RedirectPathToSwapOnly, RedirectToSwap } from './Swap/redirects'
+import { OpenClaimAddressModalAndRedirectToSwap, RedirectPathToInvestmentsOnly, RedirectToSwap } from './Swap/redirects'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -127,7 +127,6 @@ export default function App() {
               <Route exact strict path="/stake" component={Stake} />
               <Route exact strict path="/pools" component={Swap} />
               <Route exact strict path="/NFTpools" component={AddLiquidity} />
-              <Route exact strict path="/dashboard" component={Swap} />
               <Route exact strict path="/manage_pool_investment" component={Earn} />
               <Route exact strict path="/manage_NFTpool_investment" component={Earn} />
               <Route exact strict path="/NFTpools" component={Earn} />
@@ -138,8 +137,7 @@ export default function App() {
               <Route exact strict path="/create_pool" component={CreatePoolPage} />
               <Route exact strict path="/create_NFTpool" component={CreateNFTPoolPage} />
               <Route exact strict path="/investments" component={Investments} />
-              <Route exact strict path="/dashboard" component={AddLiquidity} />
-              <Route component={RedirectPathToSwapOnly} />
+              <Route component={RedirectPathToInvestmentsOnly} />
             </Switch>
           </ErrorBoundary>
           <Marginer />
