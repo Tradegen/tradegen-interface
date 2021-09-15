@@ -214,7 +214,7 @@ html {
 export const ThemedGlobalStyle = createGlobalStyle`
 html {
   color: ${({ theme }) => theme.text1};
-  background-color: ${({ theme }) => theme.bg2};
+  background-color: #252e42;
 }
 
 body {
@@ -222,9 +222,9 @@ body {
   background-position: 0 -30vh;
   background-repeat: no-repeat;
   background-image: ${({ theme }) =>
-    `radial-gradient(50% 50% at 50% 50%, ${transparentize(0.9, theme.primary1)} 0%, ${transparentize(
+    `radial-gradient(50% 50% at 50% 50%, ${transparentize(0.9, '#252e42')} 0%, ${transparentize(
       1,
-      theme.bg1
+      '#252e42'
     )} 100%)`};
 }
 `
