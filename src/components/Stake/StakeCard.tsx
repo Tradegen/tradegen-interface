@@ -1,9 +1,10 @@
-import { Percent } from '@ubeswap/sdk'
+import { Percent, Token, Price } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
 import React from 'react'
 import { DualRewardsInfo } from 'state/stake/useDualStakeRewards'
 import styled from 'styled-components'
+import { useTradegenStakingRewardsInfo, useTradegenStakingRewardsTVL, useRewardRate, useLastTimeRewardsApplicable, StakingRewardsInfo } from '../../features/stake/hooks'
 
 import { BIG_INT_SECONDS_IN_WEEK } from '../../constants'
 import { useColor } from '../../hooks/useColor'
@@ -14,7 +15,7 @@ import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import DoubleCurrencyLogo from '../DoubleLogo'
 import { RowBetween, RowFixed } from '../Row'
-import { Break, CardNoise } from './styled'
+import useCUSDPrice from 'utils/useCUSDPrice'
 
 const StatContainer = styled.div`
   display: flex;
@@ -54,29 +55,16 @@ const TopSection = styled.div`
   `};
 `
 
-interface Props {
-  stakingInfo: StakingInfo
-  dualRewards?: DualRewardsInfo
-}
+export function StakeCard() {
+  const backgroundColor = '#2172E5';
 
-export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) => {
-  const [token0, token1] = stakingInfo.tokens
+  // get the USD value of staked TGEN
+  const TGENPrice = "1"; //test
+  const TVL = "100"; //test
+  const rewardRate = "1000"; //test
+  const valueOfTotalStakedAmountInCUSD = "1000000"
 
-  const isStaking = Boolean(stakingInfo.stakedAmount && stakingInfo.stakedAmount.greaterThan('0'))
-
-  // get the color of the token
-  const token = token0.symbol?.startsWith('m') ? token1 : token0
-  const backgroundColor = useColor(token)
-
-  // get the USD value of staked WETH
-  const {
-    valueCUSD: valueOfTotalStakedAmountInCUSD,
-  } = useStakingPoolValue(stakingInfo)
-  const apyFraction =
-    stakingInfo.active && valueOfTotalStakedAmountInCUSD && !valueOfTotalStakedAmountInCUSD.equalTo('0')
-      ? stakingInfo.dollarRewardPerYear?.divide(valueOfTotalStakedAmountInCUSD)
-      : undefined
-  const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
+  const apy = valueOfTotalStakedAmountInCUSD ? new Percent(valueOfTotalStakedAmountInCUSD, "1000") : undefined
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
@@ -94,29 +82,12 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
     console.error('Weekly apy overflow', e)
   }
 
-  const showNextPoolRate =
-    (stakingInfo.active && stakingInfo.nextPeriodRewards.equalTo('0')) ||
-    (stakingInfo.active &&
-      // If the next rate is >=1_000 change from previous rate, then show it
-      Math.abs(
-        parseFloat(
-          stakingInfo.totalRewardRate
-            ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-            .subtract(stakingInfo.nextPeriodRewards)
-            .toFixed(0) ?? 0
-        )
-      ) >= 1_000) ||
-    (!stakingInfo.active && stakingInfo.nextPeriodRewards.greaterThan('0'))
-
   return (
-    <Wrapper showBackground={isStaking} bgColor={backgroundColor}>
-      <CardNoise />
-
+    <Wrapper showBackground={false} bgColor={backgroundColor}>
       <TopSection>
-        <DoubleCurrencyLogo currency0={token0} currency1={token1} size={24} />
         <PoolInfo style={{ marginLeft: '8px' }}>
           <TYPE.white fontWeight={600} fontSize={[18, 24]}>
-            {token0.symbol}-{token1.symbol}
+            TGEN Staking
           </TYPE.white>
           {apy && apy.greaterThan('0') && (
             <TYPE.small className="apr" fontWeight={400} fontSize={14}>
@@ -126,10 +97,8 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
         </PoolInfo>
 
         <StyledInternalLink
-          to={`/${dualRewards ? 'dualfarm' : 'farm'}/${currencyId(token0)}/${currencyId(token1)}/${
-            stakingInfo.poolInfo.poolAddress
-          }`}
-          style={{ width: '100%' }}
+          to={`/investments`}
+          style={{ width: '25%', marginLeft: '20%' }}
         >
           <ButtonPrimary padding="8px" borderRadius="8px">
             {'Stake'}
@@ -142,42 +111,20 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
           <TYPE.white>Total staked</TYPE.white>
           <TYPE.white>
             {valueOfTotalStakedAmountInCUSD
-              ? `$${valueOfTotalStakedAmountInCUSD.toFixed(0, {
-                  groupSeparator: ',',
-                })}`
+              ? valueOfTotalStakedAmountInCUSD
               : '-'}
           </TYPE.white>
         </RowBetween>
         <RowBetween>
-          <TYPE.white>{dualRewards ? dualRewards.totalRewardRate.token.symbol : 'Pool'} rate</TYPE.white>
+          <TYPE.white>TGEN rate</TYPE.white>
           <TYPE.white>
-            {stakingInfo
-              ? stakingInfo.active
-                ? `${stakingInfo.totalRewardRate
-                    ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                    ?.toFixed(0, { groupSeparator: ',' })} ${stakingInfo.totalRewardRate.token.symbol} / week`
-                : `0 ${stakingInfo.totalRewardRate.token.symbol} / week`
-              : '-'}
+            {rewardRate} TGEN / week
           </TYPE.white>
         </RowBetween>
-        {dualRewards && (
-          <RowBetween>
-            <TYPE.white>{dualRewards.totalUBERewardRate.token.symbol} rate</TYPE.white>
-            <TYPE.white>
-              {stakingInfo
-                ? stakingInfo.active
-                  ? `${dualRewards.totalUBERewardRate
-                      ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                      ?.toFixed(0, { groupSeparator: ',' })} ${dualRewards.totalUBERewardRate.token.symbol} / week`
-                  : `0 ${dualRewards.totalUBERewardRate.token.symbol} / week`
-                : '-'}
-            </TYPE.white>
-          </RowBetween>
-        )}
         {apy && apy.greaterThan('0') && (
           <RowBetween>
             <RowFixed>
-              <TYPE.white>{dualRewards ? 'Combined APR' : 'APR'}</TYPE.white>
+              <TYPE.white>APR</TYPE.white>
               <LightQuestionHelper
                 text={
                   <>
@@ -189,20 +136,6 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
             </RowFixed>
             <TYPE.white>
               {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'}
-            </TYPE.white>
-          </RowBetween>
-        )}
-
-        {showNextPoolRate && (
-          <RowBetween>
-            <RowFixed>
-              <TYPE.white>Next pool rate</TYPE.white>
-              <LightQuestionHelper text="The rate of emissions this pool will receive on the next rewards refresh." />
-            </RowFixed>
-            <TYPE.white>
-              {`${stakingInfo.nextPeriodRewards.toFixed(0, {
-                groupSeparator: ',',
-              })} ${stakingInfo.nextPeriodRewards.token.symbol} / week`}
             </TYPE.white>
           </RowBetween>
         )}

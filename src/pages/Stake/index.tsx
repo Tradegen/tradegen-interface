@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 import { AutoColumn } from '../../components/Column'
 import { PoolCard } from '../../components/earn/PoolCard'
+import { StakeCard } from '../../components/Stake/StakeCard'
 import Loader from '../../components/Loader'
 import { RowBetween } from '../../components/Row'
 import { BIG_INT_ZERO } from '../../constants'
@@ -40,26 +41,6 @@ flex-direction: column;
 `
 
 export default function Stake() {
-  // staking info for connected account
-  const stakingInfos = useStakingInfo()
-
-  // toggle copy if rewards are inactive
-  const stakingRewardsExist = true
-
-  const allPools = useMemo(
-    () =>
-      // Sort staking info by highest rewards
-      stakingInfos?.slice().sort((a: StakingInfo, b: StakingInfo) => {
-        return JSBI.toNumber(JSBI.subtract(b.totalRewardRate.raw, a.totalRewardRate.raw))
-      }),
-    [stakingInfos]
-  )
-
-  const [stakedPools, unstakedPools] = useMemo(() => {
-    return partition(allPools, (pool) => pool.stakedAmount && JSBI.greaterThan(pool.stakedAmount.raw, BIG_INT_ZERO))
-  }, [allPools])
-
-  const [activePools, inactivePools] = partition(unstakedPools, (pool) => pool.active)
 
   return (
     <PageWrapper gap="lg" justify="center">
@@ -68,15 +49,9 @@ export default function Stake() {
           <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Tradegen Staking</TYPE.mediumHeader>
         </DataRow>
         <PoolSection>
-          {stakingRewardsExist && stakingInfos?.length === 0 ? (
-            <Loader style={{ margin: 'auto' }} />
-          ) : (
-            activePools?.map((pool) => (
-              <ErrorBoundary key={pool.stakingRewardAddress}>
-                <PoolCard stakingInfo={pool} />
-              </ErrorBoundary>
-            ))
-          )}
+          <ErrorBoundary>
+            <StakeCard/>
+          </ErrorBoundary>
         </PoolSection>
       </AutoColumn>
     </PageWrapper>
