@@ -9,6 +9,11 @@ import NFT_POOL_FACTORY_ABI from '../constants/abis/NFTPoolFactory.json'
 import POOL_ABI from '../constants/abis/Pool.json'
 import NFT_POOL_ABI from '../constants/abis/NFTPool.json'
 
+import TRADEGEN_STAKING_REWARDS_ABI from '../constants/abis/TradegenStakingRewards.json'
+import TRADEGEN_STAKING_ESCROW_ABI from '../constants/abis/TradegenStakingEscrow.json'
+import TRADEGEN_LP_STAKING_REWARDS_ABI from '../constants/abis/TradegenLPStakingRewards.json'
+import TRADEGEN_LP_STAKING_ESCROW_ABI from '../constants/abis/TradegenLPStakingEscrow.json'
+
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import DUAL_REWARDS_ABI from '../constants/abis/moola/MoolaStakingRewards.json'
@@ -103,4 +108,20 @@ export function usePoolContract(poolAddress?: string, withSignerIfPossible?: boo
 
 export function useNFTPoolContract(NFTPoolAddress?: string, withSignerIfPossible?: boolean): Pool | null {
   return useContract(NFTPoolAddress, NFT_POOL_ABI, withSignerIfPossible) as Pool | null
+}
+
+export function useTradegenStakingRewardsContract(TradegenStakingRewardsAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(TradegenStakingRewardsAddress, TRADEGEN_STAKING_REWARDS_ABI, withSignerIfPossible) as Pool | null
+}
+
+export function useTradegenStakingEscrowContract(TradegenStakingEscrowAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(TradegenStakingEscrowAddress, TRADEGEN_STAKING_ESCROW_ABI, withSignerIfPossible) as Pool | null
+}
+
+export function useTradegenLPStakingRewardsContract(TradegenLPStakingRewardsAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(TradegenLPStakingRewardsAddress, TRADEGEN_LP_STAKING_REWARDS_ABI, withSignerIfPossible) as Pool | null
+}
+
+export function useTradegenLPStakingEscrowContract(TradegenLPStakingEscrowAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(TradegenLPStakingEscrowAddress, TRADEGEN_LP_STAKING_ESCROW_ABI, withSignerIfPossible) as Pool | null
 }
