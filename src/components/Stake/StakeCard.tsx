@@ -57,15 +57,13 @@ const TopSection = styled.div`
 export function StakeCard() {
   const backgroundColor = '#2172E5';
 
-  let { network, account } = useContractKit();
-  const { chainId } = network
-
   //get the USD value of staked TGEN
   let TGENToken = new Token(NETWORK_CHAIN_ID, TGEN, 18);
   let price = useCUSDPrice(TGENToken);
   let stringPrice = price?.raw.numerator.toString();
-  const TGENPrice = stringPrice ? BigInt(stringPrice) : BigInt(0);
-  console.log(TGENPrice);
+  let stringPrice2 = price?.raw.denominator.toString();
+  const TGENPrice = (stringPrice && stringPrice2) ? BigInt(BigInt(stringPrice) * BigInt(1e18) / BigInt(stringPrice2)) : BigInt(0);
+  console.log(formatBalance(TGENPrice));
 
   let data = useTradegenStakingRewardsInfo();
   const stakingRewardsInfo = useMemo(() => {
@@ -109,7 +107,7 @@ export function StakeCard() {
         </PoolInfo>
 
         <StyledInternalLink
-          to={`/investments`}
+          to={`/stake/TGEN`}
           style={{ width: '25%', marginLeft: '20%' }}
         >
           <ButtonPrimary padding="8px" borderRadius="8px">

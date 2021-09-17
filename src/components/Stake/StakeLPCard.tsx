@@ -111,7 +111,7 @@ export function StakeLPCard() {
         </PoolInfo>
 
         <StyledInternalLink
-          to={`/investments`}
+          to={`/stake/LP`}
           style={{ width: '25%', marginLeft: '20%' }}
         >
           <ButtonPrimary padding="8px" borderRadius="8px">

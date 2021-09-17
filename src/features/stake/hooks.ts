@@ -57,7 +57,7 @@ export function useBalanceOf(
 
     return useMemo(() => {
       return !balanceOf || balanceOf.loading
-        ? []
+        ? BigInt(0)
         : balanceOf?.result?.[0];
     }, [balanceOf])
 }
@@ -70,7 +70,7 @@ export function useTotalSupply(
   
     return useMemo(() => {
       return !totalSupply || totalSupply.loading
-        ? []
+        ? BigInt(0)
         : totalSupply?.result?.[0];
     }, [totalSupply])
 }
@@ -84,7 +84,7 @@ export function useTradegenStakingRewardsEarned(
 
     return useMemo(() => {
       return !earned || earned.loading
-        ? []
+        ? BigInt(0)
         : earned?.result?.[0];
     }, [earned])
 }
@@ -157,4 +157,21 @@ export function usePriceOfLPToken(pair:string): bigint {
           ? BigInt(0)
           : price?.result?.[0];
     }, [price])
+}
+
+export function useUserTradegenStakingInfo(userAddress:string): bigint[] {
+  const stakingRewardsContract = useTradegenStakingRewardsContract(TRADEGEN_STAKING_REWARDS_ADDRESS);
+
+  const balance = useBalanceOf(stakingRewardsContract, userAddress);
+  console.log(balance);
+
+  const earned = useTradegenStakingRewardsEarned(stakingRewardsContract, userAddress);
+  console.log(earned);
+
+  const totalSupply = useTotalSupply(stakingRewardsContract);
+  console.log(totalSupply);
+
+  return useMemo(() => {
+      return [balance, earned, totalSupply];
+  }, [balance, earned, totalSupply])
 }
