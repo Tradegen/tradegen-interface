@@ -1,11 +1,11 @@
-import { Percent, Token, Price } from '@ubeswap/sdk'
+import { Percent, Token, Price, cUSD } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import React from 'react'
 import { useMemo } from 'react'
 import styled from 'styled-components'
-import { useTradegenStakingRewardsInfo } from '../../features/stake/hooks'
+import { useTradegenLPStakingRewardsInfo, useTokenAmountsFromPair, usePriceOfLPToken } from '../../features/stake/hooks'
 
-import { BIG_INT_SECONDS_IN_WEEK, TGEN } from '../../constants'
+import { BIG_INT_SECONDS_IN_WEEK, TGEN, TGEN_cUSD } from '../../constants'
 import { NETWORK_CHAIN_ID } from '../../connectors'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
@@ -13,8 +13,6 @@ import { AutoColumn } from '../Column'
 import { RowBetween, RowFixed } from '../Row'
 import useCUSDPrice from 'utils/useCUSDPrice'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
-import { useContractKit } from '@celo-tools/use-contractkit'
-
 
 const StatContainer = styled.div`
   display: flex;
@@ -54,11 +52,8 @@ const TopSection = styled.div`
   `};
 `
 
-export function StakeCard() {
+export function StakeLPCard() {
   const backgroundColor = '#2172E5';
-
-  let { network, account } = useContractKit();
-  const { chainId } = network
 
   //get the USD value of staked TGEN
   let TGENToken = new Token(NETWORK_CHAIN_ID, TGEN, 18);
@@ -67,14 +62,21 @@ export function StakeCard() {
   const TGENPrice = stringPrice ? BigInt(stringPrice) : BigInt(0);
   console.log(TGENPrice);
 
-  let data = useTradegenStakingRewardsInfo();
+  let data = useTradegenLPStakingRewardsInfo();
   const stakingRewardsInfo = useMemo(() => {
       return data;
   }, [data]);
 
-  const rewardRate = BigInt(stakingRewardsInfo.rewardRate) * BigInt(BIG_INT_SECONDS_IN_WEEK.toString());
+  let data2 = usePriceOfLPToken(TGEN_cUSD);
+  const tokenPrice = useMemo(() => {
+      return data2;
+  }, [data2]);
+
+  const rewardRate = BigInt(stakingRewardsInfo.rewardRate);
   const TVL = BigInt(stakingRewardsInfo.TVL);
-  const valueOfTotalStakedAmountInCUSD = (TGENPrice) ? (TGENPrice * TVL / BigInt(1e18)) : undefined;
+  const valueOfTotalStakedAmountInCUSD = (tokenPrice) ? (BigInt(tokenPrice) * BigInt(TVL)) : undefined;
+
+  console.log(valueOfTotalStakedAmountInCUSD)
 
   const apy = valueOfTotalStakedAmountInCUSD ? new Percent(valueOfTotalStakedAmountInCUSD, "1000") : undefined
 
@@ -99,7 +101,7 @@ export function StakeCard() {
       <TopSection>
         <PoolInfo style={{ marginLeft: '8px' }}>
           <TYPE.white fontWeight={600} fontSize={[18, 24]}>
-            TGEN Staking
+            TGEN-cUSD Staking
           </TYPE.white>
           {apy && apy.greaterThan('0') && (
             <TYPE.small className="apr" fontWeight={400} fontSize={14}>
@@ -123,7 +125,7 @@ export function StakeCard() {
           <TYPE.white>Total staked</TYPE.white>
           <TYPE.white>
             {valueOfTotalStakedAmountInCUSD
-              ? valueOfTotalStakedAmountInCUSD + ' TGEN'
+              ? formatBalance(valueOfTotalStakedAmountInCUSD) + ' TGEN-cUSD'
               : '-'}
           </TYPE.white>
         </RowBetween>

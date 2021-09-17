@@ -1,7 +1,16 @@
 import { useMemo } from 'react'
-import { useTokenContract, useTradegenStakingRewardsContract, useTradegenLPStakingRewardsContract } from '../../hooks/useContract'
+import { useTokenContract, useTradegenStakingRewardsContract,
+         useTradegenLPStakingRewardsContract,
+         useBaseUbeswapAdapterContract,
+         useUbeswapLPTokenPriceAggregatorContract } from '../../hooks/useContract'
 import { useSingleCallResult, NEVER_RELOAD } from '../../state/multicall/hooks'
-import { TRADEGEN_LP_STAKING_ESCROW_ADDRESS, TRADEGEN_LP_STAKING_REWARDS_ADDRESS, TRADEGEN_STAKING_ESCROW_ADDRESS, TRADEGEN_STAKING_REWARDS_ADDRESS, TGEN } from '../../constants/index'
+import { TRADEGEN_LP_STAKING_ESCROW_ADDRESS,
+        TRADEGEN_LP_STAKING_REWARDS_ADDRESS,
+        TRADEGEN_STAKING_ESCROW_ADDRESS,
+        TRADEGEN_STAKING_REWARDS_ADDRESS,
+        TGEN,
+        BASE_UBESWAP_ADAPTER_ADDRESS,
+        UBESWAP_LP_TOKEN_PRICE_AGGREGATOR_ADDRESS } from '../../constants/index'
 
 export interface UserInvestmentInfo {
   userBalance: bigint,
@@ -92,10 +101,60 @@ export function useTradegenStakingRewardsInfo(): StakingRewardsInfo {
   }
 }
 
+export function useTradegenLPStakingRewardsInfo(): StakingRewardsInfo {
+    const stakingRewardsContract = useTradegenLPStakingRewardsContract(TRADEGEN_LP_STAKING_REWARDS_ADDRESS);
+    
+    const rewardRate = useRewardRate(stakingRewardsContract);
+    const TVL = useTradegenLPStakingRewardsTVL();
+  
+    return {
+      rewardRate: (!rewardRate) ? BigInt(0) : BigInt(rewardRate),
+      TVL: (!TVL) ? BigInt(0) : BigInt(TVL) / BigInt(1e18)
+    }
+  }
+
 export function useTradegenStakingRewardsTVL(): bigint {
   const TGENContract = useTokenContract(TGEN);
 
   const balance = useBalanceOf(TGENContract, TRADEGEN_STAKING_REWARDS_ADDRESS);
 
   return balance ?? BigInt(0)
+}
+
+export function useTradegenLPStakingRewardsTVL(): bigint {
+    const stakingRewardsContract = useTradegenLPStakingRewardsContract(TRADEGEN_LP_STAKING_REWARDS_ADDRESS);
+
+    const balance = useSingleCallResult(stakingRewardsContract, 'totalVestedBalance', undefined);
+  
+    return useMemo(() => {
+        return !balance || balance.loading
+          ? []
+          : balance?.result?.[0];
+    }, [balance])
+  }
+
+export function useTokenAmountsFromPair(tokenA:string, tokenB:string, numberOfTokens:bigint): bigint[] {
+    const baseUbeswapAdapterContract = useBaseUbeswapAdapterContract(BASE_UBESWAP_ADAPTER_ADDRESS);
+
+    const amounts = useSingleCallResult(baseUbeswapAdapterContract, 'getTokenAmountsFromPair', [tokenA, tokenB, numberOfTokens.toString()]);
+    console.log(amounts);
+  
+    return useMemo(() => {
+        return !amounts || amounts.loading
+          ? [BigInt(0), BigInt(0)]
+          : [amounts?.result?.[0], amounts?.result?.[1]];
+    }, [amounts])
+}
+
+export function usePriceOfLPToken(pair:string): bigint {
+    const UbeswapLPTokenPriceAggregatorContract = useUbeswapLPTokenPriceAggregatorContract(UBESWAP_LP_TOKEN_PRICE_AGGREGATOR_ADDRESS);
+
+    const price = useSingleCallResult(UbeswapLPTokenPriceAggregatorContract, 'getUSDPrice', [pair]);
+    console.log(price);
+  
+    return useMemo(() => {
+        return !price || price.loading
+          ? BigInt(0)
+          : price?.result?.[0];
+    }, [price])
 }

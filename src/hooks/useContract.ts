@@ -13,6 +13,8 @@ import TRADEGEN_STAKING_REWARDS_ABI from '../constants/abis/TradegenStakingRewar
 import TRADEGEN_STAKING_ESCROW_ABI from '../constants/abis/TradegenStakingEscrow.json'
 import TRADEGEN_LP_STAKING_REWARDS_ABI from '../constants/abis/TradegenLPStakingRewards.json'
 import TRADEGEN_LP_STAKING_ESCROW_ABI from '../constants/abis/TradegenLPStakingEscrow.json'
+import BASE_UBESWAP_ADAPTER_ABI from '../constants/abis/BaseUbeswapAdapter.json'
+import UBESWAP_LP_TOKEN_PRICE_AGGREGATOR_ABI from '../constants/abis/UbeswapLPTokenPriceAggregator.json'
 
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
@@ -124,4 +126,12 @@ export function useTradegenLPStakingRewardsContract(TradegenLPStakingRewardsAddr
 
 export function useTradegenLPStakingEscrowContract(TradegenLPStakingEscrowAddress?: string, withSignerIfPossible?: boolean): Pool | null {
   return useContract(TradegenLPStakingEscrowAddress, TRADEGEN_LP_STAKING_ESCROW_ABI, withSignerIfPossible) as Pool | null
+}
+
+export function useBaseUbeswapAdapterContract(BaseUbeswapAdapterAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(BaseUbeswapAdapterAddress, BASE_UBESWAP_ADAPTER_ABI, withSignerIfPossible) as Pool | null
+}
+
+export function useUbeswapLPTokenPriceAggregatorContract(UbeswapLPTokenPriceAggergatorAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(UbeswapLPTokenPriceAggergatorAddress, UBESWAP_LP_TOKEN_PRICE_AGGREGATOR_ABI, withSignerIfPossible) as Pool | null
 }

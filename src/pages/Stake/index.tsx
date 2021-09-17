@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { AutoColumn } from '../../components/Column'
 import { PoolCard } from '../../components/earn/PoolCard'
 import { StakeCard } from '../../components/Stake/StakeCard'
+import { StakeLPCard } from '../../components/Stake/StakeLPCard'
 import Loader from '../../components/Loader'
 import { RowBetween } from '../../components/Row'
 import { BIG_INT_ZERO } from '../../constants'
@@ -51,6 +52,7 @@ export default function Stake() {
         <PoolSection>
           <ErrorBoundary>
             <StakeCard/>
+            <StakeLPCard/>
           </ErrorBoundary>
         </PoolSection>
       </AutoColumn>
