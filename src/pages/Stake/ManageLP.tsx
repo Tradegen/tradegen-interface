@@ -1,30 +1,25 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
-import { cUSD, JSBI } from '@ubeswap/sdk'
-import QuestionHelper from 'components/QuestionHelper'
-import React, { useCallback, useState } from 'react'
+import { Token } from '@ubeswap/sdk'
+import React, { useCallback, useState, useMemo } from 'react'
 import { Link, RouteComponentProps, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { CountUp } from 'use-count-up'
+import { NETWORK_CHAIN_ID } from '../../connectors'
 
 import { ButtonEmpty, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
-import DoubleCurrencyLogo from '../../components/DoubleLogo'
-import ClaimRewardModal from '../../components/earn/ClaimRewardModal'
-import StakingModal from '../../components/earn/StakingModal'
 import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
-import UnstakingModal from '../../components/earn/UnstakingModal'
 import { RowBetween, RowFixed } from '../../components/Row'
-import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_ZERO } from '../../constants'
-import { usePair } from '../../data/Reserves'
-import { useCurrency } from '../../hooks/Tokens'
-import { useColor } from '../../hooks/useColor'
+import { BIG_INT_SECONDS_IN_WEEK, ZERO_ADDRESS, TGEN_cUSD } from '../../constants'
 import usePrevious from '../../hooks/usePrevious'
 import { useWalletModalToggle } from '../../state/application/hooks'
-import { usePairDualStakingInfo, usePairStakingInfo } from '../../state/stake/hooks'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLinkIcon, TYPE } from '../../theme'
-import { currencyId } from '../../utils/currencyId'
-import { useStakingPoolValue } from './useStakingPoolValue'
+import { useTradegenLPStakingRewardsInfo, useUserTradegenLPStakingInfo, usePriceOfLPToken, useNextVestingEntry } from '../../features/stake/hooks'
+import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
+import StakingModal from '../../components/Stake/DepositModalLP'
+import ClaimRewardModal from '../../components/Stake/ClaimRewardModalLP'
+import UnstakingModal from '../../components/Stake/WithdrawModalLP'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
@@ -86,87 +81,93 @@ const DataRow = styled(RowBetween)`
   `};
 `
 
-export default function ManageTGEN({
-  match: {
-    params: { currencyIdA, currencyIdB, stakingAddress },
-  },
-}: RouteComponentProps<{ currencyIdA: string; currencyIdB: string; stakingAddress: string }>) {
-  const { address: account, network } = useContractKit()
-  const { chainId } = network
-  const location = useLocation()
+export default function ManageLP() {
+    let { address: account, network } = useContractKit()
+    account = account ?? ZERO_ADDRESS;
 
-  // get currencies and pair
-  const [tokenA, tokenB] = [useCurrency(currencyIdA) ?? undefined, useCurrency(currencyIdB) ?? undefined]
+    let data = useTradegenLPStakingRewardsInfo();
+    const stakingRewardsInfo = useMemo(() => {
+        return data;
+    }, [data]);
+  
+    let data2 = useUserTradegenLPStakingInfo(account);
+    const userStakingInfo = useMemo(() => {
+        return data2;
+    }, [data2]);
+    console.log(userStakingInfo);
 
-  const [, stakingTokenPair] = usePair(tokenA, tokenB)
-  const singleStakingInfo = usePairStakingInfo(stakingTokenPair, stakingAddress)
-  const dualStakingInfo = usePairDualStakingInfo(singleStakingInfo)
-  const isDualFarm = location.pathname.includes('dualfarm')
+    let data3 = usePriceOfLPToken(TGEN_cUSD);
+    const tokenPrice = useMemo(() => {
+        return data3;
+    }, [data3]);
 
-  const stakingInfo = isDualFarm ? dualStakingInfo : singleStakingInfo
+    let data4 = useNextVestingEntry(account);
+    const vestingEntry = useMemo(() => {
+        return data4;
+    }, [data4]);
 
-  // detect existing unstaked LP position to show add button if none found
-  const userLiquidityUnstaked = useTokenBalance(account ?? undefined, stakingInfo?.stakedAmount?.token)
-  const showAddLiquidityButton = Boolean(stakingInfo?.stakedAmount?.equalTo('0') && userLiquidityUnstaked?.equalTo('0'))
+    console.log(data4)
 
-  // toggle for staking modal and unstaking modal
-  const [showStakingModal, setShowStakingModal] = useState(false)
-  const [showUnstakingModal, setShowUnstakingModal] = useState(false)
-  const [showClaimRewardModal, setShowClaimRewardModal] = useState(false)
+    const nextVestTimestamp = data4[0];
+    const nextVestQuantity = data4[1];
 
-  // fade cards if nothing staked or nothing earned yet
-  const disableTop = !stakingInfo?.stakedAmount || stakingInfo.stakedAmount.equalTo(JSBI.BigInt(0))
+    console.log(Number(nextVestTimestamp.toString()));
+    console.log(formatBalance(nextVestQuantity));
 
-  const token = tokenA === cUSD[chainId] ? tokenB : tokenA
-  const backgroundColor = useColor(token ?? undefined)
+    const userTokensStaked = data2[0];
+    const userRewardsEarned = data2[1];
+    const totalSupply = data2[2];
 
-  // get CUSD value of staked LP tokens
-  const {
-    valueCUSD: valueOfTotalStakedAmountInCUSD,
-    userValueCUSD,
-    userAmountTokenA,
-    userAmountTokenB,
-  } = useStakingPoolValue(stakingInfo)
+    const rewardRate = BigInt(stakingRewardsInfo.rewardRate);
+    const TVL = BigInt(stakingRewardsInfo.TVL);
+    const valueOfTotalStakedAmountInCUSD = (tokenPrice) ? (BigInt(tokenPrice) * TVL / BigInt(1e18)) : undefined;
+    const userValueInCUSD = (tokenPrice) ? (BigInt(tokenPrice) * BigInt(userTokensStaked) / BigInt(1e18)) : undefined;
+    const userRewardRate = (BigInt(totalSupply) == BigInt(0)) ? BigInt(0) : BigInt(rewardRate) * BigInt(userTokensStaked) / BigInt(totalSupply);
+  
+    // detect existing unstaked LP position to show add button if none found
+    const userLiquidityUnstaked = useTokenBalance(account, new Token(NETWORK_CHAIN_ID, TGEN_cUSD, 18))
+    const showAddLiquidityButton = Boolean(userTokensStaked.toString() == "0" && userLiquidityUnstaked?.equalTo('0'))
 
-  const ubeCountUpAmount = stakingInfo?.earnedAmountUbe?.toFixed(6) ?? '0'
-  const ubeCountUpAmountPrevious = usePrevious(ubeCountUpAmount) ?? '0'
-  const countUpAmount = stakingInfo?.earnedAmount?.toFixed(6) ?? '0'
-  const countUpAmountPrevious = usePrevious(countUpAmount) ?? '0'
+    // toggle for staking modal and unstaking modal
+    const [showStakingModal, setShowStakingModal] = useState(false)
+    const [showUnstakingModal, setShowUnstakingModal] = useState(false)
+    const [showClaimRewardModal, setShowClaimRewardModal] = useState(false)
 
-  const toggleWalletModal = useWalletModalToggle()
+    // fade cards if nothing staked or nothing earned yet
+    const disableTop = Boolean(userTokensStaked.toString() == "0")
 
-  const handleDepositClick = useCallback(() => {
-    if (account) {
-      setShowStakingModal(true)
-    } else {
-      toggleWalletModal()
-    }
-  }, [account, toggleWalletModal])
+    const backgroundColor = '#2172E5';
+
+    const ubeCountUpAmount = formatBalance(userRewardsEarned) ?? '0'
+    const ubeCountUpAmountPrevious = usePrevious(ubeCountUpAmount) ?? '0'
+    const countUpAmount = formatBalance(userRewardsEarned) ?? '0'
+    const countUpAmountPrevious = usePrevious(countUpAmount) ?? '0'
+
+    const toggleWalletModal = useWalletModalToggle()
+
+    const handleDepositClick = useCallback(() => {
+        if (account) {
+        setShowStakingModal(true)
+        } else {
+        toggleWalletModal()
+        }
+    }, [account, toggleWalletModal])
 
   return (
     <PageWrapper gap="lg" justify="center">
       <RowBetween style={{ gap: '24px' }}>
         <TYPE.mediumHeader style={{ margin: 0 }}>
-          {tokenA?.symbol}-{tokenB?.symbol} Liquidity Mining
+          TGEN-cUSD Staking
         </TYPE.mediumHeader>
-        <DoubleCurrencyLogo currency0={tokenA ?? undefined} currency1={tokenB ?? undefined} size={24} />
       </RowBetween>
 
       <DataRow style={{ gap: '24px' }}>
         <PoolData>
           <AutoColumn gap="sm">
-            <TYPE.body style={{ margin: 0 }}>Total deposits</TYPE.body>
+            <TYPE.body style={{ margin: 0 }}>Total staked</TYPE.body>
             <TYPE.body fontSize={24} fontWeight={500}>
               {valueOfTotalStakedAmountInCUSD
-                ? `$${
-                    valueOfTotalStakedAmountInCUSD.lessThan('1')
-                      ? valueOfTotalStakedAmountInCUSD.toFixed(2, {
-                          groupSeparator: ',',
-                        })
-                      : valueOfTotalStakedAmountInCUSD.toFixed(0, {
-                          groupSeparator: ',',
-                        })
-                  }`
+                ? '$' + valueOfTotalStakedAmountInCUSD
                 : '-'}
             </TYPE.body>
           </AutoColumn>
@@ -175,11 +176,7 @@ export default function ManageTGEN({
           <AutoColumn gap="sm">
             <TYPE.body style={{ margin: 0 }}>Pool Rate</TYPE.body>
             <TYPE.body fontSize={24} fontWeight={500}>
-              {stakingInfo?.active
-                ? stakingInfo?.ubeRewardRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ??
-                  '-'
-                : '0'}
-              {` ${stakingInfo?.rewardToken?.symbol ?? 'UBE'} / week`}
+              {formatBalance(BigInt(rewardRate) / BigInt(1e18), 0)} TGEN / week
             </TYPE.body>
           </AutoColumn>
         </PoolData>
@@ -191,12 +188,12 @@ export default function ManageTGEN({
           <CardNoise />
           <CardSection>
             <AutoColumn gap="md">
-              <RowBetween>
-                <TYPE.white fontWeight={600}>Step 1. Get UBE-LP Liquidity tokens</TYPE.white>
+            <RowBetween>
+                <TYPE.white fontWeight={600}>Step 1. Get TGEN tokens</TYPE.white>
               </RowBetween>
               <RowBetween style={{ marginBottom: '1rem' }}>
                 <TYPE.white fontSize={14}>
-                  {`UBE-LP tokens are required. Once you've added liquidity to the ${tokenA?.symbol}-${tokenB?.symbol} pool you can stake your liquidity tokens on this page.`}
+                  {`TGEN tokens are required. After you have TGEN tokens, you can stake them on this page.`}
                 </TYPE.white>
               </RowBetween>
               <ButtonPrimary
@@ -204,9 +201,9 @@ export default function ManageTGEN({
                 borderRadius="8px"
                 width={'fit-content'}
                 as={Link}
-                to={`/add/${tokenA && currencyId(tokenA)}/${tokenB && currencyId(tokenB)}`}
+                to={`https://app.ubeswap.org/#/swap`}
               >
-                {`Add ${tokenA?.symbol}-${tokenB?.symbol} liquidity`}
+                {`Add TGEN-cUSD liquidity`}
               </ButtonPrimary>
             </AutoColumn>
           </CardSection>
@@ -215,26 +212,21 @@ export default function ManageTGEN({
         </VoteCard>
       )}
 
-      {stakingInfo && (
-        <>
-          <StakingModal
-            isOpen={showStakingModal}
-            onDismiss={() => setShowStakingModal(false)}
-            stakingInfo={stakingInfo}
-            userLiquidityUnstaked={userLiquidityUnstaked}
-          />
-          <UnstakingModal
-            isOpen={showUnstakingModal}
-            onDismiss={() => setShowUnstakingModal(false)}
-            stakingInfo={stakingInfo}
-          />
-          <ClaimRewardModal
-            isOpen={showClaimRewardModal}
-            onDismiss={() => setShowClaimRewardModal(false)}
-            stakingInfo={stakingInfo}
-          />
-        </>
-      )}
+      <StakingModal
+          isOpen={showStakingModal}
+          onDismiss={() => setShowStakingModal(false)}
+          TGENBalance={userLiquidityUnstaked?.raw.toString()}
+      />
+      <UnstakingModal
+          isOpen={showUnstakingModal}
+          onDismiss={() => setShowUnstakingModal(false)}
+          tokenBalance={userTokensStaked ? userTokensStaked.toString() : "0"}
+      />
+      <ClaimRewardModal
+        isOpen={showClaimRewardModal}
+        onDismiss={() => setShowClaimRewardModal(false)}
+        availableRewards={userRewardsEarned ? userRewardsEarned.toString() : "0"}
+      />
 
       <PositionInfo gap="lg" justify="center" dim={showAddLiquidityButton}>
         <BottomSection gap="lg" justify="center">
@@ -243,72 +235,58 @@ export default function ManageTGEN({
               <CardNoise />
               <AutoColumn gap="md">
                 <RowBetween>
-                  <TYPE.white fontWeight={600}>Your liquidity deposits</TYPE.white>
+                  <TYPE.white fontWeight={600}>Your stake</TYPE.white>
                 </RowBetween>
                 <RowBetween style={{ alignItems: 'baseline' }}>
                   <TYPE.white fontSize={36} fontWeight={600}>
-                    {stakingInfo?.stakedAmount?.toSignificant(6) ?? '-'}
+                    {formatBalance(userTokensStaked.toString())}
                   </TYPE.white>
                   <RowFixed>
                     <TYPE.white>
-                      UBE-LP {tokenA?.symbol}-{tokenB?.symbol}
+                      TGEN-cUSD
                     </TYPE.white>
-                    {stakingInfo && (
-                      <PairLinkIcon
-                        href={`https://info.ubeswap.org/pair/${stakingInfo.stakingToken.address.toLowerCase()}`}
-                      />
-                    )}
                   </RowFixed>
                 </RowBetween>
-                {stakingInfo?.stakedAmount && stakingInfo.stakedAmount.greaterThan('0') && (
+                {userTokensStaked && userTokensStaked.toString() != "0" && (
                   <RowBetween>
                     <RowFixed>
                       <TYPE.white>
                         Current value:{' '}
-                        {userValueCUSD
-                          ? `$${userValueCUSD.toFixed(2, {
-                              separator: ',',
-                            })}`
+                        {userValueInCUSD
+                          ? `$${formatBalance(userValueInCUSD)}`
                           : '--'}
                       </TYPE.white>
-                      <QuestionHelper
-                        text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
-                          userAmountTokenA?.token.symbol
-                        }, ${userAmountTokenB?.toFixed(0, { groupSeparator: ',' })} ${userAmountTokenB?.token.symbol}`}
-                      />
                     </RowFixed>
                   </RowBetween>
                 )}
               </AutoColumn>
             </CardSection>
           </StyledDataCard>
-          <StyledBottomCard dim={stakingInfo?.stakedAmount?.equalTo(JSBI.BigInt(0))}>
+          <StyledBottomCard dim={!userTokensStaked || userTokensStaked.toString() == "0"}>
             <CardNoise />
             <AutoColumn gap="sm">
-              <RowBetween>
-                <div>
-                  <TYPE.black>Your unclaimed rewards</TYPE.black>
-                </div>
-                {((stakingInfo?.earnedAmount && JSBI.notEqual(BIG_INT_ZERO, stakingInfo?.earnedAmount?.raw)) ||
-                  (stakingInfo?.earnedAmountUbe && JSBI.notEqual(BIG_INT_ZERO, stakingInfo?.earnedAmountUbe?.raw))) && (
-                  <ButtonEmpty
-                    padding="8px"
-                    borderRadius="8px"
-                    width="fit-content"
-                    onClick={() => setShowClaimRewardModal(true)}
-                  >
-                    Claim
-                  </ButtonEmpty>
-                )}
-              </RowBetween>
-              <RowBetween style={{ alignItems: 'baseline' }}>
+                <RowBetween>
+                    <div>
+                    <TYPE.black>Your unclaimed rewards</TYPE.black>
+                    </div>
+                    {userRewardsEarned && userRewardsEarned.toString() != "0" && (
+                    <ButtonEmpty
+                        padding="8px"
+                        borderRadius="8px"
+                        width="fit-content"
+                        onClick={() => setShowClaimRewardModal(true)}
+                    >
+                        Claim
+                    </ButtonEmpty>
+                    )}
+                </RowBetween>
+                <RowBetween style={{ alignItems: 'baseline' }}>
                 <TYPE.largeHeader fontSize={36} fontWeight={600}>
                   <CountUp
-                    key={ubeCountUpAmount}
                     isCounting
                     decimalPlaces={4}
-                    start={parseFloat(ubeCountUpAmountPrevious)}
-                    end={parseFloat(ubeCountUpAmount)}
+                    start={parseFloat(ubeCountUpAmountPrevious.toString())}
+                    end={parseFloat(ubeCountUpAmount.toString())}
                     thousandsSeparator={','}
                     duration={1}
                   />
@@ -317,40 +295,11 @@ export default function ManageTGEN({
                   <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
                     ⚡
                   </span>
-                  {stakingInfo?.active
-                    ? stakingInfo?.ubeRewardRate
-                        ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                        ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                  {userRewardRate ? formatBalance(userRewardRate / BigInt(1e18), 0)
                     : '0'}
-                  {` ${isDualFarm ? 'UBE' : stakingInfo?.rewardToken?.symbol ?? 'UBE'} / week`}
+                  {` TGEN / week`}
                 </TYPE.black>
               </RowBetween>
-              {isDualFarm && (
-                <RowBetween style={{ alignItems: 'baseline' }}>
-                  <TYPE.largeHeader fontSize={36} fontWeight={600}>
-                    <CountUp
-                      key={countUpAmount}
-                      isCounting
-                      decimalPlaces={4}
-                      start={parseFloat(countUpAmountPrevious)}
-                      end={parseFloat(countUpAmount)}
-                      thousandsSeparator={','}
-                      duration={1}
-                    />
-                  </TYPE.largeHeader>
-                  <TYPE.black fontSize={16} fontWeight={500}>
-                    <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
-                      ⚡
-                    </span>
-                    {dualStakingInfo?.active
-                      ? dualStakingInfo?.rewardRate
-                          ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                          ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
-                      : '0'}
-                    {` ${dualStakingInfo?.rewardToken?.symbol} / week`}
-                  </TYPE.black>
-                </RowBetween>
-              )}
             </AutoColumn>
           </StyledBottomCard>
         </BottomSection>
@@ -358,18 +307,16 @@ export default function ManageTGEN({
           <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px' }}>
             ⭐️
           </span>
-          When you withdraw, the contract will automagically claim UBE on your behalf!
+          When you withdraw, the contract will automagically claim TGEN rewards on your behalf!
         </TYPE.main>
 
         {!showAddLiquidityButton && (
           <DataRow style={{ marginBottom: '1rem' }}>
-            {stakingInfo && stakingInfo.active && (
-              <ButtonPrimary padding="8px" borderRadius="8px" width="160px" onClick={handleDepositClick}>
-                {stakingInfo?.stakedAmount?.greaterThan(JSBI.BigInt(0)) ? 'Deposit' : 'Deposit UBE-LP Tokens'}
-              </ButtonPrimary>
-            )}
+            <ButtonPrimary padding="8px" borderRadius="8px" width="160px" onClick={handleDepositClick}>
+              {userTokensStaked.toString() != "0" ? 'Deposit' : 'Deposit TGEN-cUSD tokens'}
+            </ButtonPrimary>
 
-            {stakingInfo?.stakedAmount?.greaterThan(JSBI.BigInt(0)) && (
+            {userTokensStaked && userTokensStaked.toString() != "0" && (
               <>
                 <ButtonPrimary
                   padding="8px"
@@ -381,23 +328,18 @@ export default function ManageTGEN({
                 </ButtonPrimary>
               </>
             )}
-            {stakingInfo && !stakingInfo.active && (
-              <TYPE.main style={{ textAlign: 'center' }} fontSize={14}>
-                Staking Rewards inactive for this pair.
-              </TYPE.main>
-            )}
           </DataRow>
         )}
-        {!userLiquidityUnstaked ? null : userLiquidityUnstaked.equalTo('0') ? null : !stakingInfo?.active ? null : (
-          <TYPE.main>{userLiquidityUnstaked.toSignificant(6)} UBE LP tokens available</TYPE.main>
+        {userLiquidityUnstaked && userLiquidityUnstaked.toString() != "0" && (
+          <TYPE.main>{formatBalance(userLiquidityUnstaked.raw.toString())} TGEN-cUSD tokens available</TYPE.main>
+        )}
+        {nextVestQuantity.toString() != "0" && nextVestTimestamp.toString() != "0" && (
+            <>
+          <TYPE.main>Next vesting timestamp: {Number(nextVestTimestamp.toString())}</TYPE.main>
+          <TYPE.main>Next vesting quantity: {formatBalance(nextVestQuantity)} TGEN-cUSD</TYPE.main>
+          </>
         )}
       </PositionInfo>
     </PageWrapper>
   )
 }
-
-const PairLinkIcon = styled(ExternalLinkIcon)`
-  svg {
-    stroke: ${(props) => props.theme.primary1};
-  }
-`

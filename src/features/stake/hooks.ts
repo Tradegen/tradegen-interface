@@ -62,6 +62,20 @@ export function useBalanceOf(
     }, [balanceOf])
 }
 
+export function useBalance(
+  stakingRewardsContract: any,
+  user: string
+): bigint {
+
+  const balanceOf = useSingleCallResult(stakingRewardsContract, 'totalVestedAccountBalance', [user]);
+
+  return useMemo(() => {
+    return !balanceOf || balanceOf.loading
+      ? BigInt(0)
+      : balanceOf?.result?.[0];
+  }, [balanceOf])
+}
+
 export function useTotalSupply(
     stakingRewardsContract: any,
   ): bigint {
@@ -73,6 +87,19 @@ export function useTotalSupply(
         ? BigInt(0)
         : totalSupply?.result?.[0];
     }, [totalSupply])
+}
+
+export function useTotalVestedBalance(
+  stakingRewardsContract: any,
+): bigint {
+
+  const totalSupply = useSingleCallResult(stakingRewardsContract, 'totalVestedBalance', undefined);
+
+  return useMemo(() => {
+    return !totalSupply || totalSupply.loading
+      ? BigInt(0)
+      : totalSupply?.result?.[0];
+  }, [totalSupply])
 }
 
 export function useTradegenStakingRewardsEarned(
@@ -174,4 +201,35 @@ export function useUserTradegenStakingInfo(userAddress:string): bigint[] {
   return useMemo(() => {
       return [balance, earned, totalSupply];
   }, [balance, earned, totalSupply])
+}
+
+export function useUserTradegenLPStakingInfo(userAddress:string): bigint[] {
+  const stakingRewardsContract = useTradegenLPStakingRewardsContract(TRADEGEN_LP_STAKING_REWARDS_ADDRESS);
+
+  const balance = useBalance(stakingRewardsContract, userAddress);
+  console.log(balance);
+
+  const earned = useTradegenStakingRewardsEarned(stakingRewardsContract, userAddress);
+  console.log(earned);
+
+  const totalSupply = useTotalVestedBalance(stakingRewardsContract);
+  console.log(totalSupply);
+
+  return useMemo(() => {
+      return [balance, earned, totalSupply];
+  }, [balance, earned, totalSupply])
+}
+
+export function useNextVestingEntry(
+  user: string
+): bigint[] {
+
+  const stakingRewardsContract = useTradegenLPStakingRewardsContract(TRADEGEN_LP_STAKING_REWARDS_ADDRESS);
+  const vestingEntry = useSingleCallResult(stakingRewardsContract, 'getNextVestingEntry', [user]);
+
+  return useMemo(() => {
+    return !vestingEntry || vestingEntry.loading
+      ? [BigInt(0), BigInt(0), BigInt(0)]
+      : vestingEntry?.result?.[0];
+  }, [vestingEntry])
 }

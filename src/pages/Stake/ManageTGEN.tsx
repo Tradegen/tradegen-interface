@@ -1,8 +1,7 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
-import { cUSD, JSBI, Token } from '@ubeswap/sdk'
-import QuestionHelper from 'components/QuestionHelper'
+import { Token } from '@ubeswap/sdk'
 import React, { useCallback, useState, useMemo } from 'react'
-import { Link, RouteComponentProps, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { CountUp } from 'use-count-up'
 import { NETWORK_CHAIN_ID } from '../../connectors'
@@ -22,26 +21,6 @@ import { formatNumber, formatPercent, formatBalance } from '../../functions/form
 import StakingModal from '../../components/Stake/DepositModal'
 import ClaimRewardModal from '../../components/Stake/ClaimRewardModal'
 import UnstakingModal from '../../components/Stake/WithdrawModal'
-
-/*
-
-      <StakingModal
-          isOpen={showStakingModal}
-          onDismiss={() => setShowStakingModal(false)}
-          poolAddress={id}
-          cUSDBalance={cUSDBalance}
-      />
-      <UnstakingModal
-          isOpen={showUnstakingModal}
-          onDismiss={() => setShowUnstakingModal(false)}
-          poolAddress={id}
-          tokenBalance={tokenBalance}
-      />
-      <ClaimRewardModal
-        isOpen={showClaimRewardModal}
-        onDismiss={() => setShowClaimRewardModal(false)}
-        stakingInfo={stakingInfo}
-      />*/
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;

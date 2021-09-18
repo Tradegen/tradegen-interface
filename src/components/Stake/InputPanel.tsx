@@ -181,7 +181,7 @@ export default function CurrencyInputPanel({
                   fontSize={14}
                   style={{ display: 'inline', cursor: 'pointer' }}
                 >
-                  {('Available tokens: ') + formatBalance(availableTokens)}
+                  {(customBalanceText) ? customBalanceText + availableTokens : 'Available to stake: ' + formatBalance(availableTokens)}
                 </TYPE.body>
               )}
             </RowBetween>

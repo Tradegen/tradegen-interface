@@ -128,7 +128,7 @@ export default function App() {
               <Route exact strict path="/dualfarm/:currencyIdA/:currencyIdB/:stakingAddress" component={Manage} />
               <Route exact strict path="/stake" component={Stake} />
               <Route exact strict path="/stake/TGEN" component={ManageTGEN} />
-              <Route exact strict path="/stake/LP" component={Manage} />
+              <Route exact strict path="/stake/LP" component={ManageLP} />
               <Route exact strict path="/pools" component={Swap} />
               <Route exact strict path="/NFTpools" component={AddLiquidity} />
               <Route exact strict path="/manage_pool_investment" component={Earn} />
