@@ -4,6 +4,9 @@ import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import { ButtonPrimary } from '../../components/Button'
+import { StyledInternalLink, TYPE } from '../../theme'
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { ZERO_ADDRESS } from '../../constants'
 
 const Wrapper = styled.div`
   display: grid;
@@ -44,6 +47,9 @@ const NoResults = styled.div`
 `
 
 export function PoolInfo(props:any) {
+    let { address: account, network } = useContractKit()
+    account = account ?? ZERO_ADDRESS;
+
     let data = usePoolInfo(props.address);
     const poolInfo = useMemo(() => {
         return data;
@@ -83,6 +89,16 @@ export function PoolInfo(props:any) {
                                 </ErrorBoundary>
                             )))}
                         </ItemWrapper>
+                        {poolInfo.manager == account &&
+                            <StyledInternalLink
+                                to={`/manage_pool/${poolInfo.address}`}
+                                style={{ width: '100%' }}
+                            >
+                                <ButtonPrimary padding="8px" borderRadius="8px">
+                                    {'Manage Pool'}
+                                </ButtonPrimary>
+                            </StyledInternalLink>
+                        }
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>
