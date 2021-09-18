@@ -9,7 +9,6 @@ import { NETWORK_CHAIN_ID } from '../../connectors'
 
 import { ButtonEmpty, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
-import ClaimRewardModal from '../../components/earn/ClaimRewardModal'
 import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import { RowBetween, RowFixed } from '../../components/Row'
 import usePrevious from '../../hooks/usePrevious'
@@ -21,7 +20,8 @@ import { useTradegenStakingRewardsInfo, useUserTradegenStakingInfo } from '../..
 import { BIG_INT_SECONDS_IN_WEEK, TGEN, ZERO_ADDRESS } from '../../constants'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import StakingModal from '../../components/Stake/DepositModal'
-//import UnstakingModal from '../../components/Stake/WithdrawModal'
+import ClaimRewardModal from '../../components/Stake/ClaimRewardModal'
+import UnstakingModal from '../../components/Stake/WithdrawModal'
 
 /*
 
@@ -228,6 +228,16 @@ export default function ManageTGEN() {
           isOpen={showStakingModal}
           onDismiss={() => setShowStakingModal(false)}
           TGENBalance={userLiquidityUnstaked?.raw.toString()}
+      />
+      <UnstakingModal
+          isOpen={showUnstakingModal}
+          onDismiss={() => setShowUnstakingModal(false)}
+          tokenBalance={userTokensStaked ? userTokensStaked.toString() : "0"}
+      />
+      <ClaimRewardModal
+        isOpen={showClaimRewardModal}
+        onDismiss={() => setShowClaimRewardModal(false)}
+        availableRewards={userRewardsEarned ? userRewardsEarned.toString() : "0"}
       />
 
       <PositionInfo gap="lg" justify="center" dim={showAddLiquidityButton}>

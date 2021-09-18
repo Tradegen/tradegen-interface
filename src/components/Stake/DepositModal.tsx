@@ -6,7 +6,7 @@ import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
-import { usePoolContract, useTradegenStakingRewardsContract } from '../../hooks/useContract'
+import { useTradegenStakingRewardsContract } from '../../hooks/useContract'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
 import { StakingInfo, useDerivedStakeInfo } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'

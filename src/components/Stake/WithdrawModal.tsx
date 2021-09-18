@@ -1,20 +1,17 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
-import { TokenAmount, Token } from '@ubeswap/sdk'
 import { useDoTransaction } from 'components/swap/routing'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { usePoolContract } from '../../hooks/useContract'
-import { StakingInfo } from '../../state/stake/hooks'
+import { useTradegenStakingRewardsContract } from '../../hooks/useContract'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError } from '../Button'
 import { AutoColumn } from '../Column'
-import FormattedCurrencyAmount from '../FormattedCurrencyAmount'
 import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import { RowBetween } from '../Row'
 import { formatBalance } from '../../functions/format'
-
+import { TRADEGEN_STAKING_REWARDS_ADDRESS, TGEN } from '../../constants'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -24,11 +21,10 @@ const ContentWrapper = styled(AutoColumn)`
 interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
-  poolAddress: string,
   tokenBalance: string
 }
 
-export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBalance }: StakingModalProps) {
+export default function UnstakingModal({ isOpen, onDismiss, tokenBalance }: StakingModalProps) {
   const { address: account, network } = useContractKit()
   const { chainId } = network
 
@@ -43,14 +39,14 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBa
     onDismiss()
   }
 
-  const poolContract = usePoolContract(poolAddress)
+  const stakingContract = useTradegenStakingRewardsContract(TRADEGEN_STAKING_REWARDS_ADDRESS)
 
   async function onWithdraw() {
-    if (poolContract && tokenBalance) {
+    if (stakingContract && tokenBalance) {
       setAttempting(true)
-      await doTransaction(poolContract, 'exit', {
+      await doTransaction(stakingContract, 'exit', {
         args: [],
-        summary: `Withdraw from pool`,
+        summary: `Withdraw from TGEN stake`,
       })
         .then((response) => {
           setHash(response.hash)
@@ -82,18 +78,18 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBa
               <TYPE.body fontWeight={600} fontSize={36}>
                 { formatBalance(tokenBalance, 18) }
               </TYPE.body>
-              <TYPE.body>Deposited pool tokens</TYPE.body>
+              <TYPE.body>Staked TGEN</TYPE.body>
             </AutoColumn>
           )}
           <ButtonError disabled={!!error} error={!!error && !!tokenBalance} onClick={onWithdraw}>
-            {error ?? 'Withdraw'}
+            {error ?? 'Withdraw & claim'}
           </ButtonError>
         </ContentWrapper>
       )}
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOndismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.body fontSize={20}>Withdrawing {formatBalance(tokenBalance, 18)} pool tokens</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrawing {formatBalance(tokenBalance, 18)} TGEN</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -101,7 +97,7 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBa
         <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Withdrew pool tokens!</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrew TGEN!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

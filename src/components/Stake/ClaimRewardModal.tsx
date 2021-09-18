@@ -3,8 +3,7 @@ import { useDoTransaction } from 'components/swap/routing'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { useStakingContract, useTradegenStakingRewardsContract } from '../../hooks/useContract'
-import { StakingInfo } from '../../state/stake/hooks'
+import { useTradegenStakingRewardsContract } from '../../hooks/useContract'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError } from '../Button'
 import { AutoColumn } from '../Column'
@@ -12,7 +11,7 @@ import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import { RowBetween } from '../Row'
 import { TRADEGEN_STAKING_REWARDS_ADDRESS, TGEN } from '../../constants'
-import { NETWORK_CHAIN_ID } from '../../connectors'
+import { formatBalance } from '../../functions/format'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -22,10 +21,10 @@ const ContentWrapper = styled(AutoColumn)`
 interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
-  stakingInfo: StakingInfo
+  availableRewards: string
 }
 
-export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: StakingModalProps) {
+export default function ClaimRewardModal({ isOpen, onDismiss, availableRewards }: StakingModalProps) {
   const { address: account } = useContractKit()
 
   // monitor call to help UI loading state
@@ -39,10 +38,10 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
     onDismiss()
   }
 
-  const stakingContract = useStakingContract(stakingInfo.stakingRewardAddress)
+  const stakingContract = useTradegenStakingRewardsContract(TRADEGEN_STAKING_REWARDS_ADDRESS)
 
   async function onClaimReward() {
-    if (stakingContract && stakingInfo?.stakedAmount) {
+    if (stakingContract && availableRewards != "0") {
       setAttempting(true)
       await doTransaction(stakingContract, 'getReward', {
         args: [],
@@ -59,7 +58,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
   if (!account) {
     error = 'Connect Wallet'
   }
-  if (!stakingInfo?.stakedAmount) {
+  if (availableRewards == "0") {
     error = error ?? 'Enter an amount'
   }
 
@@ -72,19 +71,15 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
           <AutoColumn justify="center" gap="md">
-            {stakingInfo?.earnedAmounts?.map((earnedAmount, idx) => {
-              return (
-                <TYPE.body fontWeight={600} fontSize={36} key={idx}>
-                  {earnedAmount.toSignificant(4)} {earnedAmount.token.symbol}
-                </TYPE.body>
-              )
-            })}
+            <TYPE.body fontWeight={600} fontSize={36}>
+                {formatBalance(BigInt(availableRewards) / BigInt(1e14), 4)} TGEN
+            </TYPE.body>
             <TYPE.body>Unclaimed rewards</TYPE.body>
           </AutoColumn>
           <TYPE.subHeader style={{ textAlign: 'center' }}>
             When you claim without withdrawing your TGEN remains staked in the contract.
           </TYPE.subHeader>
-          <ButtonError disabled={!!error} error={!!error && !!stakingInfo?.stakedAmount} onClick={onClaimReward}>
+          <ButtonError disabled={!!error} error={!!error && availableRewards != "0"} onClick={onClaimReward}>
             {error ?? 'Claim'}
           </ButtonError>
         </ContentWrapper>
@@ -94,9 +89,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.body fontSize={20}>
               Claiming{' '}
-              {stakingInfo?.earnedAmounts
-                ?.map((earnedAmount) => `${earnedAmount.toSignificant(4)} ${earnedAmount?.token.symbol}`)
-                .join(' + ')}
+              {formatBalance(BigInt(availableRewards) / BigInt(1e14), 4)} TGEN
             </TYPE.body>
           </AutoColumn>
         </LoadingView>
@@ -106,7 +99,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
             <TYPE.body fontSize={20}>
-              Claimed {stakingInfo?.rewardTokens.map((rewardToken) => rewardToken.symbol).join(' + ')}!
+            {formatBalance(BigInt(availableRewards) / BigInt(1e14), 4)} TGEN
             </TYPE.body>
           </AutoColumn>
         </SubmittedView>
