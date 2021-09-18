@@ -23,6 +23,7 @@ import Stake from './Stake'
 import Manage from './Earn/Manage'
 import Pool from './UbeswapPool'
 import PoolPage from './Pool'
+import ManagePoolPage from './Manage/ManagePool'
 import NFTPoolPage from './NFTPool'
 import CreatePoolPage from './Create/CreatePool'
 import CreateNFTPoolPage from './Create/CreateNFTPool'
@@ -134,7 +135,7 @@ export default function App() {
               <Route exact strict path="/manage_pool_investment" component={Earn} />
               <Route exact strict path="/manage_NFTpool_investment" component={Earn} />
               <Route exact strict path="/NFTpools" component={Earn} />
-              <Route exact strict path="/manage_pool/:id" component={Earn} />
+              <Route exact strict path="/manage_pool/:id" component={ManagePoolPage} />
               <Route exact strict path="/manage_NFTpool/:id" component={Earn} />
               <Route exact strict path="/NFTpool/:id" component={NFTPoolPage} />
               <Route exact strict path="/pool/:id" component={PoolPage} />
