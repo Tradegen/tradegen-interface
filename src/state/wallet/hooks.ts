@@ -2,6 +2,8 @@ import { useContractKit } from '@celo-tools/use-contractkit'
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { UBE, cUSD } from 'constants/tokens'
 import { useMemo } from 'react'
+import { TGEN } from '../../constants'
+import { NETWORK_CHAIN_ID } from '../../connectors'
 
 import ERC20_INTERFACE from '../../constants/abis/erc20'
 import { useAllTokens } from '../../hooks/Tokens'
@@ -121,4 +123,20 @@ export function useAggregateCUSDBalance(): TokenAmount | undefined {
   if (!cusd) return undefined
 
   return cUSDBalance
+}
+
+// get the total owned, unclaimed, and unharvested UBE for account
+export function useAggregateTGENBalance(): TokenAmount | undefined {
+  const {
+    address,
+    network: { chainId },
+  } = useContractKit()
+
+  const token = new Token(NETWORK_CHAIN_ID, TGEN, 18)
+
+  const tokenBalance: TokenAmount | undefined = useTokenBalance(address ?? undefined, token)
+
+  if (!token) return undefined
+
+  return tokenBalance
 }

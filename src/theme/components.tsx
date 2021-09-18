@@ -192,8 +192,9 @@ const rotateImg = keyframes`
 `
 
 export const UbeTokenAnimated = styled.img`
-  padding: 2rem 0 0 0;
   filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.15));
+  border-radius: 60px;
+  border: 1px solid #252e42;
 `
 
 /**

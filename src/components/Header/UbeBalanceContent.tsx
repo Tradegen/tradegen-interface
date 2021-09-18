@@ -1,7 +1,7 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
-import { ChainId, TokenAmount } from '@ubeswap/sdk'
+import { ChainId, TokenAmount, Token } from '@ubeswap/sdk'
 import Loader from 'components/Loader'
-import React from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import { X } from 'react-feather'
 import styled from 'styled-components'
 import useCUSDPrice from 'utils/useCUSDPrice'
@@ -10,12 +10,16 @@ import tokenLogo from '../../assets/images/token.JPG'
 import { UBE } from '../../constants'
 import { useTotalSupply } from '../../data/TotalSupply'
 import { useTotalUbeEarned } from '../../state/stake/hooks'
-import { useAggregateUbeBalance, useTokenBalance } from '../../state/wallet/hooks'
+import { useAggregateTGENBalance, useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLink, StyledInternalLink, TYPE, UbeTokenAnimated } from '../../theme'
 import { AutoColumn } from '../Column'
 import { Break, CardNoise, CardSection, DataCard } from '../earn/styled'
 import { RowBetween } from '../Row'
 import { useCirculatingSupply } from './useCirculatingSupply'
+import { NETWORK_CHAIN_ID } from '../../connectors'
+import { TGEN, ZERO_ADDRESS } from '../../constants'
+import { useTradegenStakingRewardsInfo, useUserTradegenStakingInfo } from '../../features/stake/hooks'
+import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -23,7 +27,7 @@ const ContentWrapper = styled(AutoColumn)`
 
 const ModalUpper = styled(DataCard)`
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  background: radial-gradient(76.02% 75.41% at 1.84% 0%, ${({ theme }) => theme.primary1} 0%, #021d43 100%), #edeef2;
+  background: #252e42;
   padding: 0.5rem;
 `
 
@@ -41,17 +45,28 @@ const StyledClose = styled(X)`
  * Content for balance stats modal
  */
 export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowUbeBalanceModal: any }) {
-  const { address: account, network } = useContractKit()
+  let { address: account, network } = useContractKit()
   const chainId = network.chainId
   const ube = chainId ? UBE[chainId] : undefined
+  account = account ?? ZERO_ADDRESS;
 
-  const total = useAggregateUbeBalance()
-  const ubeBalance: TokenAmount | undefined = useTokenBalance(account ?? undefined, ube)
+  let data = useUserTradegenStakingInfo(account);
+  const userStakingInfo = useMemo(() => {
+      return data;
+  }, [data]);
+  console.log(userStakingInfo);
+
+  const userRewardsEarned = data[1] ?? BigInt(0);
+
+  const total = useAggregateTGENBalance()
+  const ubeBalance = total;
   const ubeToClaim: TokenAmount | undefined = useTotalUbeEarned()
 
-  const totalSupply: TokenAmount | undefined = useTotalSupply(ube)
-  const ubePrice = useCUSDPrice(ube)
-  const circulation = useCirculatingSupply()
+  const totalSupply: TokenAmount | undefined = useTotalSupply(new Token(NETWORK_CHAIN_ID, TGEN, 18))
+  const ubePrice = useCUSDPrice(new Token(NETWORK_CHAIN_ID, TGEN, 18))
+  const deployerBalance = useTokenBalance("0xb10199414D158A264e25A5ec06b463c0cD8457Bb", new Token(NETWORK_CHAIN_ID, TGEN, 18)) ?? new TokenAmount(new Token(NETWORK_CHAIN_ID, TGEN, 18), '0')
+  const circulatingSupply = (totalSupply && deployerBalance) ? Number(totalSupply?.toFixed(2)) - Number(deployerBalance.toFixed(2)) : 0;
+  const circulation = new TokenAmount(new Token(NETWORK_CHAIN_ID, TGEN, 0), circulatingSupply.toString());
 
   return (
     <ContentWrapper gap="lg">
@@ -81,9 +96,9 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
                 <RowBetween>
                   <TYPE.white color="white">Unclaimed:</TYPE.white>
                   <TYPE.white color="white">
-                    {ubeToClaim?.toFixed(4, { groupSeparator: ',' })}{' '}
+                    {formatBalance(BigInt(userRewardsEarned) / BigInt(1e14), 4)} TGEN
                     {ubeToClaim && ubeToClaim.greaterThan('0') && (
-                      <StyledInternalLink onClick={() => setShowUbeBalanceModal(false)} to="/farm">
+                      <StyledInternalLink onClick={() => setShowUbeBalanceModal(false)} to="/stake">
                         (claim)
                       </StyledInternalLink>
                     )}

@@ -10,7 +10,7 @@ import { Moon, Sun } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
-import { useAggregateUbeBalance, useAggregateCUSDBalance, useTokenBalance } from 'state/wallet/hooks'
+import { useAggregateTGENBalance, useAggregateCUSDBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 import { ExternalLink } from 'theme/components'
@@ -271,7 +271,7 @@ export default function Header() {
   const userCELOBalance = useTokenBalance(account ?? undefined, CELO[chainId])
   const [darkMode, toggleDarkMode] = useDarkModeManager()
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
-  const aggregateBalance: TokenAmount | undefined = useAggregateUbeBalance()
+  const aggregateBalance: TokenAmount | undefined = useAggregateTGENBalance()
   const cUSDBalance: TokenAmount | undefined = useAggregateCUSDBalance()
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
