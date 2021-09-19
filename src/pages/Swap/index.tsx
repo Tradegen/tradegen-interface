@@ -11,6 +11,7 @@ import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
+import { MaxUint256 } from '@ethersproject/constants'
 
 import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonConfirmed, ButtonError, ButtonLight, ButtonPrimary } from '../../components/Button'
@@ -28,7 +29,7 @@ import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../
 import SwapHeader from '../../components/swap/SwapHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import TokenWarningModal from '../../components/TokenWarningModal'
-import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
+import { INITIAL_ALLOWED_SLIPPAGE, ZERO_ADDRESS, ROUTER_ADDRESS } from '../../constants'
 import { useAllTokens, useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
@@ -45,9 +46,23 @@ import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
 import { ClickableText } from '../UbeswapPool/styleds'
+import Web3 from 'web3'
+import { usePoolApproveCallback } from '../../hooks/usePoolApproveCallback'
+import { useDoTransaction } from 'components/swap/routing'
+import { useTokenContract, usePoolContract } from '../../hooks/useContract'
 
-export default function Swap() {
+const web3 = new Web3('https://alfajores-forno.celo-testnet.org');
+
+interface SwapProps {
+  poolAddress: string
+  manager: string
+}
+
+export default function Swap({ poolAddress, manager }: SwapProps) {
   const loadedUrlParams = useDefaultsFromURLSearch()
+
+  console.log(poolAddress);
+  console.log(manager);
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
@@ -87,7 +102,7 @@ export default function Swap() {
 
   // swap state
   const { independentField, typedValue, recipient } = useSwapState()
-  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useDerivedSwapInfo()
+  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useDerivedSwapInfo(poolAddress)
   const { address: recipientAddress } = useENS(recipient)
   const trade = v2Trade
 
@@ -95,6 +110,51 @@ export default function Swap() {
     [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.inputAmount,
     [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
   }
+
+  console.log(parsedAmount);
+  console.log(parsedAmount?.raw.toString())
+  console.log(trade)
+
+  let approvalAmount = parsedAmount ? parsedAmount?.raw.toString() : '0';
+  let fromToken = trade ? trade?.inputAmount.token.address : ZERO_ADDRESS;
+  let toToken = trade ? trade?.outputAmount.token.address : ZERO_ADDRESS;
+
+  let params = web3.eth.abi.encodeFunctionCall({
+    name: 'approve',
+    type: 'function',
+    inputs: [{
+        type: 'address',
+        name: 'spender'
+    },{
+        type: 'uint256',
+        name: 'value'
+    }]
+  }, [ROUTER_ADDRESS, approvalAmount]);
+  
+  let params2 = web3.eth.abi.encodeFunctionCall({
+    name: 'swapExactTokensForTokens',
+    type: 'function',
+    inputs: [{
+        type: 'uint256',
+        name: 'amountIn'
+    },{
+        type: 'uint256',
+        name: 'amountOutMin'
+    },{
+        type: 'address[]',
+        name: 'path'
+    },{
+        type: 'address',
+        name: 'to'
+    },{
+        type: 'uint256',
+        name: 'deadline'
+    }]
+  }, [approvalAmount, '0', [fromToken, toToken], poolAddress, MaxUint256.toString()]);
+
+  console.log(fromToken);
+  console.log(toToken);
+  console.log(params2);
 
   const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
   const isValid = !swapInputError
@@ -143,7 +203,7 @@ export default function Swap() {
   const noRoute = !route
 
   // check whether the user has approved the router on the input token
-  const [approval, approveCallback] = useApproveCallbackFromTrade(trade, allowedSlippage)
+  const [approval, approveCallback] = usePoolApproveCallback(trade?.inputAmount, poolAddress, params)
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)
@@ -165,6 +225,29 @@ export default function Swap() {
 
   const [singleHopOnly] = useUserSingleHopOnly()
 
+   // state for pending and submitted txn views
+   const [attempting, setAttempting] = useState<boolean>(false)
+   const [hash, setHash] = useState<string | undefined>()
+
+  const doTransaction = useDoTransaction()
+  const poolContract = usePoolContract(poolAddress)
+
+  async function onSwap() {
+    setAttempting(true)
+    if (poolContract && parsedAmount) {
+      if (approval === ApprovalState.APPROVED) {
+        const response = await doTransaction(poolContract, 'executeTransaction', {
+          args: [ROUTER_ADDRESS, params2],
+          summary: `Swapped tokens for pool`,
+        })
+        setHash(response.hash)
+      } else {
+        setAttempting(false)
+        throw new Error('Attempting to swap without approval or a signature. Please contact support.')
+      }
+    }
+  }
+
   const handleSwap = useCallback(() => {
     if (priceImpactWithoutFee && !confirmPriceImpactWithoutFee(priceImpactWithoutFee)) {
       return
@@ -176,22 +259,6 @@ export default function Swap() {
     swapCallback()
       .then((hash) => {
         setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
-
-        ReactGA.event({
-          category: 'Swap',
-          action:
-            recipient === null
-              ? 'Swap w/o Send'
-              : (recipientAddress ?? recipient) === account
-              ? 'Swap w/o Send + recipient'
-              : 'Swap w/ Send',
-          label: [trade?.inputAmount?.currency?.symbol, trade?.outputAmount?.currency?.symbol].join('/'),
-        })
-
-        ReactGA.event({
-          category: 'Routing',
-          action: singleHopOnly ? 'Swap with multihop disabled' : 'Swap with multihop enabled',
-        })
       })
       .catch((error) => {
         setSwapState({
@@ -299,6 +366,7 @@ export default function Swap() {
               onCurrencySelect={handleInputSelect}
               otherCurrency={currencies[Field.OUTPUT]}
               id="swap-currency-input"
+              poolAddress={poolAddress}
             />
             <AutoColumn justify="space-between">
               <AutoRow justify={isExpertMode ? 'space-between' : 'center'} style={{ padding: '0 1rem' }}>
@@ -328,6 +396,7 @@ export default function Swap() {
               onCurrencySelect={handleOutputSelect}
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
+              poolAddress={poolAddress}
             />
 
             {recipient !== null ? (
@@ -403,17 +472,7 @@ export default function Swap() {
                 </ButtonConfirmed>
                 <ButtonError
                   onClick={() => {
-                    if (isExpertMode) {
-                      handleSwap()
-                    } else {
-                      setSwapState({
-                        tradeToConfirm: trade,
-                        attemptingTxn: false,
-                        swapErrorMessage: undefined,
-                        showConfirm: true,
-                        txHash: undefined,
-                      })
-                    }
+                    onSwap()
                   }}
                   width="48%"
                   id="swap-button"
@@ -432,17 +491,7 @@ export default function Swap() {
             ) : (
               <ButtonError
                 onClick={() => {
-                  if (isExpertMode) {
-                    handleSwap()
-                  } else {
-                    setSwapState({
-                      tradeToConfirm: trade,
-                      attemptingTxn: false,
-                      swapErrorMessage: undefined,
-                      showConfirm: true,
-                      txHash: undefined,
-                    })
-                  }
+                  onSwap()
                 }}
                 id="swap-button"
                 disabled={!isValid || (priceImpactSeverity > 3 && !isExpertMode) || !!swapCallbackError}

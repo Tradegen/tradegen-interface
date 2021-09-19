@@ -106,7 +106,7 @@ function involvesAddress(trade: Trade, checksummedAddress: string): boolean {
 }
 
 // from the current swap inputs, compute the best trade and return it.
-export function useDerivedSwapInfo(): {
+export function useDerivedSwapInfo(poolAddress:string): {
   currencies: { [field in Field]?: Token }
   currencyBalances: { [field in Field]?: TokenAmount }
   parsedAmount: TokenAmount | undefined
@@ -128,7 +128,7 @@ export function useDerivedSwapInfo(): {
   const recipientLookup = useENS(recipient ?? undefined)
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
 
-  const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
+  const relevantTokenBalances = useCurrencyBalances(poolAddress ?? undefined, [
     inputCurrency ?? undefined,
     outputCurrency ?? undefined,
   ])

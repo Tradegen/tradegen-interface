@@ -130,6 +130,7 @@ interface CurrencyInputPanelProps {
   id: string
   showCommonBases?: boolean
   customBalanceText?: string
+  poolAddress?: string
 }
 
 export default function CurrencyInputPanel({
@@ -148,13 +149,14 @@ export default function CurrencyInputPanel({
   id,
   showCommonBases,
   customBalanceText,
+  poolAddress
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
 
   const [modalOpen, setModalOpen] = useState(false)
   const { address: account } = useContractKit()
 
-  const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
+  const selectedCurrencyBalance = useCurrencyBalance((poolAddress ? poolAddress : account ?? undefined), currency ?? undefined)
   const theme = useTheme()
 
   const handleDismissSearch = useCallback(() => {

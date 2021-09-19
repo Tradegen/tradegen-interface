@@ -12,12 +12,6 @@ import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
-import AddLiquidity from './AddLiquidity'
-import {
-  RedirectDuplicateTokenIds,
-  RedirectOldAddLiquidityPathStructure,
-  RedirectToAddLiquidity,
-} from './AddLiquidity/redirects'
 import Earn from './Earn'
 import Stake from './Stake'
 import Manage from './Earn/Manage'
@@ -25,14 +19,7 @@ import Pool from './UbeswapPool'
 import PoolPage from './Pool'
 import ManagePoolPage from './Manage/ManagePool'
 import NFTPoolPage from './NFTPool'
-import CreatePoolPage from './Create/CreatePool'
-import CreateNFTPoolPage from './Create/CreateNFTPool'
-import PoolFinder from './PoolFinder'
-import RemoveLiquidity from './RemoveLiquidity'
-import { RedirectOldRemoveLiquidityPathStructure } from './RemoveLiquidity/redirects'
-import Send from './Send'
-import Swap from './Swap'
-import { OpenClaimAddressModalAndRedirectToSwap, RedirectPathToInvestmentsOnly, RedirectToSwap } from './Swap/redirects'
+import { RedirectPathToInvestmentsOnly } from './Swap/redirects'
 import ManageTGEN from './Stake/ManageTGEN'
 import ManageLP from './Stake/ManageLP'
 
@@ -109,38 +96,17 @@ export default function App() {
           <Polling />
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
             <Switch>
-              <Route exact strict path="/swap" component={Swap} />
-              <Route exact strict path="/claim" component={OpenClaimAddressModalAndRedirectToSwap} />
-              <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
-              <Route exact strict path="/send" component={Send} />
-              <Route exact strict path="/find" component={PoolFinder} />
               <Route exact strict path="/pool" component={Pool} />
-              <Route exact strict path="/create" component={RedirectToAddLiquidity} />
-              <Route exact path="/add" component={AddLiquidity} />
-              <Route exact path="/add/:currencyIdA" component={RedirectOldAddLiquidityPathStructure} />
-              <Route exact path="/add/:currencyIdA/:currencyIdB" component={RedirectDuplicateTokenIds} />
-              <Route exact path="/create" component={AddLiquidity} />
-              <Route exact path="/create/:currencyIdA" component={RedirectOldAddLiquidityPathStructure} />
-              <Route exact path="/create/:currencyIdA/:currencyIdB" component={RedirectDuplicateTokenIds} />
-              <Route exact strict path="/remove/:tokens" component={RedirectOldRemoveLiquidityPathStructure} />
-              <Route exact strict path="/remove/:currencyIdA/:currencyIdB" component={RemoveLiquidity} />
               <Route exact strict path="/farm" component={Earn} />
               <Route exact strict path="/farm/:currencyIdA/:currencyIdB/:stakingAddress" component={Manage} />
-              <Route exact strict path="/dualfarm/:currencyIdA/:currencyIdB/:stakingAddress" component={Manage} />
               <Route exact strict path="/stake" component={Stake} />
               <Route exact strict path="/stake/TGEN" component={ManageTGEN} />
               <Route exact strict path="/stake/LP" component={ManageLP} />
-              <Route exact strict path="/pools" component={Swap} />
-              <Route exact strict path="/NFTpools" component={AddLiquidity} />
-              <Route exact strict path="/manage_pool_investment" component={Earn} />
-              <Route exact strict path="/manage_NFTpool_investment" component={Earn} />
               <Route exact strict path="/NFTpools" component={Earn} />
               <Route exact strict path="/manage_pool/:id" component={ManagePoolPage} />
               <Route exact strict path="/manage_NFTpool/:id" component={Earn} />
               <Route exact strict path="/NFTpool/:id" component={NFTPoolPage} />
               <Route exact strict path="/pool/:id" component={PoolPage} />
-              <Route exact strict path="/create_pool" component={CreatePoolPage} />
-              <Route exact strict path="/create_NFTpool" component={CreateNFTPoolPage} />
               <Route exact strict path="/investments" component={Investments} />
               <Route component={RedirectPathToInvestmentsOnly} />
             </Switch>

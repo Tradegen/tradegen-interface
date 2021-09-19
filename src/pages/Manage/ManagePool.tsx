@@ -1,15 +1,9 @@
-import { PoolInfo } from '../../features/pools/PoolInfo'
-import { UserInvestmentInfo } from '../../features/pools/UserInvestmentInfo'
 import { useUserInvestmentInfo, useStableCoinBalance, usePoolInfo } from '../../features/pools/hooks'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
 import { useContractKit } from '@celo-tools/use-contractkit'
-import StakingModal from '../../components/pools/DepositModal'
-import UnstakingModal from '../../components/pools/WithdrawModal'
-import { useWalletModalToggle } from '../../state/application/hooks'
 import React, { useCallback, useState, useMemo } from 'react'
 import { ButtonPrimary } from '../../components/Button'
-import { cUSD } from '@ubeswap/sdk'
 import { ZERO_ADDRESS } from '../../constants'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
@@ -38,7 +32,6 @@ export default function ManagePoolPage({
     }: RouteComponentProps<{ id: string }>) {
 
     let { network, account } = useContractKit();
-    const { chainId } = network
     console.log(account);
     account = account ?? ZERO_ADDRESS;
 
@@ -47,22 +40,7 @@ export default function ManagePoolPage({
         return data;
     }, [data]);
 
-    const [showStakingModal, setShowStakingModal] = useState(false)
-    const [showUnstakingModal, setShowUnstakingModal] = useState(false)
-
-    const investmentInfo = useUserInvestmentInfo(id, account)
-    const tokenBalance = investmentInfo ? investmentInfo.userBalance.toString() : '0'
-    const cUSDBalance = useStableCoinBalance(cUSD[chainId].address, account).toString()
-
-    const toggleWalletModal = useWalletModalToggle()
-
-    const handleDepositClick = useCallback(() => {
-    if (account) {
-        setShowStakingModal(true)
-    } else {
-        toggleWalletModal()
-    }
-    }, [account, toggleWalletModal])
+    let manager = poolInfo.manager ?? ZERO_ADDRESS;
 
     return (
         <>
@@ -90,7 +68,10 @@ export default function ManagePoolPage({
                 )))}
             </ItemWrapper>
 
-            <Swap></Swap>
+            <Swap
+                poolAddress={id}
+                manager={manager}
+            ></Swap>
         </>
     )
 }
