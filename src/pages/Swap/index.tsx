@@ -49,16 +49,17 @@ import { ClickableText } from '../UbeswapPool/styleds'
 import Web3 from 'web3'
 import { usePoolApproveCallback } from '../../hooks/usePoolApproveCallback'
 import { useDoTransaction } from 'components/swap/routing'
-import { useTokenContract, usePoolContract } from '../../hooks/useContract'
+import { useTokenContract, usePoolContract, useNFTPoolContract } from '../../hooks/useContract'
 
 const web3 = new Web3('https://alfajores-forno.celo-testnet.org');
 
 interface SwapProps {
   poolAddress: string
   manager: string
+  isNFTPool: boolean
 }
 
-export default function Swap({ poolAddress, manager }: SwapProps) {
+export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
   const loadedUrlParams = useDefaultsFromURLSearch()
 
   console.log(poolAddress);
@@ -203,7 +204,7 @@ export default function Swap({ poolAddress, manager }: SwapProps) {
   const noRoute = !route
 
   // check whether the user has approved the router on the input token
-  const [approval, approveCallback] = usePoolApproveCallback(trade?.inputAmount, poolAddress, params)
+  const [approval, approveCallback] = usePoolApproveCallback(trade?.inputAmount, poolAddress, params, isNFTPool)
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)
@@ -231,16 +232,28 @@ export default function Swap({ poolAddress, manager }: SwapProps) {
 
   const doTransaction = useDoTransaction()
   const poolContract = usePoolContract(poolAddress)
+  const NFTPoolContract = useNFTPoolContract(poolAddress)
 
   async function onSwap() {
     setAttempting(true)
-    if (poolContract && parsedAmount) {
+    if ((poolContract || NFTPoolContract) && parsedAmount) {
       if (approval === ApprovalState.APPROVED) {
-        const response = await doTransaction(poolContract, 'executeTransaction', {
-          args: [ROUTER_ADDRESS, params2],
-          summary: `Swapped tokens for pool`,
-        })
-        setHash(response.hash)
+        if (!isNFTPool)
+        {
+          const response = await doTransaction(poolContract, 'executeTransaction', {
+            args: [ROUTER_ADDRESS, params2],
+            summary: `Swapped tokens for pool`,
+          })
+          setHash(response.hash)
+        }
+        else
+        {
+          const response = await doTransaction(NFTPoolContract, 'executeTransaction', {
+            args: [ROUTER_ADDRESS, params2],
+            summary: `Swapped tokens for NFT pool`,
+          })
+          setHash(response.hash)
+        }
       } else {
         setAttempting(false)
         throw new Error('Attempting to swap without approval or a signature. Please contact support.')

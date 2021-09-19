@@ -13,7 +13,7 @@ import { useTokenAllowance } from '../data/Allowances'
 import { Field } from '../state/swap/actions'
 import { useHasPendingApproval } from '../state/transactions/hooks'
 import { computeSlippageAdjustedAmounts } from '../utils/prices'
-import { useTokenContract, usePoolContract } from './useContract'
+import { useTokenContract, usePoolContract, useNFTPoolContract } from './useContract'
 
 export enum ApprovalState {
   UNKNOWN,
@@ -26,7 +26,8 @@ export enum ApprovalState {
 export function usePoolApproveCallback(
   amountToApprove?: TokenAmount,
   poolAddress?: string,
-  data?: string
+  data?: string,
+  isNFTPool?: boolean
 ): [ApprovalState, () => Promise<void>] {
   const getConnectedSigner = useGetConnectedSigner()
 
@@ -49,6 +50,7 @@ export function usePoolApproveCallback(
   }, [amountToApprove, currentAllowance, pendingApproval, ROUTER_ADDRESS])
 
   const poolContract = usePoolContract(poolAddress)
+  const NFTPoolContract = useNFTPoolContract(poolAddress)
   const doTransaction = useDoTransaction()
 
   const approve = useCallback(async (): Promise<void> => {
@@ -61,8 +63,13 @@ export function usePoolApproveCallback(
       return
     }
 
-    if (!poolContract) {
+    if (!poolContract && !isNFTPool) {
       console.error('poolContract is null')
+      return
+    }
+
+    if (!NFTPoolContract && isNFTPool) {
+      console.error('NFTPoolContract is null')
       return
     }
 
@@ -76,11 +83,23 @@ export function usePoolApproveCallback(
       return
     }
 
-    await doTransaction(poolContract, 'executeTransaction', {
+    if (!isNFTPool)
+    {
+      await doTransaction(poolContract, 'executeTransaction', {
+        args: [token?.address, data],
+        summary: `Approve ${amountToApprove.toSignificant(6)} ${amountToApprove.currency.symbol}`,
+        approval: { tokenAddress: token.address, spender: ROUTER_ADDRESS },
+      })
+    }
+    else
+    {
+      await doTransaction(NFTPoolContract, 'executeTransaction', {
         args: [token?.address, data],
         summary: `Approve ${amountToApprove.toSignificant(6)} ${amountToApprove.currency.symbol}`,
         approval: { tokenAddress: token.address, spender: ROUTER_ADDRESS },
     })
+    }
+    
   }, [
     approvalState,
     token,

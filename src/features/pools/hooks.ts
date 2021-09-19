@@ -143,10 +143,10 @@ export function usePoolInfo(poolAddress:string): PoolInfo {
   const positionsAndTotal = usePositionsAndTotal(poolContract);
 
   return {
-    TVL: (!positionsAndTotal || positionsAndTotal[2] === undefined) ? BigInt(0) : BigInt(positionsAndTotal[2]) / BigInt(1e18),
+    TVL: (!positionsAndTotal || positionsAndTotal[2] === undefined) ? BigInt(0) : BigInt(positionsAndTotal[2]) / BigInt(1e16),
     address: poolAddress,
     name: name,
-    tokenPrice: (!tokenPrice) ? BigInt(0) : BigInt(tokenPrice) / BigInt(1e18),
+    tokenPrice: (!tokenPrice) ? BigInt(0) : BigInt(tokenPrice) / BigInt(1e16),
     totalReturn: (!tokenPrice || BigInt(tokenPrice) == BigInt(0)) ? BigInt(0) : (BigInt(tokenPrice) - BigInt(1e18)) * BigInt(100) / BigInt(1e18),
     manager: manager,
     performanceFee: (!performanceFee) ? 0 : Number(performanceFee),

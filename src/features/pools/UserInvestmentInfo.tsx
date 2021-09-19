@@ -57,7 +57,7 @@ export function UserInvestmentInfo(props:any) {
                 <ItemWrapper>
                     <ErrorBoundary>
                         <p>Your token balance: {formatBalance(info.userBalance)}</p>
-                        <p>Your USD value: {formatNumber(Number(info.userUSDBalance / BigInt(1e18)), true, true, 18)}</p>
+                        <p>Your USD value: {formatNumber(Number(info.userUSDBalance / BigInt(1e16)) / 100, true, true, 18)}</p>
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>

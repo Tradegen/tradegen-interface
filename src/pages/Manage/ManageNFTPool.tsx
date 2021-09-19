@@ -1,4 +1,4 @@
-import { useUserInvestmentInfo, useStableCoinBalance, usePoolInfo } from '../../features/pools/hooks'
+import { useNFTPoolInfo } from '../../features/NFTPools/hooks'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
 import { useContractKit } from '@celo-tools/use-contractkit'
@@ -25,7 +25,7 @@ const ItemWrapper = styled.div`
   margin-bottom: 1rem;
 `
 
-export default function ManagePoolPage({
+export default function ManageNFTPoolPage({
         match: {
             params: { id },
         },
@@ -35,7 +35,7 @@ export default function ManagePoolPage({
     console.log(account);
     account = account ?? ZERO_ADDRESS;
 
-    let data = usePoolInfo(id);
+    let data = useNFTPoolInfo(id);
     const poolInfo = useMemo(() => {
         return data;
     }, [data]);
@@ -44,7 +44,7 @@ export default function ManagePoolPage({
 
     return (
         <>
-            <p>Manage Pool</p>
+            <p>Manage NFT Pool</p>
             <p>Positions:</p>
             <ItemWrapper>
                 {poolInfo.positionAddresses?.length === 0 ? (
@@ -71,7 +71,7 @@ export default function ManagePoolPage({
             <Swap
                 poolAddress={id}
                 manager={manager}
-                isNFTPool={false}
+                isNFTPool={true}
             ></Swap>
         </>
     )
