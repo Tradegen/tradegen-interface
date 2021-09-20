@@ -185,6 +185,7 @@ const WalletAction = styled(ButtonSecondary)`
   margin-left: 8px;
   font-size: 0.825rem;
   padding: 4px 6px;
+  color: #5271FF;
   :hover {
     cursor: pointer;
     text-decoration: underline;
