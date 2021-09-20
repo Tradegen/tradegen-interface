@@ -1,8 +1,9 @@
 import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react'
 import { useNFTPoolContract, useTokenContract } from '../../hooks/useContract'
-import { useSingleCallResult, NEVER_RELOAD } from '../../state/multicall/hooks'
+import { useSingleCallResult, NEVER_RELOAD, useMultipleContractSingleData } from '../../state/multicall/hooks'
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
+import ERC20_INTERFACE from '../../constants/abis/erc20'
 
 export interface NFTPoolInfo {
   TVL: bigint | null,
@@ -236,4 +237,10 @@ export function useTotalBalance(NFTPoolAddress:string, userAddress:string): bigi
   const balance = useOwnerBalance(NFTPoolContract, userAddress);
 
   return balance ?? BigInt(0)
+}
+
+export function usePositionNames(positions:string[]): string[] {
+  const names = useMultipleContractSingleData(positions, ERC20_INTERFACE, 'symbol')?.map((element:any) => (element?.result ? element?.result[0] : null));
+
+  return names ?? [];
 }

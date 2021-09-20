@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { usePoolInfo } from '../../features/pools/hooks'
+import { usePoolInfo, usePositionNames } from '../../features/pools/hooks'
 import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
@@ -55,6 +55,31 @@ export function PoolInfo(props:any) {
         return data;
     }, [data]);
 
+    let positions = poolInfo ? (poolInfo.positionAddresses ?? []) : [];
+
+    let data1 = usePositionNames(positions);
+    const positionNames = useMemo(() => {
+        return data1;
+    }, [data1]);
+
+    let combinedPositions = [];
+    if (!poolInfo.positionBalances || !positionNames || poolInfo.positionBalances.length != positionNames.length)
+    {
+        combinedPositions = [];
+    }
+    else
+    {
+        for (var i = 0; i < positionNames.length; i++)
+        {
+            combinedPositions.push({
+                symbol: positionNames[i],
+                balance: poolInfo.positionBalances[i]
+            });
+        }
+    }
+
+    console.log(combinedPositions);
+
     return poolInfo ? (
         <>
             <div>
@@ -69,23 +94,12 @@ export function PoolInfo(props:any) {
                         <p>Total Return: {poolInfo.totalReturn}</p>
                         <p>Positions:</p>
                         <ItemWrapper>
-                            {poolInfo.positionAddresses?.length === 0 ? (
+                            {combinedPositions.length === 0 ? (
                                 <div>No positions yet.</div>
                             ) : (
-                            poolInfo.positionAddresses.map((address:string) => (
-                                <ErrorBoundary key={address}>
-                                    <p>{address}</p>
-                                </ErrorBoundary>
-                            )))}
-                        </ItemWrapper>
-                        <p>Balances:</p>
-                        <ItemWrapper>
-                            {poolInfo.positionBalances?.length === 0 ? (
-                                <div>No positions yet.</div>
-                            ) : (
-                            poolInfo.positionBalances.map((balance:bigint) => (
-                                <ErrorBoundary>
-                                    <p>{formatBalance(balance)}</p>
+                            combinedPositions.map((element:any) => (
+                                <ErrorBoundary key={element.symbol}>
+                                    <p>{element.symbol}: {formatBalance(element.balance)}</p>
                                 </ErrorBoundary>
                             )))}
                         </ItemWrapper>

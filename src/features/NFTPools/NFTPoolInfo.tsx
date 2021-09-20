@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useNFTPoolInfo } from '../../features/NFTPools/hooks'
+import { useNFTPoolInfo, usePositionNames } from '../../features/NFTPools/hooks'
 import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
@@ -7,32 +7,6 @@ import { ButtonPrimary } from '../../components/Button'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { ZERO_ADDRESS } from '../../constants'
-
-const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 700;
-  color: rgba(191, 191, 191, 1);
-`
-
-const ColumnWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  grid-column: span 2/span 2;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  cursor: pointer;
-`
-
-const ColumnWrapper2 = styled.div`
-  display: flex;
-  align-items: center;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  cursor: pointer;
-`
 
 const ItemWrapper = styled.div`
   margin-top: 1rem;
@@ -54,6 +28,31 @@ export function NFTPoolInfo(props:any) {
     const info = useMemo(() => {
         return data;
     }, [data]);
+
+    let positions = info ? (info.positionAddresses ?? []) : [];
+
+    let data1 = usePositionNames(positions);
+    const positionNames = useMemo(() => {
+        return data1;
+    }, [data1]);
+
+    let combinedPositions = [];
+    if (!info.positionBalances || !positionNames || info.positionBalances.length != positionNames.length)
+    {
+        combinedPositions = [];
+    }
+    else
+    {
+        for (var i = 0; i < positionNames.length; i++)
+        {
+            combinedPositions.push({
+                symbol: positionNames[i],
+                balance: info.positionBalances[i]
+            });
+        }
+    }
+
+    console.log(combinedPositions);
 
     return info ? (
         <>
@@ -81,23 +80,12 @@ export function NFTPoolInfo(props:any) {
                         </ItemWrapper>
                         <p>Positions:</p>
                         <ItemWrapper>
-                            {info.positionAddresses?.length === 0 ? (
+                            {combinedPositions.length === 0 ? (
                                 <div>No positions yet.</div>
                             ) : (
-                            info.positionAddresses?.map((address:string) => (
-                                <ErrorBoundary key={address}>
-                                    <p>{address}</p>
-                                </ErrorBoundary>
-                            )))}
-                        </ItemWrapper>
-                        <p>Balances:</p>
-                        <ItemWrapper>
-                            {info.positionBalances?.length === 0 ? (
-                                <div>No positions yet.</div>
-                            ) : (
-                            info.positionBalances?.map((balance:bigint) => (
-                                <ErrorBoundary>
-                                    <p>{formatBalance(BigInt(BigInt(balance)), 18)}</p>
+                            combinedPositions.map((element:any) => (
+                                <ErrorBoundary key={element.symbol}>
+                                    <p>{element.symbol}: {formatBalance(element.balance)}</p>
                                 </ErrorBoundary>
                             )))}
                         </ItemWrapper>
