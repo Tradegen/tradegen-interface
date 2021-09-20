@@ -186,7 +186,7 @@ export function useNFTPoolInfo(NFTPoolAddress:string): NFTPoolInfo {
   const tokenBalancesPerClass = useAvailableTokensPerClass(NFTPoolContract);
 
   return {
-    TVL: (!positionsAndTotal || positionsAndTotal[2] === undefined) ? BigInt(0) : BigInt(positionsAndTotal[2]) / BigInt(1e18),
+    TVL: (!positionsAndTotal || positionsAndTotal[2] === undefined) ? BigInt(0) : BigInt(positionsAndTotal[2]) / BigInt(1e16),
     address: NFTPoolAddress,
     name: name,
     tokenPrice: (!tokenPrice) ? BigInt(0) : BigInt(tokenPrice) / BigInt(1e16),

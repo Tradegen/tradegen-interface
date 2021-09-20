@@ -23,6 +23,7 @@ import NFTPoolPage from './NFTPool'
 import { RedirectPathToInvestmentsOnly } from './Swap/redirects'
 import ManageTGEN from './Stake/ManageTGEN'
 import ManageLP from './Stake/ManageLP'
+import Filler from './Filler'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -98,8 +99,8 @@ export default function App() {
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
             <Switch>
               <Route exact strict path="/pool" component={Pool} />
-              <Route exact strict path="/farm" component={Earn} />
-              <Route exact strict path="/farm/:currencyIdA/:currencyIdB/:stakingAddress" component={Manage} />
+              <Route exact strict path="/farm" component={Filler} />
+              <Route exact strict path="/farm/:currencyIdA/:currencyIdB/:stakingAddress" component={Filler} />
               <Route exact strict path="/stake" component={Stake} />
               <Route exact strict path="/stake/TGEN" component={ManageTGEN} />
               <Route exact strict path="/stake/LP" component={ManageLP} />

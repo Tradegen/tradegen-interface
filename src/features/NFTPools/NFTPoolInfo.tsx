@@ -66,7 +66,7 @@ export function NFTPoolInfo(props:any) {
                         <p>Max Supply: {Number(info.maxSupply)}</p>
                         <p>Seed Price: {formatNumber(Number(info.seedPrice) / 100, true, true, 18)}</p>
                         <p>Token price: {formatNumber(Number(info.tokenPrice) / 100, true, true, 18)}</p>
-                        <p>TVL: {formatNumber(Number(info.TVL), true, true, 18)}</p>
+                        <p>TVL: {formatNumber(Number(info.TVL) / 100, true, true, 18)}</p>
                         <p>Total Return: {formatPercent(Number(info.totalReturn))}</p>
                         <p>Available tokens per class:</p>
                         <ItemWrapper>
