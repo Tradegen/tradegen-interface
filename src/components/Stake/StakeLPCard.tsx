@@ -59,7 +59,8 @@ export function StakeLPCard() {
   let TGENToken = new Token(NETWORK_CHAIN_ID, TGEN, 18);
   let price = useCUSDPrice(TGENToken);
   let stringPrice = price?.raw.numerator.toString();
-  const TGENPrice = stringPrice ? BigInt(stringPrice) : BigInt(0);
+  let stringPrice2 = price?.raw.denominator.toString();
+  const TGENPrice = (stringPrice && stringPrice2) ? BigInt(BigInt(stringPrice) * BigInt(1e18) / BigInt(stringPrice2)) : BigInt(0);
   console.log(TGENPrice);
 
   let data = useTradegenLPStakingRewardsInfo();
@@ -74,9 +75,10 @@ export function StakeLPCard() {
 
   const rewardRate = BigInt(stakingRewardsInfo.rewardRate);
   const TVL = BigInt(stakingRewardsInfo.TVL);
-  const valueOfTotalStakedAmountInCUSD = (TVL) ? (BigInt(TVL)) : undefined;
-
-  console.log(valueOfTotalStakedAmountInCUSD)
+  const valueOfTotalStakedAmountInCUSD = (tokenPrice) ? (BigInt(tokenPrice) * BigInt(TVL) / BigInt(1e18)) : BigInt(0);
+  const valueOfTGENInUSD = (TGENPrice != BigInt(0)) ? (BigInt(TGENPrice) * BigInt(rewardRate) * BigInt(52) / BigInt(1e36)) : BigInt(0);
+  
+  const apr = (valueOfTotalStakedAmountInCUSD != BigInt(0)) ? BigInt(valueOfTGENInUSD) / BigInt(valueOfTotalStakedAmountInCUSD) * BigInt(100) : BigInt(0)
 
   const apy = valueOfTotalStakedAmountInCUSD ? new Percent(valueOfTotalStakedAmountInCUSD, "1000") : undefined
 
@@ -105,7 +107,7 @@ export function StakeLPCard() {
           </TYPE.white>
           {apy && apy.greaterThan('0') && (
             <TYPE.small className="apr" fontWeight={400} fontSize={14}>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
+              {apr.toString()}% APR
             </TYPE.small>
           )}
         </PoolInfo>
@@ -125,7 +127,7 @@ export function StakeLPCard() {
           <TYPE.white>Total staked</TYPE.white>
           <TYPE.white>
             {valueOfTotalStakedAmountInCUSD
-              ? valueOfTotalStakedAmountInCUSD.toString() + ' TGEN-cUSD'
+              ? TVL.toString() + ' TGEN-cUSD'
               : '-'}
           </TYPE.white>
         </RowBetween>
@@ -149,7 +151,7 @@ export function StakeLPCard() {
               />
             </RowFixed>
             <TYPE.white>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'}
+              {apr.toString()}%
             </TYPE.white>
           </RowBetween>
         )}
