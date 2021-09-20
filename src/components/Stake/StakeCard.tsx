@@ -74,6 +74,10 @@ export function StakeCard() {
   const TVL = BigInt(stakingRewardsInfo.TVL);
   const valueOfTotalStakedAmountInCUSD = (TGENPrice) ? (TGENPrice * TVL / BigInt(1e18)) : undefined;
 
+  const apr = (BigInt(100) * BigInt(rewardRate) * BigInt(52) / BigInt(TVL) / BigInt(1e18))
+  console.log(TVL.toString())
+  console.log(apr.toString())
+
   const apy = valueOfTotalStakedAmountInCUSD ? new Percent(valueOfTotalStakedAmountInCUSD, "1000") : undefined
 
   const dpy = apy
@@ -101,7 +105,7 @@ export function StakeCard() {
           </TYPE.white>
           {apy && apy.greaterThan('0') && (
             <TYPE.small className="apr" fontWeight={400} fontSize={14}>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
+              {apr.toString()} APR
             </TYPE.small>
           )}
         </PoolInfo>
@@ -121,7 +125,7 @@ export function StakeCard() {
           <TYPE.white>Total staked</TYPE.white>
           <TYPE.white>
             {valueOfTotalStakedAmountInCUSD
-              ? valueOfTotalStakedAmountInCUSD + ' TGEN'
+              ? TVL.toString() + ' TGEN'
               : '-'}
           </TYPE.white>
         </RowBetween>
@@ -145,7 +149,7 @@ export function StakeCard() {
               />
             </RowFixed>
             <TYPE.white>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'}
+              {apr ? apr.toString() + '%' : '-'}
             </TYPE.white>
           </RowBetween>
         )}
