@@ -1,13 +1,14 @@
 import { useMemo } from 'react'
 import { usePoolContract, useTokenContract } from '../../hooks/useContract'
 import { useSingleCallResult, NEVER_RELOAD } from '../../state/multicall/hooks'
+import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 
 export interface PoolInfo {
   TVL: bigint | null,
   address: string,
   name: string | null,
   tokenPrice: bigint | null,
-  totalReturn: bigint,
+  totalReturn: string,
   manager: string,
   performanceFee: number,
   positionAddresses: string[],
@@ -142,12 +143,29 @@ export function usePoolInfo(poolAddress:string): PoolInfo {
   const manager = useManager(poolContract);
   const positionsAndTotal = usePositionsAndTotal(poolContract);
 
+  let totalReturn = "0%";
+  if (!tokenPrice)
+  {
+    totalReturn = "0%";
+  }
+  else
+  {
+    if (BigInt(tokenPrice) >= BigInt(1e18))
+    {
+      totalReturn = formatPercent(formatBalance((BigInt(tokenPrice) - BigInt(1e18)) * BigInt(100)));
+    }
+    else
+    {
+      totalReturn = "-" + formatPercent(formatBalance((BigInt(1e18) - BigInt(tokenPrice)) * BigInt(100)));
+    }
+  }
+
   return {
     TVL: (!positionsAndTotal || positionsAndTotal[2] === undefined) ? BigInt(0) : BigInt(positionsAndTotal[2]) / BigInt(1e16),
     address: poolAddress,
     name: name,
     tokenPrice: (!tokenPrice) ? BigInt(0) : BigInt(tokenPrice) / BigInt(1e16),
-    totalReturn: (!tokenPrice || BigInt(tokenPrice) == BigInt(0)) ? BigInt(0) : (BigInt(tokenPrice) - BigInt(1e18)) * BigInt(100) / BigInt(1e18),
+    totalReturn: totalReturn,
     manager: manager,
     performanceFee: (!performanceFee) ? 0 : Number(performanceFee),
     positionAddresses: (!positionsAndTotal || positionsAndTotal[0] === undefined) ? [] : positionsAndTotal[0],

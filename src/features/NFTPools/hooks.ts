@@ -2,13 +2,14 @@ import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react'
 import { useNFTPoolContract, useTokenContract } from '../../hooks/useContract'
 import { useSingleCallResult, NEVER_RELOAD } from '../../state/multicall/hooks'
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
+import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 
 export interface NFTPoolInfo {
   TVL: bigint | null,
   address: string,
   name: string | null,
   tokenPrice: bigint | null,
-  totalReturn: bigint,
+  totalReturn: string,
   manager: string,
   maxSupply: bigint | null,
   seedPrice: bigint | null,
@@ -185,12 +186,29 @@ export function useNFTPoolInfo(NFTPoolAddress:string): NFTPoolInfo {
   const positionsAndTotal = usePositionsAndTotal(NFTPoolContract);
   const tokenBalancesPerClass = useAvailableTokensPerClass(NFTPoolContract);
 
+  let totalReturn = "0%";
+  if (!tokenPrice || !seedPrice || BigInt(seedPrice) == BigInt(0))
+  {
+    totalReturn = "0%";
+  }
+  else
+  {
+    if (BigInt(tokenPrice) >= BigInt(seedPrice))
+    {
+      totalReturn = formatPercent(formatBalance((BigInt(tokenPrice) - BigInt(seedPrice)) * BigInt(100) * BigInt(1e18) / BigInt(seedPrice)));
+    }
+    else
+    {
+      totalReturn = "-" + formatPercent(formatBalance((BigInt(seedPrice) - BigInt(tokenPrice)) * BigInt(100) * BigInt(1e18) / BigInt(seedPrice)));
+    }
+  }
+
   return {
     TVL: (!positionsAndTotal || positionsAndTotal[2] === undefined) ? BigInt(0) : BigInt(positionsAndTotal[2]) / BigInt(1e16),
     address: NFTPoolAddress,
     name: name,
     tokenPrice: (!tokenPrice) ? BigInt(0) : BigInt(tokenPrice) / BigInt(1e16),
-    totalReturn: (!tokenPrice || BigInt(tokenPrice) == BigInt(0)) ? BigInt(0) : (BigInt(tokenPrice) - BigInt(seedPrice)) * BigInt(100) / BigInt(seedPrice),
+    totalReturn: totalReturn,
     manager: manager,
     maxSupply: (!maxSupply) ? BigInt(0) : BigInt(maxSupply),
     seedPrice: (!seedPrice) ? BigInt(0) : BigInt(seedPrice) / BigInt(1e16),

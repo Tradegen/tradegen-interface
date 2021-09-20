@@ -66,7 +66,7 @@ export function PoolInfo(props:any) {
                         <p>Performance fee: {Number(poolInfo.performanceFee) / 100}%</p>
                         <p>Token price: {formatNumber(Number(poolInfo.tokenPrice) / 100, true, true, 18)}</p>
                         <p>TVL: {formatNumber(Number(poolInfo.TVL) / 100, true, true, 18)}</p>
-                        <p>Total Return: {formatPercent(Number(poolInfo.totalReturn))}</p>
+                        <p>Total Return: {poolInfo.totalReturn}</p>
                         <p>Positions:</p>
                         <ItemWrapper>
                             {poolInfo.positionAddresses?.length === 0 ? (

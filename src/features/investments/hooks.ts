@@ -6,13 +6,14 @@ import { ChainId } from '@ubeswap/sdk'
 import { concat } from 'lodash'
 import { POOL_INTERFACE } from '../../constants/abis/pool'
 import { NFT_POOL_INTERFACE } from '../../constants/abis/NFTpool'
+import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 
 export interface Investment {
   TVL: bigint | null,
   address: string,
   name: string | null,
   tokenPrice: bigint | null,
-  totalReturn: bigint,
+  totalReturn: string,
   type: string
 }
 
@@ -30,7 +31,7 @@ export interface ManagedInvestment {
   address: string,
   TVL: bigint,
   tokenPrice: bigint,
-  totalReturn: bigint,
+  totalReturn: string,
   manager: string
 }
 
@@ -95,25 +96,59 @@ export function useInvestments(): Investment[] {
   
   for (var i = 0; i < poolAddresses.length; i++)
   {
+    let totalReturn = "0%";
+    if (!poolTokenPrices[i])
+    {
+      totalReturn = "0%";
+    }
+    else
+    {
+      if (BigInt(poolTokenPrices[i]) >= BigInt(1e18))
+      {
+        totalReturn = formatPercent(formatBalance((BigInt(poolTokenPrices[i]) - BigInt(1e18)) * BigInt(100)));
+      }
+      else
+      {
+        totalReturn = "-" + formatPercent(formatBalance((BigInt(1e18) - BigInt(poolTokenPrices[i])) * BigInt(100)));
+      }
+    }
+
     investments.push({
       type: "Pool",
       address: poolAddresses[i],
       tokenPrice: (poolTokenPrices[i] === null) ? BigInt(0) : BigInt(poolTokenPrices[i]) / BigInt(1e16),
       TVL: (poolValues[i] === null) ? BigInt(0) : BigInt(poolValues[i]) / BigInt(1e16),
       name: poolNames[i],
-      totalReturn: (poolTokenPrices[i] === null || BigInt(poolTokenPrices[i]) == BigInt(0)) ? BigInt(0) : (BigInt(poolTokenPrices[i]) - BigInt(1e18)) * BigInt(100) / BigInt(1e18)
+      totalReturn: totalReturn
     });
   }
   
   for (var i = 0; i < NFTPoolAddresses.length; i++)
   {
+    let totalReturn = "0%";
+    if (!NFTPoolTokenPrices[i] || !NFTPoolSeedPrices[i] || BigInt(NFTPoolSeedPrices[i]) == BigInt(0))
+    {
+      totalReturn = "0%";
+    }
+    else
+    {
+      if (BigInt(NFTPoolTokenPrices[i]) >= BigInt(NFTPoolSeedPrices[i]))
+      {
+        totalReturn = formatPercent(formatBalance((BigInt(NFTPoolTokenPrices[i]) - BigInt(NFTPoolSeedPrices[i])) * BigInt(100) * BigInt(1e18) / BigInt(NFTPoolSeedPrices[i])));
+      }
+      else
+      {
+        totalReturn = "-" + formatPercent(formatBalance((BigInt(NFTPoolSeedPrices[i]) - BigInt(NFTPoolTokenPrices[i])) * BigInt(100) * BigInt(1e18) / BigInt(NFTPoolSeedPrices[i])));
+      }
+    }
+
     investments.push({
       type: "NFT Pool",
       address: NFTPoolAddresses[i],
       tokenPrice: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(NFTPoolTokenPrices[i]) / BigInt(1e16),
       TVL: (NFTPoolValues[i] === null) ? BigInt(0) : BigInt(NFTPoolValues[i]) / BigInt(1e16),
       name: NFTPoolNames[i],
-      totalReturn: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(BigInt(NFTPoolSeedPrices[i]) - BigInt(NFTPoolTokenPrices[i])) * BigInt(100) / BigInt(NFTPoolSeedPrices[i]) 
+      totalReturn: totalReturn
     });
   }
 
@@ -137,9 +172,7 @@ export function useUserInvestments(userAddress:string): UserInvestment[] {
 
   const poolUSDBalances = useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'getUSDBalance', [userAddress])?.map((element:any) => (element?.result ? element?.result[0] : null));
   const NFTPoolUSDBalances = useMultipleContractSingleData(NFTPoolAddresses, NFT_POOL_INTERFACE, 'getUSDBalance', [userAddress])?.map((element:any) => (element?.result ? element?.result[0] : null));
-  
-  console.log(useMultipleContractSingleData(poolAddresses, POOL_INTERFACE, 'name'));
-  
+    
   let investments:UserInvestment[] = [];
   
   for (var i = 0; i < poolAddresses.length; i++)
@@ -194,26 +227,60 @@ export function useManagedInvestments(): ManagedInvestment[] {
   
   for (var i = 0; i < poolAddresses.length; i++)
   {
+    let totalReturn = "0%";
+    if (!poolTokenPrices[i])
+    {
+      totalReturn = "0%";
+    }
+    else
+    {
+      if (BigInt(poolTokenPrices[i]) >= BigInt(1e18))
+      {
+        totalReturn = formatPercent(formatBalance((BigInt(poolTokenPrices[i]) - BigInt(1e18)) * BigInt(100)));
+      }
+      else
+      {
+        totalReturn = "-" + formatPercent(formatBalance((BigInt(1e18) - BigInt(poolTokenPrices[i])) * BigInt(100)));
+      }
+    }
+
     investments.push({
       name: poolNames[i],
       type: "Pool",
       address: poolAddresses[i],
       TVL: (!poolValues[i]) ? BigInt(0) : BigInt(poolValues[i]),
       tokenPrice: (poolTokenPrices[i] === null) ? BigInt(0) : BigInt(poolTokenPrices[i]) / BigInt(1e16),
-      totalReturn: (poolTokenPrices[i] === null || BigInt(poolTokenPrices[i]) == BigInt(0)) ? BigInt(0) : (BigInt(poolTokenPrices[i]) - BigInt(1e18)) * BigInt(100) / BigInt(1e18),
+      totalReturn: totalReturn,
       manager: poolManagers[i]
     });
   }
   
   for (var i = 0; i < NFTPoolAddresses.length; i++)
   {
+    let totalReturn = "0%";
+    if (!NFTPoolTokenPrices[i] || !NFTPoolSeedPrices[i] || BigInt(NFTPoolSeedPrices[i]) == BigInt(0))
+    {
+      totalReturn = "0%";
+    }
+    else
+    {
+      if (BigInt(NFTPoolTokenPrices[i]) >= BigInt(NFTPoolSeedPrices[i]))
+      {
+        totalReturn = formatPercent(formatBalance((BigInt(NFTPoolTokenPrices[i]) - BigInt(NFTPoolSeedPrices[i])) * BigInt(100) * BigInt(1e18) / BigInt(NFTPoolSeedPrices[i])));
+      }
+      else
+      {
+        totalReturn = "-" + formatPercent(formatBalance((BigInt(NFTPoolSeedPrices[i]) - BigInt(NFTPoolTokenPrices[i])) * BigInt(100) * BigInt(1e18) / BigInt(NFTPoolSeedPrices[i])));
+      }
+    }
+
     investments.push({
       name: NFTPoolNames[i],
       type: "NFT Pool",
       address: NFTPoolAddresses[i],
       TVL: (!NFTPoolValues[i]) ? BigInt(0) : BigInt(NFTPoolValues[i]),
       tokenPrice: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(NFTPoolTokenPrices[i]) / BigInt(1e16),
-      totalReturn: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(BigInt(NFTPoolSeedPrices[i]) - BigInt(NFTPoolTokenPrices[i])) * BigInt(100) / BigInt(NFTPoolSeedPrices[i]),
+      totalReturn: totalReturn,
       manager: NFTPoolManagers[i]
     });
   }

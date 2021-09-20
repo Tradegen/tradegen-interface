@@ -170,7 +170,7 @@ export function ManagedInvestments(props:any) {
                                 <p>{formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}/token</p>
                             </InvestmentCardContent>
                             <InvestmentCardContent>
-                                <p>{formatPercent(Number(investment.totalReturn))}</p>
+                                <p>{investment.totalReturn}</p>
                             </InvestmentCardContent>
                         </InvestmentCard>
                     </StyledInternalLink>
@@ -285,7 +285,7 @@ export function InvestmentList() {
                                             <p>{formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}/token</p>
                                         </InvestmentCardContent>
                                         <InvestmentCardContent>
-                                            <p>{formatPercent(Number(investment.totalReturn))}</p>
+                                            <p>{investment.totalReturn}</p>
                                         </InvestmentCardContent>
                                     </InvestmentCard>
                                 </StyledInternalLink>
