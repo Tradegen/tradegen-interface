@@ -108,15 +108,15 @@ export default function ManageLP() {
 
     console.log(data4)
 
-    const nextVestTimestamp = data4[0];
-    const nextVestQuantity = data4[1];
+    const nextVestTimestamp = vestingEntry ? vestingEntry[0] : BigInt(0);
+    const nextVestQuantity = vestingEntry ? vestingEntry[1] : BigInt(0);
 
     console.log(Number(nextVestTimestamp.toString()));
     console.log(formatBalance(nextVestQuantity));
 
-    const userTokensStaked = data2[0];
-    const userRewardsEarned = data2[1];
-    const totalSupply = data2[2];
+    const userTokensStaked = userStakingInfo[0];
+    const userRewardsEarned = userStakingInfo[1];
+    const totalSupply = userStakingInfo[2];
 
     const rewardRate = BigInt(stakingRewardsInfo.rewardRate);
     const TVL = BigInt(stakingRewardsInfo.TVL);

@@ -114,7 +114,7 @@ export default function StakingModal({ isOpen, onDismiss, TGENBalance }: Staking
             pair={undefined}
             label={''}
             disableCurrencySelect={true}
-            customBalanceText={'Available to stake: '}
+            customBalanceText={undefined}
             id="stake-liquidity-token"
             availableTokens={TGENBalance}
           />

@@ -74,7 +74,7 @@ export function StakeCard() {
   const TVL = BigInt(stakingRewardsInfo.TVL);
   const valueOfTotalStakedAmountInCUSD = (TGENPrice) ? (TGENPrice * TVL / BigInt(1e18)) : undefined;
 
-  const apr = (BigInt(100) * BigInt(rewardRate) * BigInt(52) / BigInt(TVL) / BigInt(1e18))
+  const apr = (TVL) ? (BigInt(100) * BigInt(rewardRate) * BigInt(52) / BigInt(TVL) / BigInt(1e18)) : BigInt(0)
 
   const apy = valueOfTotalStakedAmountInCUSD ? new Percent(valueOfTotalStakedAmountInCUSD, "1000") : undefined
 

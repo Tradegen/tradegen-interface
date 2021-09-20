@@ -59,10 +59,10 @@ export function UserInvestmentInfo(props:any) {
                         {
                         info.userBalances.map((balance:bigint, index:number) => (
                             <ErrorBoundary>
-                                <p>C{index + 1}: {formatBalance(Number(balance), 0)}</p>
+                                {balance && (<p>C{index + 1}: {formatBalance(Number(balance), 0)}</p>)}
                             </ErrorBoundary>
                         ))}
-                        <p>Your USD balance: {formatNumber(BigInt(BigInt(info.userUSDBalance) / BigInt(1e18)).toString(), true, true, 18)}</p>
+                        <p>Your USD balance: {formatNumber(Number(BigInt(info.userUSDBalance) / BigInt(1e16)) / 100, true, true, 18)}</p>
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>
