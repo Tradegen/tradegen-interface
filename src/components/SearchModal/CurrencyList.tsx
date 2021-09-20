@@ -87,12 +87,14 @@ function CurrencyRow({
   isSelected,
   otherSelected,
   style,
+  poolAddress
 }: {
   currency: Token
   onSelect: () => void
   isSelected: boolean
   otherSelected: boolean
   style: CSSProperties
+  poolAddress?: string
 }) {
   const { address: account } = useContractKit()
 
@@ -100,7 +102,7 @@ function CurrencyRow({
   const selectedTokenList = useCombinedActiveList()
   const isOnSelectedList = isTokenOnList(selectedTokenList, currency)
   const customAdded = useIsUserAddedToken(currency)
-  const balance = useCurrencyBalance(account ?? undefined, currency)
+  const balance = useCurrencyBalance(poolAddress ? poolAddress : account ?? undefined, currency)
 
   // only show add or remove buttons if not on selected list
   return (
@@ -137,6 +139,7 @@ export default function CurrencyList({
   fixedListRef,
   showImportView,
   setImportToken,
+  poolAddress
 }: {
   height: number
   currencies: Token[]
@@ -147,6 +150,7 @@ export default function CurrencyList({
   showETH: boolean
   showImportView: () => void
   setImportToken: (token: Token) => void
+  poolAddress?: string
 }) {
   const itemData = currencies
 
@@ -183,6 +187,7 @@ export default function CurrencyList({
             isSelected={isSelected}
             onSelect={handleSelect}
             otherSelected={otherSelected}
+            poolAddress={poolAddress}
           />
         )
       }

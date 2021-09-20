@@ -17,6 +17,7 @@ interface CurrencySearchModalProps {
   onCurrencySelect: (currency: Token) => void
   otherSelectedCurrency?: Token | null
   showCommonBases?: boolean
+  poolAddress?: string
 }
 
 export enum CurrencyModalView {
@@ -33,6 +34,7 @@ export default function CurrencySearchModal({
   selectedCurrency,
   otherSelectedCurrency,
   showCommonBases = false,
+  poolAddress
 }: CurrencySearchModalProps) {
   const [modalView, setModalView] = useState<CurrencyModalView>(CurrencyModalView.manage)
   const lastOpen = useLast(isOpen)
@@ -77,6 +79,7 @@ export default function CurrencySearchModal({
           showImportView={() => setModalView(CurrencyModalView.importToken)}
           setImportToken={setImportToken}
           showManageView={() => setModalView(CurrencyModalView.manage)}
+          poolAddress={poolAddress}
         />
       ) : modalView === CurrencyModalView.importToken && importToken ? (
         <ImportToken

@@ -51,6 +51,7 @@ interface CurrencySearchProps {
   showManageView: () => void
   showImportView: () => void
   setImportToken: (token: Token) => void
+  poolAddress?: string
 }
 
 export function CurrencySearch({
@@ -63,6 +64,7 @@ export function CurrencySearch({
   showManageView,
   showImportView,
   setImportToken,
+  poolAddress
 }: CurrencySearchProps) {
   const { t } = useTranslation()
   const { network } = useContractKit()
@@ -238,6 +240,7 @@ export function CurrencySearch({
                 fixedListRef={fixedList}
                 showImportView={showImportView}
                 setImportToken={setImportToken}
+                poolAddress={poolAddress}
               />
             )}
           </AutoSizer>

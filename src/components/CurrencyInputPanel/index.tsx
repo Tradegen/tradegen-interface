@@ -244,6 +244,7 @@ export default function CurrencyInputPanel({
           selectedCurrency={currency}
           otherSelectedCurrency={otherCurrency}
           showCommonBases={showCommonBases}
+          poolAddress={poolAddress}
         />
       )}
     </InputPanel>
