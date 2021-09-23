@@ -286,7 +286,7 @@ export default function Header() {
       <HeaderRow>
         <Title to="/">
           <TradegenIcon>
-            <img width={'140px'} src={darkMode ? LogoDark : Logo} alt="logo" />
+            <img width={'140px'} src={LogoDark} alt="logo" />
           </TradegenIcon>
         </Title>
         <HeaderLinks>

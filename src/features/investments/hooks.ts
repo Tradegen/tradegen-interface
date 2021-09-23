@@ -248,7 +248,7 @@ export function useManagedInvestments(): ManagedInvestment[] {
       name: poolNames[i],
       type: "Pool",
       address: poolAddresses[i],
-      TVL: (!poolValues[i]) ? BigInt(0) : BigInt(poolValues[i]),
+      TVL: (!poolValues[i]) ? BigInt(0) : BigInt(poolValues[i]) / BigInt(1e16),
       tokenPrice: (poolTokenPrices[i] === null) ? BigInt(0) : BigInt(poolTokenPrices[i]) / BigInt(1e16),
       totalReturn: totalReturn,
       manager: poolManagers[i]
@@ -278,7 +278,7 @@ export function useManagedInvestments(): ManagedInvestment[] {
       name: NFTPoolNames[i],
       type: "NFT Pool",
       address: NFTPoolAddresses[i],
-      TVL: (!NFTPoolValues[i]) ? BigInt(0) : BigInt(NFTPoolValues[i]),
+      TVL: (!NFTPoolValues[i]) ? BigInt(0) : BigInt(NFTPoolValues[i]) / BigInt(1e16),
       tokenPrice: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(NFTPoolTokenPrices[i]) / BigInt(1e16),
       totalReturn: totalReturn,
       manager: NFTPoolManagers[i]

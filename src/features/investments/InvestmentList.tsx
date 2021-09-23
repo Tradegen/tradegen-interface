@@ -164,7 +164,7 @@ export function ManagedInvestments(props:any) {
                                 <p>{investment.type}</p>
                             </InvestmentCardContent>
                             <InvestmentCardContent>
-                                <p>{formatNumber(Number(investment.TVL), true, true, 16)}</p>
+                                <p>{formatNumber(Number(investment.TVL) / 100, true, true, 16)}</p>
                             </InvestmentCardContent>
                             <InvestmentCardContent>
                                 <p>{formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}/token</p>
@@ -187,7 +187,7 @@ export function InvestmentList() {
     let investments = useMemo(() => {
         console.log(data);
         return data;
-    }, [data]);
+    }, [data, filter]);
 
     let { network, account } = useContractKit();
     console.log(account);

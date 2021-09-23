@@ -36,6 +36,7 @@ const white = '#FFFFFF'
 const black = '#000000'
 
 export function colors(darkMode: boolean): Colors {
+  darkMode = true;
   return {
     // base
     white,
@@ -90,6 +91,7 @@ export function colors(darkMode: boolean): Colors {
 }
 
 export function theme(darkMode: boolean): DefaultTheme {
+  darkMode = true;
   return {
     ...colors(darkMode),
 
@@ -118,7 +120,7 @@ export function theme(darkMode: boolean): DefaultTheme {
 }
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const darkMode = useIsDarkMode()
+  const darkMode = true;
 
   const themeObject = useMemo(() => theme(darkMode), [darkMode])
 
