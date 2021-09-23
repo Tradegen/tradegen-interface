@@ -101,23 +101,28 @@ export function UserInvestments(props:any) {
             {investments?.length === 0 ? (
                 <Loader style={{ margin: 'auto' }} />
             ) : (
-            investments.map((investment:UserInvestment) => (
+            investments.filter((x): x is UserInvestment => x.balance >= BigInt(0)).map((investment:UserInvestment) => (
                 <ErrorBoundary key={investment.address}>
-                    <InvestmentCard>
-                        <p>Name: {investment.name}</p>
-                        <p>Type: {investment.type}</p>
-                        <p>Address: {investment.address}</p>
-                        <p>Your balance: {investment.type == "NFT Pool" ? investment.balance.toString() : formatBalance(BigInt(BigInt(investment.balance) / BigInt(1e18)).toString(), 0)}</p>
-                        <p>Your USD value: {formatNumber(Number(investment.USDBalance / BigInt(1e18)), true, true, 18)}</p>
-                        <StyledInternalLink
-                            to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
-                            style={{ width: '100%' }}
-                        >
-                            <ButtonPrimary padding="8px" borderRadius="8px">
-                                {'View Details'}
-                            </ButtonPrimary>
-                        </StyledInternalLink>
-                    </InvestmentCard>
+                    <StyledInternalLink
+                        to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
+                        style={{ width: '100%' }}
+                    >
+                        <InvestmentCard>
+                            <InvestmentCardContent>
+                                <p>{investment.name}</p>
+                                <p>{investment.type}</p>
+                            </InvestmentCardContent>
+                            <InvestmentCardContent>
+                                <p>{investment.type == "Pool" ? formatBalance(investment.balance) : investment.balance.toString()}</p>
+                            </InvestmentCardContent>
+                            <InvestmentCardContent>
+                                <p>{formatNumber(Number(investment.USDBalance) / 100, true, true, 18)}</p>
+                            </InvestmentCardContent>
+                            <InvestmentCardContent>
+                                <p>{investment.totalReturn}</p>
+                            </InvestmentCardContent>
+                        </InvestmentCard>
+                    </StyledInternalLink>
                 </ErrorBoundary>
             )))}
         </ItemWrapper>
@@ -235,7 +240,7 @@ export function InvestmentList() {
                         {'NFT Pools'}
                     </ButtonPrimary>
                     <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("all")}}>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("myInvestments")}}>
                         {'My Investments'}
                     </ButtonPrimary>
                     <Buffer/>
@@ -248,10 +253,10 @@ export function InvestmentList() {
                         Name
                     </InvestmentCardContent>
                     <InvestmentCardContent>
-                        TVL
+                        {filter == "myInvestments" ? "Tokens" : "TVL"}
                     </InvestmentCardContent>
                     <InvestmentCardContent>
-                        Token price
+                        {filter == "myInvestments" ? "USD Value" : "Token Price"}
                     </InvestmentCardContent>
                     <InvestmentCardContent>
                         Total return
