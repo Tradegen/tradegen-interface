@@ -61,17 +61,7 @@ const Buffer = styled.div`
   height: 15px;
 `
 
-let filter:string = "all";
-
-function updateFilter(newFilter:string)
-{
-    console.log("update filter:");
-    console.log(newFilter);
-
-    filter = newFilter;
-}
-
-function filterInvestments(investments:Investment[])
+function filterInvestments(investments:Investment[], filter:string)
 {
     if (filter == "all")
     {
@@ -104,7 +94,7 @@ export function UserInvestments(props:any) {
     let investments = useMemo(() => {
         console.log(data);
         return data;
-    }, [data, filter]);
+    }, [data]);
 
     return investments ? (
         <ItemWrapper>
@@ -187,25 +177,26 @@ export function InvestmentList() {
     let investments = useMemo(() => {
         console.log(data);
         return data;
-    }, [data, filter]);
+    }, [data]);
 
     let { network, account } = useContractKit();
     console.log(account);
     account = account ?? null;
 
-    investments = filterInvestments(investments);
-
     const [showCreatePoolModal, setShowCreatePoolModal] = useState(false)
     const [showCreateNFTPoolModal, setShowCreateNFTPoolModal] = useState(false)
+    const [filter, setFilter] = useState("all");
+
+    investments = filterInvestments(investments, filter);
 
     const toggleWalletModal = useWalletModalToggle()
 
     const handleCreatePoolClick = useCallback(() => {
-    if (account) {
-        setShowCreatePoolModal(true)
-    } else {
-        toggleWalletModal()
-    }
+        if (account) {
+            setShowCreatePoolModal(true)
+        } else {
+            toggleWalletModal()
+        }
     }, [account, toggleWalletModal])
 
     const handleCreateNFTPoolClick = useCallback(() => {
@@ -214,7 +205,11 @@ export function InvestmentList() {
         } else {
             toggleWalletModal()
         }
-        }, [account, toggleWalletModal])
+    }, [account, toggleWalletModal])
+
+    const handleFilterChange = useCallback((newFilter:string) => {
+        setFilter(newFilter);
+    }, [])
 
     return investments ? (
         <>
@@ -228,23 +223,23 @@ export function InvestmentList() {
                         {'Create NFT Pool'}
                     </ButtonPrimary>
                     <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("all")}}>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("all")}}>
                         {'All Investments'}
                     </ButtonPrimary>
                     <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("pools")}}>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("pools")}}>
                         {'Pools'}
                     </ButtonPrimary>
                     <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("NFTPools")}}>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("NFTPools")}}>
                         {'NFT Pools'}
                     </ButtonPrimary>
                     <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("all")}}>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("all")}}>
                         {'My Investments'}
                     </ButtonPrimary>
                     <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateFilter("managedInvestments")}}>
+                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("managedInvestments")}}>
                         {'Managed Investments'}
                     </ButtonPrimary>
                 </ButtonWrapper>
