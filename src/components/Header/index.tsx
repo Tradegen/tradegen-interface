@@ -305,12 +305,12 @@ export default function Header() {
           <StyledNavLink id="farm-nav-link" to="/stake">
             Stake
           </StyledNavLink>
-          <StyledExternalLink id={`stake-nav-link`} href={'https://info.ubeswap.org'}>
+          <StyledNavLink id={`stake-nav-link`} to="/farm">
             Charts <span style={{ fontSize: '11px' }}>↗</span>
-          </StyledExternalLink>
-          <StyledExternalLink id={`stake-nav-link`} href={'https://info.ubeswap.org'}>
+          </StyledNavLink>
+          <StyledNavLink id={`stake-nav-link`} to="/farm">
             Marketplace <span style={{ fontSize: '11px' }}>↗</span>
-          </StyledExternalLink>
+          </StyledNavLink>
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
