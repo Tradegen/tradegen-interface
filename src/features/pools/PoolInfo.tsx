@@ -47,32 +47,23 @@ const NoResults = styled.div`
 `
 
 export function PoolInfo(props:any) {
-    let { address: account, network } = useContractKit()
-    account = account ?? ZERO_ADDRESS;
-
+    
     let data = usePoolInfo(props.address);
     const poolInfo = useMemo(() => {
         return data;
     }, [data]);
 
-    let positions = poolInfo ? (poolInfo.positionAddresses ?? []) : [];
-
-    let data1 = usePositionNames(positions);
-    const positionNames = useMemo(() => {
-        return data1;
-    }, [data1]);
-
     let combinedPositions = [];
-    if (!poolInfo.positionBalances || !positionNames || poolInfo.positionBalances.length != positionNames.length)
+    if (!poolInfo.positionBalances || !poolInfo.positionNames || poolInfo.positionBalances.length != poolInfo.positionNames.length)
     {
         combinedPositions = [];
     }
     else
     {
-        for (var i = 0; i < positionNames.length; i++)
+        for (var i = 0; i < poolInfo.positionNames.length; i++)
         {
             combinedPositions.push({
-                symbol: positionNames[i],
+                symbol: poolInfo.positionNames[i],
                 balance: poolInfo.positionBalances[i]
             });
         }
@@ -103,16 +94,6 @@ export function PoolInfo(props:any) {
                                 </ErrorBoundary>
                             )))}
                         </ItemWrapper>
-                        {poolInfo.manager == account &&
-                            <StyledInternalLink
-                                to={`/manage_pool/${poolInfo.address}`}
-                                style={{ width: '100%' }}
-                            >
-                                <ButtonPrimary padding="8px" borderRadius="8px">
-                                    {'Manage Pool'}
-                                </ButtonPrimary>
-                            </StyledInternalLink>
-                        }
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>

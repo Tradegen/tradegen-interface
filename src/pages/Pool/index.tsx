@@ -37,7 +37,7 @@ export default function PoolPage({
     const [showStakingModal, setShowStakingModal] = useState(false)
     const [showUnstakingModal, setShowUnstakingModal] = useState(false)
 
-    const investmentInfo = useUserInvestmentInfo(id, account)
+    const investmentInfo = useUserInvestmentInfo(id)
     const tokenBalance = investmentInfo ? investmentInfo.userBalance.toString() : '0'
     const cUSDBalance = useStableCoinBalance(cUSD[chainId].address, account).toString()
 
@@ -55,9 +55,7 @@ export default function PoolPage({
         <>
             <p>Pool Info</p>
             <PoolInfo address={id}></PoolInfo>
-
-            {account && <UserInvestmentInfo poolAddress={id} userAddress={account}></UserInvestmentInfo>}
-
+            <UserInvestmentInfo poolAddress={id}></UserInvestmentInfo>
             <ButtonWrapper>
                 <Buffer/>
                 <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>

@@ -3,6 +3,8 @@ import { usePoolContract, useTokenContract } from '../../hooks/useContract'
 import { useSingleCallResult, NEVER_RELOAD, useMultipleContractSingleData } from '../../state/multicall/hooks'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import ERC20_INTERFACE from '../../constants/abis/erc20'
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { ZERO_ADDRESS } from '../../constants'
 
 export interface PoolInfo {
   TVL: bigint | null,
@@ -13,12 +15,14 @@ export interface PoolInfo {
   manager: string,
   performanceFee: number,
   positionAddresses: string[],
-  positionBalances: bigint[]
+  positionBalances: bigint[],
+  positionNames: string[]
 }
 
 export interface UserInvestmentInfo {
   userBalance: bigint,
-  userUSDBalance: bigint
+  userUSDBalance: bigint,
+  manager: string
 }
 
 export interface PositionsAndTotal {
@@ -31,7 +35,7 @@ export function useTokenPrice(
     poolContract: any,
   ): bigint {
   
-    const tokenPrice = useSingleCallResult(poolContract, 'tokenPrice', undefined, NEVER_RELOAD);
+    const tokenPrice = useSingleCallResult(poolContract, 'tokenPrice', undefined);
   
     return useMemo(() => {
       return !tokenPrice || tokenPrice.loading
@@ -58,7 +62,7 @@ export function useName(
     poolContract: any,
   ): string {
   
-    const name = useSingleCallResult(poolContract, 'name', undefined, NEVER_RELOAD);
+    const name = useSingleCallResult(poolContract, 'name', undefined);
   
     return useMemo(() => {
       return !name || name.loading
@@ -98,7 +102,7 @@ export function useTotalSupply(
     poolContract: any,
   ): bigint {
   
-    const totalSupply = useSingleCallResult(poolContract, 'totalSupply', undefined, NEVER_RELOAD);
+    const totalSupply = useSingleCallResult(poolContract, 'totalSupply', undefined);
   
     return useMemo(() => {
       return !totalSupply || totalSupply.loading
@@ -144,6 +148,9 @@ export function usePoolInfo(poolAddress:string): PoolInfo {
   const manager = useManager(poolContract);
   const positionsAndTotal = usePositionsAndTotal(poolContract);
 
+  let positions = (!positionsAndTotal || positionsAndTotal[0] === undefined) ? [] : positionsAndTotal[0];
+  const names = usePositionNames(positions);
+
   let totalReturn = "0%";
   if (!tokenPrice)
   {
@@ -164,25 +171,33 @@ export function usePoolInfo(poolAddress:string): PoolInfo {
   return {
     TVL: (!positionsAndTotal || positionsAndTotal[2] === undefined) ? BigInt(0) : BigInt(positionsAndTotal[2]) / BigInt(1e16),
     address: poolAddress,
-    name: name,
+    name: name ?? "",
     tokenPrice: (!tokenPrice) ? BigInt(0) : BigInt(tokenPrice) / BigInt(1e16),
     totalReturn: totalReturn,
-    manager: manager,
+    manager: manager ?? "",
     performanceFee: (!performanceFee) ? 0 : Number(performanceFee),
     positionAddresses: (!positionsAndTotal || positionsAndTotal[0] === undefined) ? [] : positionsAndTotal[0],
-    positionBalances: (!positionsAndTotal || positionsAndTotal[1] === undefined) ? [] : positionsAndTotal[1]
+    positionBalances: (!positionsAndTotal || positionsAndTotal[1] === undefined) ? [] : positionsAndTotal[1],
+    positionNames: names
   }
 }
 
-export function useUserInvestmentInfo(poolAddress:string, userAddress:string): UserInvestmentInfo {
+export function useUserInvestmentInfo(poolAddress:string): UserInvestmentInfo {
+  let { network, account } = useContractKit();
+  const { chainId } = network
+  console.log(account);
+  account = account ?? ZERO_ADDRESS;
+
   const poolContract = usePoolContract(poolAddress);
 
-  const userTokenBalance = useBalanceOf(poolContract, userAddress);
-  const userUSDBalance = useUSDBalance(poolContract, userAddress);
+  const userTokenBalance = useBalanceOf(poolContract, account);
+  const userUSDBalance = useUSDBalance(poolContract, account);
+  const manager = useManager(poolContract);
 
   return {
     userBalance: (!userTokenBalance) ? BigInt(0) : BigInt(userTokenBalance),
-    userUSDBalance: (!userUSDBalance) ? BigInt(0) : BigInt(userUSDBalance)
+    userUSDBalance: (!userUSDBalance) ? BigInt(0) : BigInt(userUSDBalance),
+    manager: manager ?? ""
   }
 }
 

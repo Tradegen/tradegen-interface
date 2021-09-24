@@ -3,6 +3,10 @@ import { useUserInvestmentInfo } from '../../features/pools/hooks'
 import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatBalance } from '../../functions/format'
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { ZERO_ADDRESS } from '../../constants'
+import { ButtonPrimary } from '../../components/Button'
+import { StyledInternalLink, TYPE } from '../../theme'
 
 const Wrapper = styled.div`
   display: grid;
@@ -43,15 +47,16 @@ const NoResults = styled.div`
 `
 
 export function UserInvestmentInfo(props:any) {
-    console.log(props.poolAddress);
-    console.log(props.userAddress);
-    let data = useUserInvestmentInfo(props.poolAddress, props.userAddress);
+    let { address: account, network } = useContractKit()
+    account = account ?? ZERO_ADDRESS;
+
+    let data = useUserInvestmentInfo(props.poolAddress);
     const info = useMemo(() => {
         console.log(data);
         return data;
     }, [data]);
 
-    return info ? (
+    return info.userBalance.toString() != "0" ? (
         <>
             <div>
                 <ItemWrapper>
@@ -60,9 +65,31 @@ export function UserInvestmentInfo(props:any) {
                         <p>Your USD value: {formatNumber(Number(info.userUSDBalance / BigInt(1e16)) / 100, true, true, 18)}</p>
                     </ErrorBoundary>
                 </ItemWrapper>
+                {info.manager == account &&
+                    <StyledInternalLink
+                        to={`/manage_pool/${props.poolAddress}`}
+                        style={{ width: '100%' }}
+                    >
+                        <ButtonPrimary padding="8px" borderRadius="8px">
+                            {'Manage Pool'}
+                        </ButtonPrimary>
+                    </StyledInternalLink>
+                }
             </div>
         </>
     ) : (
-        <NoResults>Not invested in pool.</NoResults>
+        <>
+          <NoResults>Not invested in pool.</NoResults>
+          {info.manager == account &&
+              <StyledInternalLink
+                  to={`/manage_pool/${props.poolAddress}`}
+                  style={{ width: '100%' }}
+              >
+                  <ButtonPrimary padding="8px" borderRadius="8px">
+                      {'Manage Pool'}
+                  </ButtonPrimary>
+              </StyledInternalLink>
+          }
+        </>
     )
 }
