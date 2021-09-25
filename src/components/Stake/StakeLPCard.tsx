@@ -103,7 +103,7 @@ export function StakeLPCard() {
       <TopSection>
         <PoolInfo style={{ marginLeft: '8px' }}>
           <TYPE.white fontWeight={600} fontSize={[18, 24]}>
-            TGEN-cUSD Staking
+            TGEN-cUSD
           </TYPE.white>
           {apy && apy.greaterThan('0') && (
             <TYPE.small className="apr" fontWeight={400} fontSize={14}>
@@ -114,7 +114,7 @@ export function StakeLPCard() {
 
         <StyledInternalLink
           to={`/stake/LP`}
-          style={{ width: '25%', marginLeft: '20%' }}
+          style={{ width: '25%', marginLeft: '90%' }}
         >
           <ButtonPrimary padding="8px" borderRadius="8px">
             {'Stake'}

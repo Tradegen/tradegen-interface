@@ -110,7 +110,7 @@ export function StakeCard() {
 
         <StyledInternalLink
           to={`/stake/TGEN`}
-          style={{ width: '25%', marginLeft: '20%' }}
+          style={{ width: '25%', marginLeft: '90%' }}
         >
           <ButtonPrimary padding="8px" borderRadius="8px">
             {'Stake'}
