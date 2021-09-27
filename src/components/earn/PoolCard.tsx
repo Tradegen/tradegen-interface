@@ -1,20 +1,19 @@
-import { Percent } from '@ubeswap/sdk'
+import { Percent, Token } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
-import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
 import React from 'react'
 import { DualRewardsInfo } from 'state/stake/useDualStakeRewards'
 import styled from 'styled-components'
+import { NETWORK_CHAIN_ID } from '../../connectors'
+import useCUSDPrice from 'utils/useCUSDPrice'
 
-import { BIG_INT_SECONDS_IN_WEEK } from '../../constants'
-import { useColor } from '../../hooks/useColor'
+import { BIG_INT_SECONDS_IN_WEEK, TGEN } from '../../constants'
 import { StakingInfo } from '../../state/stake/hooks'
 import { StyledInternalLink, TYPE } from '../../theme'
-import { currencyId } from '../../utils/currencyId'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
-import DoubleCurrencyLogo from '../DoubleLogo'
 import { RowBetween, RowFixed } from '../Row'
 import { Break, CardNoise } from './styled'
+import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 
 const StatContainer = styled.div`
   display: flex;
@@ -71,26 +70,37 @@ interface Props {
 }
 
 export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) => {
-  const [token0, token1] = stakingInfo.tokens
+  const name = stakingInfo.name;
 
   const isStaking = Boolean(stakingInfo.stakedAmount && stakingInfo.stakedAmount.greaterThan('0'))
 
-  // get the color of the token
-  const token = token0.symbol?.startsWith('m') ? token1 : token0
-  const backgroundColor = useColor(token)
+  //get the USD value of staked TGEN
+  let TGENToken = new Token(NETWORK_CHAIN_ID, TGEN, 18);
+  let price = useCUSDPrice(TGENToken);
+  let stringPrice = price?.raw.numerator.toString();
+  let stringPrice2 = price?.raw.denominator.toString();
+  const TGENPrice = (stringPrice && stringPrice2) ? BigInt(BigInt(stringPrice) * BigInt(1e18) / BigInt(stringPrice2)) : BigInt(0);
+  console.log(TGENPrice);
 
-  // get the USD value of staked WETH
-  const {
-    valueCUSD: valueOfTotalStakedAmountInCUSD,
-    userValueCUSD,
-    userAmountTokenA,
-    userAmountTokenB,
-  } = useStakingPoolValue(stakingInfo)
-  const apyFraction =
-    stakingInfo.active && valueOfTotalStakedAmountInCUSD && !valueOfTotalStakedAmountInCUSD.equalTo('0')
-      ? stakingInfo.dollarRewardPerYear?.divide(valueOfTotalStakedAmountInCUSD)
-      : undefined
-  const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
+  const tokenPrice = stakingInfo.tokenPrice?.toString() ?? "0";
+  const poolValue = BigInt(stakingInfo.totalStakedAmount.raw.toString()) * BigInt(tokenPrice);
+
+  console.log(tokenPrice.toString());
+  console.log(stakingInfo.totalStakedAmount.raw.toString());
+
+  // get the background color
+  const backgroundColor = '#2172E5';
+
+  const rewardRate = BigInt(stakingInfo.totalRewardRate.numerator.toString()) * BigInt(BIG_INT_SECONDS_IN_WEEK.toString()) / BigInt(stakingInfo.totalRewardRate.denominator.toString());
+
+  console.log(rewardRate);
+  
+  const valueOfTGENInUSD = (BigInt(TGENPrice) != BigInt(0)) ? (BigInt(TGENPrice) * BigInt(rewardRate) * BigInt(52) / BigInt(1e36)) : BigInt(0);
+  const userValueUSD = (stakingInfo.stakedAmount && stakingInfo.totalStakedAmount && BigInt(stakingInfo.totalStakedAmount.toExact()) != BigInt(0)) ?
+                        valueOfTGENInUSD * BigInt(stakingInfo.stakedAmount?.toExact()) / BigInt(stakingInfo.totalStakedAmount.toExact()) : BigInt(0);
+  const apr = (BigInt(poolValue) != BigInt(0)) ? BigInt(valueOfTGENInUSD) / BigInt(poolValue) * BigInt(100) : BigInt(0)
+
+  const apy = poolValue ? new Percent(poolValue, "1000") : undefined
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
@@ -127,23 +137,20 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
       <CardNoise />
 
       <TopSection>
-        <DoubleCurrencyLogo currency0={token0} currency1={token1} size={24} />
         <PoolInfo style={{ marginLeft: '8px' }}>
           <TYPE.white fontWeight={600} fontSize={[18, 24]}>
-            {token0.symbol}-{token1.symbol}
+            {name}
           </TYPE.white>
-          {apy && apy.greaterThan('0') && (
+          {apr && BigInt(apr) != BigInt(0) && (
             <TYPE.small className="apr" fontWeight={400} fontSize={14}>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
+              {apr.toString()}% APR
             </TYPE.small>
           )}
         </PoolInfo>
 
         <StyledInternalLink
-          to={`/${dualRewards ? 'dualfarm' : 'farm'}/${currencyId(token0)}/${currencyId(token1)}/${
-            stakingInfo.poolInfo.poolAddress
-          }`}
-          style={{ width: '100%' }}
+          to={`/farm`}
+          style={{ width: '25%', marginLeft: '90%' }}
         >
           <ButtonPrimary padding="8px" borderRadius="8px">
             {isStaking ? 'Manage' : 'Deposit'}
@@ -155,40 +162,18 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
         <RowBetween>
           <TYPE.white>Total deposited</TYPE.white>
           <TYPE.white>
-            {valueOfTotalStakedAmountInCUSD
-              ? `$${valueOfTotalStakedAmountInCUSD.toFixed(0, {
-                  groupSeparator: ',',
-                })}`
+            {poolValue
+              ? formatNumber(poolValue)
               : '-'}
           </TYPE.white>
         </RowBetween>
         <RowBetween>
-          <TYPE.white>{dualRewards ? dualRewards.totalRewardRate.token.symbol : 'Pool'} rate</TYPE.white>
+          <TYPE.white>Pool rate</TYPE.white>
           <TYPE.white>
-            {stakingInfo
-              ? stakingInfo.active
-                ? `${stakingInfo.totalRewardRate
-                    ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                    ?.toFixed(0, { groupSeparator: ',' })} ${stakingInfo.totalRewardRate.token.symbol} / week`
-                : `0 ${stakingInfo.totalRewardRate.token.symbol} / week`
-              : '-'}
+            {rewardRate.toString()} TGEN / week
           </TYPE.white>
         </RowBetween>
-        {dualRewards && (
-          <RowBetween>
-            <TYPE.white>{dualRewards.totalUBERewardRate.token.symbol} rate</TYPE.white>
-            <TYPE.white>
-              {stakingInfo
-                ? stakingInfo.active
-                  ? `${dualRewards.totalUBERewardRate
-                      ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                      ?.toFixed(0, { groupSeparator: ',' })} ${dualRewards.totalUBERewardRate.token.symbol} / week`
-                  : `0 ${dualRewards.totalUBERewardRate.token.symbol} / week`
-                : '-'}
-            </TYPE.white>
-          </RowBetween>
-        )}
-        {apy && apy.greaterThan('0') && (
+        {apr && BigInt(apr) != BigInt(0) && (
           <RowBetween>
             <RowFixed>
               <TYPE.white>{dualRewards ? 'Combined APR' : 'APR'}</TYPE.white>
@@ -202,7 +187,7 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
               />
             </RowFixed>
             <TYPE.white>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'}
+              {apr ? apr.toString() + '%' : '-'}
             </TYPE.white>
           </RowBetween>
         )}
@@ -252,7 +237,7 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
                   : '-'}
               </TYPE.black>
             </RowBetween>
-            {userValueCUSD && (
+            {userValueUSD && BigInt(userValueUSD) != BigInt(0) && (
               <RowBetween>
                 <TYPE.black color={'white'} fontWeight={500}>
                   <span>Your stake</span>
@@ -260,13 +245,8 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
 
                 <RowFixed>
                   <TYPE.black style={{ textAlign: 'right' }} color={'white'} fontWeight={500}>
-                    ${userValueCUSD.toFixed(0, { groupSeparator: ',' })}
+                    {formatNumber(userValueUSD)}
                   </TYPE.black>
-                  <QuestionHelper
-                    text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
-                      userAmountTokenA?.token.symbol
-                    }, ${userAmountTokenB?.toFixed(0, { groupSeparator: ',' })} ${userAmountTokenB?.token.symbol}`}
-                  />
                 </RowFixed>
               </RowBetween>
             )}

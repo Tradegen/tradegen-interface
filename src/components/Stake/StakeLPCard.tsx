@@ -76,7 +76,7 @@ export function StakeLPCard() {
   const rewardRate = BigInt(stakingRewardsInfo.rewardRate);
   const TVL = BigInt(stakingRewardsInfo.TVL);
   const valueOfTotalStakedAmountInCUSD = (tokenPrice) ? (BigInt(tokenPrice) * BigInt(TVL) / BigInt(1e18)) : BigInt(0);
-  const valueOfTGENInUSD = (TGENPrice != BigInt(0)) ? (BigInt(TGENPrice) * BigInt(rewardRate) * BigInt(52) / BigInt(1e36)) : BigInt(0);
+  const valueOfTGENInUSD = (TGENPrice != BigInt(0)) ? (BigInt(TGENPrice) * BigInt(rewardRate) * BigInt(52) / BigInt(1e18)) : BigInt(0);
   
   const apr = (valueOfTotalStakedAmountInCUSD != BigInt(0)) ? BigInt(valueOfTGENInUSD) / BigInt(valueOfTotalStakedAmountInCUSD) * BigInt(100) : BigInt(0)
 

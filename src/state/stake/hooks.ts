@@ -3,18 +3,18 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { ChainId as UbeswapChainId, JSBI, Pair, Token, TokenAmount } from '@ubeswap/sdk'
 import { POOL_MANAGER } from 'constants/poolManager'
 import { UBE } from 'constants/tokens'
+import { TGEN, POOL_MANAGER_ADDRESS } from '../../constants'
+import { NETWORK_CHAIN_ID } from 'connectors'
 import { PoolManager } from 'generated/'
-import { useAllTokens } from 'hooks/Tokens'
 import useCurrentBlockTimestamp from 'hooks/useCurrentBlockTimestamp'
 import { zip } from 'lodash'
 // Hooks
 import { useMemo } from 'react'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
-import ERC_20_INTERFACE from '../../constants/abis/erc20'
+import NFT_POOL_INTERFACE from '../../constants/abis/NFTpool'
 import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'
 // Interfaces
-import { UNISWAP_V2_PAIR_INTERFACE } from '../../constants/abis/uniswap-v2-pair'
 import { usePoolManagerContract, useTokenContract } from '../../hooks/useContract'
 import {
   NEVER_RELOAD,
@@ -38,10 +38,15 @@ export const STAKING_GENESIS = 1619100000
 export interface StakingInfo {
   // the address of the reward contract
   readonly stakingRewardAddress: string
-  // the token of the liquidity pool
+  // the token of the NFT pool
   readonly stakingToken: Token
   // the tokens involved in this pair
-  readonly tokens: readonly [Token, Token]
+  readonly name: string
+  // staked tokens by classs
+  readonly stakedC1?: TokenAmount
+  readonly stakedC2?: TokenAmount
+  readonly stakedC3?: TokenAmount
+  readonly stakedC4?: TokenAmount
   // the amount of token currently staked, or undefined if no account
   readonly stakedAmount?: TokenAmount
   // the amount of reward token earned by the active account, or undefined if no account
@@ -71,10 +76,11 @@ export interface StakingInfo {
   readonly dollarRewardPerYear: TokenAmount | undefined
   readonly rewardToken: Token | undefined
   readonly dualRewards: boolean
+  readonly tokenPrice?: BigInt
 }
 
-export const usePairStakingInfo = (pairToFilterBy?: Pair | null, stakingAddress?: string): StakingInfo | undefined => {
-  return useStakingInfo(pairToFilterBy, stakingAddress)[0] ?? undefined
+export const usePairStakingInfo = (poolNameToFilterBy?: string | null, stakingAddress?: string): StakingInfo | undefined => {
+  return useStakingInfo(poolNameToFilterBy, stakingAddress)[0] ?? undefined
 }
 
 export const usePairDualStakingInfo = (stakingInfo: StakingInfo | undefined): DualRewardsInfo | null => {
@@ -108,9 +114,12 @@ interface UnclaimedInfo {
 export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
   const { network } = useContractKit()
   const { chainId } = network
-  const ube = chainId ? UBE[chainId] : undefined
-  const ubeContract = useTokenContract(ube?.address)
-  const poolManagerContract = usePoolManagerContract(chainId !== ChainId.Baklava ? POOL_MANAGER[chainId] : undefined)
+  const tgen = new Token(NETWORK_CHAIN_ID, TGEN, 18);
+  const tgenPrice = useCUSDPrice(tgen)
+  const tgenContract = useTokenContract(tgen?.address)
+  const poolManagerContract = usePoolManagerContract(
+    POOL_MANAGER_ADDRESS
+  )
   const poolsCountBigNumber = useSingleCallResult(poolManagerContract, 'poolsCount').result?.[0] as
     | BigNumber
     | undefined
@@ -119,7 +128,7 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
 
   // compute amount that is locked up
   const balancesRaw = useSingleContractMultipleData(
-    ubeContract,
+    tgenContract,
     'balanceOf',
     poolAddresses.map((addr) => [addr])
   )
@@ -167,24 +176,32 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
 }
 
 // gets the staking info from the network for the active chain id
-export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: string): readonly StakingInfo[] {
+export function useStakingInfo(poolNameToFilterBy?: string | null, stakingAddress?: string): readonly StakingInfo[] {
   const { network, address } = useContractKit()
   const chainId = network.chainId as unknown as UbeswapChainId
-  const ube = chainId ? UBE[chainId] : undefined
-  const ubePrice = useCUSDPrice(ube)
+  const tgen = new Token(NETWORK_CHAIN_ID, TGEN, 18);
+  const tgenPrice = useCUSDPrice(tgen)
 
   // detect if staking is ended
   const currentBlockTimestamp = useCurrentBlockTimestamp()
 
-  const info = useStakingPools(pairToFilterBy, stakingAddress)
+  const info = useStakingPools(poolNameToFilterBy, stakingAddress)
 
   // These are the staking pools
   const rewardsAddresses = useMemo(() => info.map(({ stakingRewardAddress }) => stakingRewardAddress), [info])
+  const stakingTokenAddresses = useMemo(() => info.map(({ poolInfo }) => poolInfo.stakingToken), [info])
 
   const accountArg = useMemo(() => [address ?? undefined], [address])
+  const C1Arg = useMemo(() => [address ?? undefined, 1], [address]);
+  const C2Arg = useMemo(() => [address ?? undefined, 2], [address]);
+  const C3Arg = useMemo(() => [address ?? undefined, 3], [address]);
+  const C4Arg = useMemo(() => [address ?? undefined, 4], [address]);
 
   // get all the info from the staking rewards contracts
-  const balances = useMultipleContractSingleData(rewardsAddresses, STAKING_REWARDS_INTERFACE, 'balanceOf', accountArg)
+  const balanceC1 = useMultipleContractSingleData(rewardsAddresses, STAKING_REWARDS_INTERFACE, 'balanceOf', C1Arg)
+  const balanceC2 = useMultipleContractSingleData(rewardsAddresses, STAKING_REWARDS_INTERFACE, 'balanceOf', C2Arg)
+  const balanceC3 = useMultipleContractSingleData(rewardsAddresses, STAKING_REWARDS_INTERFACE, 'balanceOf', C3Arg)
+  const balanceC4 = useMultipleContractSingleData(rewardsAddresses, STAKING_REWARDS_INTERFACE, 'balanceOf', C4Arg)
   const earnedAmounts = useMultipleContractSingleData(rewardsAddresses, STAKING_REWARDS_INTERFACE, 'earned', accountArg)
   const totalSupplies = useMultipleContractSingleData(rewardsAddresses, STAKING_REWARDS_INTERFACE, 'totalSupply')
 
@@ -205,14 +222,26 @@ export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: st
     NEVER_RELOAD
   )
 
+  const prices = useMultipleContractSingleData(
+    stakingTokenAddresses,
+    NFT_POOL_INTERFACE,
+    'tokenPrice',
+    undefined,
+    NEVER_RELOAD
+  )?.map((element:any) => (element?.result ? element?.result[0] : BigInt(0)));
+
   return useMemo(() => {
-    if (!chainId || !ube) return []
+    if (!chainId || !tgen) return []
 
     return info.reduce(
-      (memo: StakingInfo[], { stakingRewardAddress: rewardsAddress, poolInfo, tokens }, index: number) => {
+      (memo: StakingInfo[], { stakingRewardAddress: rewardsAddress, poolInfo, name }, index: number) => {
         // these two are dependent on account
-        const balanceState = balances[index]
+        const balanceC1State = balanceC1[index]
+        const balanceC2State = balanceC2[index]
+        const balanceC3State = balanceC3[index]
+        const balanceC4State = balanceC4[index]
         const earnedAmountState = earnedAmounts[index]
+        const priceState = prices[index]
 
         // these get fetched regardless of account
         const totalSupplyState = totalSupplies[index]
@@ -221,8 +250,12 @@ export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: st
 
         if (
           // these may be undefined if not logged in
-          !balanceState?.loading &&
+          !balanceC1State?.loading &&
+          !balanceC2State?.loading &&
+          !balanceC3State?.loading &&
+          !balanceC4State?.loading &&
           !earnedAmountState?.loading &&
+          !priceState?.loading &&
           // always need these
           totalSupplyState &&
           !totalSupplyState.loading &&
@@ -232,8 +265,12 @@ export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: st
           !periodFinishState.loading
         ) {
           if (
-            balanceState?.error ||
+            balanceC1State?.error ||
+            balanceC2State?.error ||
+            balanceC3State?.error ||
+            balanceC4State?.error ||
             earnedAmountState?.error ||
+            priceState?.error ||
             totalSupplyState.error ||
             rewardRateState.error ||
             periodFinishState.error
@@ -244,23 +281,36 @@ export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: st
 
           const rewardToken = poolInfo.rewardToken
             ? new Token(chainId, poolInfo.rewardToken, 18, poolInfo.rewardTokenSymbol)
-            : ube
+            : tgen
 
-          // get the LP token
-          const liquidityToken = new Token(chainId, poolInfo.stakingToken, 18, 'ULP', 'Ubeswap LP Token')
+          // get the pool token
+          const poolToken = new Token(chainId, poolInfo.stakingToken, 0, 'TOK', 'NFT Pool Token')
+
+          const rawC1 = balanceC1State?.result?.[0] ?? 0;
+          const rawC2 = balanceC1State?.result?.[0] ?? 0;
+          const rawC3 = balanceC1State?.result?.[0] ?? 0;
+          const rawC4 = balanceC1State?.result?.[0] ?? 0;
+
+          const rawStakedAmount = BigInt(rawC1) + BigInt(rawC2) + BigInt(rawC3) + BigInt(rawC4);
+
+          const price = priceState?.result?.[0] ?? BigInt(0);
 
           // check for account, if no account set to 0
-          const stakedAmount = new TokenAmount(liquidityToken, JSBI.BigInt(balanceState?.result?.[0] ?? 0))
-          const totalStakedAmount = new TokenAmount(liquidityToken, JSBI.BigInt(totalSupplyState.result?.[0]))
+          const stakedAmount = new TokenAmount(poolToken, BigInt(rawStakedAmount))
+          const balanceC1 = new TokenAmount(poolToken, BigInt(rawC1))
+          const balanceC2 = new TokenAmount(poolToken, BigInt(rawC2))
+          const balanceC3 = new TokenAmount(poolToken, BigInt(rawC3))
+          const balanceC4 = new TokenAmount(poolToken, BigInt(rawC4))
+          const totalStakedAmount = new TokenAmount(poolToken, JSBI.BigInt(totalSupplyState.result?.[0]))
           const totalRewardRate = new TokenAmount(rewardToken, JSBI.BigInt(rewardRateState.result?.[0]))
-          const nextPeriodRewards = new TokenAmount(ube, poolInfo.nextPeriodRewards?.toString() ?? '0')
+          const nextPeriodRewards = new TokenAmount(tgen, poolInfo.nextPeriodRewards?.toString() ?? '0')
 
           // tokens per month
           const ubePerYear =
-            rewardToken === ube
-              ? new TokenAmount(ube, JSBI.multiply(totalRewardRate.raw, JSBI.BigInt(365 * 24 * 60 * 60)))
-              : new TokenAmount(ube, '0')
-          const dollarRewardPerYear = ubePrice?.quote(ubePerYear)
+            rewardToken === tgen
+              ? new TokenAmount(tgen, JSBI.multiply(totalRewardRate.raw, JSBI.BigInt(365 * 24 * 60 * 60)))
+              : new TokenAmount(tgen, '0')
+          const dollarRewardPerYear = tgenPrice?.quote(ubePerYear)
 
           const getHypotheticalRewardRate = (
             stakedAmount: TokenAmount,
@@ -286,14 +336,18 @@ export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: st
               ? periodFinishSeconds > currentBlockTimestamp.toNumber()
               : false
 
-          if (!tokens) {
+          if (!name) {
             return memo
           }
 
           memo.push({
             stakingRewardAddress: rewardsAddress,
             stakingToken: totalStakedAmount.token,
-            tokens,
+            name,
+            stakedC1: balanceC1,
+            stakedC2: balanceC2,
+            stakedC3: balanceC3,
+            stakedC4: balanceC4,
             periodFinish: periodFinishMs > 0 ? new Date(periodFinishMs) : undefined,
             earnedAmount: new TokenAmount(rewardToken, JSBI.BigInt(earnedAmountState?.result?.[0] ?? 0)),
             earnedAmountUbe: new TokenAmount(rewardToken, JSBI.BigInt(earnedAmountState?.result?.[0] ?? 0)),
@@ -310,6 +364,7 @@ export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: st
             dollarRewardPerYear,
             rewardToken,
             dualRewards: false,
+            tokenPrice: price
           })
         }
         return memo
@@ -317,7 +372,10 @@ export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: st
       []
     )
   }, [
-    balances,
+    balanceC1,
+    balanceC2,
+    balanceC3,
+    balanceC4,
     chainId,
     currentBlockTimestamp,
     earnedAmounts,
@@ -325,24 +383,22 @@ export function useStakingInfo(pairToFilterBy?: Pair | null, stakingAddress?: st
     periodFinishes,
     rewardRates,
     totalSupplies,
-    ube,
-    ubePrice,
+    tgen,
+    tgenPrice,
   ])
 }
 
 interface IStakingPool {
   stakingRewardAddress: string
-  tokens?: readonly [Token, Token]
+  name?: string
   poolInfo: IRawPool
 }
 
-export function useStakingPools(pairToFilterBy?: Pair | null, stakingAddress?: string): readonly IStakingPool[] {
-  const { network } = useContractKit()
-  const chainId = network.chainId as unknown as UbeswapChainId
-  const ube = chainId ? UBE[chainId] : undefined
+export function useStakingPools(nameToFilterBy?: string | null, stakingAddress?: string): readonly IStakingPool[] {
+  const tgen = new Token(NETWORK_CHAIN_ID, TGEN, 18);
 
   const poolManagerContract = usePoolManagerContract(
-    chainId !== UbeswapChainId.BAKLAVA ? POOL_MANAGER[chainId] : undefined
+    POOL_MANAGER_ADDRESS
   )
   const poolsCountBigNumber = useSingleCallResult(poolManagerContract, 'poolsCount').result?.[0] as
     | BigNumber
@@ -353,41 +409,40 @@ export function useStakingPools(pairToFilterBy?: Pair | null, stakingAddress?: s
   const pools = useStakingPoolsInfo(poolManagerContract, poolAddresses)
 
   const stakingTokens = pools.map((p) => p?.stakingToken as string)
-  const poolPairs = usePairDataFromAddresses(stakingTokens)
+  const poolNames = useStakingPoolNamesFromAddresses(stakingTokens)
 
   return useMemo(() => {
-    if (!ube || !pools || !poolPairs) return []
+    if (!tgen || !pools || !poolNames) return []
 
     return (
       pools
-        .reduce((memo: IStakingPool[], poolInfo, index) => {
+        .reduce((memo: IStakingPool[], poolInfo:IRawPool, index) => {
           return [
             ...memo,
             {
               stakingRewardAddress: poolInfo.poolAddress,
-              tokens: poolPairs[index],
+              name: poolNames[index],
               poolInfo,
             },
           ]
         }, [])
-        .filter((stakingRewardInfo) => {
-          if (pairToFilterBy === undefined) {
+        .filter((stakingRewardInfo:any) => {
+          if (nameToFilterBy === undefined) {
             return true
           }
-          if (pairToFilterBy === null) {
+          if (nameToFilterBy === null) {
             return false
           }
           if (stakingAddress) {
             return stakingAddress.toLowerCase() === stakingRewardInfo.stakingRewardAddress.toLowerCase()
           }
           return (
-            stakingRewardInfo.tokens &&
-            pairToFilterBy.involvesToken(stakingRewardInfo.tokens[0]) &&
-            pairToFilterBy.involvesToken(stakingRewardInfo.tokens[1])
+            stakingRewardInfo.name &&
+            stakingRewardInfo.name.includes(nameToFilterBy)
           )
         }) ?? []
     )
-  }, [ube, pools, poolPairs, pairToFilterBy, stakingAddress])
+  }, [tgen, pools, poolNames, nameToFilterBy, stakingAddress])
 }
 
 export function useStakingPoolAddresses(
@@ -416,25 +471,6 @@ interface IRawPool {
   nextPeriodRewards?: BigNumber | null
 }
 
-const EXTERNAL_POOLS: IRawPool[] = [
-  {
-    index: -1,
-    poolAddress: '0x33F819986FE80A4f4A9032260A24770918511849',
-    stakingToken: '0xF97E6168283e38FC42725082FC63b47B6cD16B18',
-    rewardToken: '0x18414Ce6dAece0365f935F3e78A7C1993e77d8Cd',
-    rewardTokenSymbol: 'LAPIS',
-    weight: 0,
-  },
-  {
-    index: -1,
-    poolAddress: '0xD409B7C4F67F5C845c53505b3d3B5aCD44e479AB',
-    stakingToken: '0x573bcEBD09Ff805eD32df2cb1A968418DC74DCf7',
-    rewardToken: '0x18414Ce6dAece0365f935F3e78A7C1993e77d8Cd',
-    rewardTokenSymbol: 'LAPIS',
-    weight: 0,
-  },
-]
-
 export function useStakingPoolsInfo(
   poolManagerContract: PoolManager | null,
   poolAddresses: readonly string[]
@@ -457,122 +493,40 @@ export function useStakingPoolsInfo(
     'computeAmountForPool',
     rawPools.map((p) => [p.stakingToken, nextPeriod?.result?.[0]])
   )
-  return rawPools.concat(EXTERNAL_POOLS).map((pool, i) => ({
+  return rawPools.map((pool, i) => ({
     ...pool,
     nextPeriodRewards: poolRewards?.[i]?.result?.[0] ?? null,
   }))
 }
 
-export function usePairDataFromAddresses(
-  pairAddresses: readonly string[]
-): readonly (readonly [Token, Token] | undefined)[] {
-  const { network } = useContractKit()
-  const chainId = network.chainId as unknown as UbeswapChainId
-
-  const token0Data = useMultipleContractSingleData(
-    pairAddresses,
-    UNISWAP_V2_PAIR_INTERFACE,
-    'token0',
-    undefined,
-    NEVER_RELOAD
-  )
-
-  const token1Data = useMultipleContractSingleData(
-    pairAddresses,
-    UNISWAP_V2_PAIR_INTERFACE,
-    'token1',
-    undefined,
-    NEVER_RELOAD
-  )
-
-  const tokens0 = token0Data.map((t) => t?.result?.[0] as string | undefined)
-  const tokens1 = token1Data.map((t) => t?.result?.[0] as string | undefined)
-  const tokensDb = useAllTokens()
-
-  // Construct a set of all the unique token addresses that are not in the tokenlists.
-  const tokenAddressesNeededToFetch = useMemo(
-    () =>
-      [...new Set([...tokens0, ...tokens1])].filter((addr): addr is string => addr !== undefined && !tokensDb[addr]),
-    [tokensDb, tokens0, tokens1]
-  )
+export function useStakingPoolNamesFromAddresses(
+  poolAddresses: readonly string[]
+): readonly (string | undefined)[] {
 
   const names = useMultipleContractSingleData(
-    tokenAddressesNeededToFetch,
-    ERC_20_INTERFACE,
+    poolAddresses,
+    NFT_POOL_INTERFACE,
     'name',
     undefined,
     NEVER_RELOAD
-  )
+  )?.map((element:any) => (element?.result ? element?.result[0] : ""));
 
-  const symbols = useMultipleContractSingleData(
-    tokenAddressesNeededToFetch,
-    ERC_20_INTERFACE,
-    'symbol',
-    undefined,
-    NEVER_RELOAD
-  )
-
-  const tokenDecimals = useMultipleContractSingleData(
-    tokenAddressesNeededToFetch,
-    ERC_20_INTERFACE,
-    'decimals',
-    undefined,
-    NEVER_RELOAD
-  )
-
-  // Construct the full token data
-  const tokensNeededToFetch: readonly Token[] | null = useMemo(() => {
-    if (!tokenAddressesNeededToFetch.length || !names.length || !symbols.length || !tokenDecimals.length) return null
-    if (names[0].loading || tokenDecimals[0].loading || symbols[0].loading) return null
-    if (!names[0].result || !tokenDecimals[0].result || !symbols[0].result) return null
-
-    return tokenAddressesNeededToFetch.reduce((memo: Token[], address, index) => {
-      const decimals = tokenDecimals[index].result?.[0]
-      const name = names[index].result?.[0] === 'Celo Gold' ? 'Celo' : names[index].result?.[0]
-      const symbol = symbols[index].result?.[0] === 'cGLD' ? 'CELO' : symbols[index].result?.[0] // todo - remove hardcoded symbol swap for CELO
-
-      const token = new Token(chainId, address, decimals, symbol, name)
-      return [...memo, token]
-    }, [])
-  }, [chainId, tokenAddressesNeededToFetch, names, symbols, tokenDecimals])
-
-  const pairsData: readonly (readonly [Token, Token] | undefined)[] = useMemo(() => {
-    const tokens = tokensNeededToFetch ?? []
-    return tokens0.reduce((pairs: readonly (readonly [Token, Token] | undefined)[], token0Address, index) => {
-      if (!token0Address) {
-        return [...pairs, undefined]
-      }
-      const token1Address = tokens1[index]
-      if (!token1Address) {
-        return [...pairs, undefined]
-      }
-      const token0 = tokensDb[token0Address] ?? tokens.find((t) => t.address === token0Address)
-      const token1 = tokensDb[token1Address] ?? tokens.find((t) => t.address === token1Address)
-      if (!token0 || !token1) {
-        return [...pairs, undefined]
-      }
-      return [...pairs, [token0, token1]]
-    }, [])
-  }, [tokensNeededToFetch, tokens0, tokens1, tokensDb])
-
-  return pairsData
+  return names;
 }
 
 export function useTotalUbeEarned(): TokenAmount | undefined {
-  const { network } = useContractKit()
-  const { chainId } = network
-  const ube = chainId ? UBE[chainId] : undefined
+  const tgen = new Token(NETWORK_CHAIN_ID, TGEN, 18);
   const stakingInfos = useStakingInfo()
 
   return useMemo(() => {
-    if (!ube) return undefined
+    if (!tgen) return undefined
     return (
       stakingInfos
-        ?.filter((stakingInfo) => stakingInfo.rewardToken == ube)
-        .reduce((accumulator, stakingInfo) => accumulator.add(stakingInfo.earnedAmount), new TokenAmount(ube, '0')) ??
-      new TokenAmount(ube, '0')
+        ?.filter((stakingInfo) => stakingInfo.rewardToken == tgen)
+        .reduce((accumulator, stakingInfo) => accumulator.add(stakingInfo.earnedAmount), new TokenAmount(tgen, '0')) ??
+      new TokenAmount(tgen, '0')
     )
-  }, [stakingInfos, ube])
+  }, [stakingInfos, tgen])
 }
 
 // based on typed value

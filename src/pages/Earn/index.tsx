@@ -11,16 +11,10 @@ import Loader from '../../components/Loader'
 import { RowBetween } from '../../components/Row'
 import { BIG_INT_ZERO } from '../../constants'
 import {
-  MOO_DUAL_POOL1,
-  MOO_DUAL_POOL2,
-  MOO_LP1,
-  MOO_LP2,
-  POOF_DUAL_LP,
   StakingInfo,
   useStakingInfo,
 } from '../../state/stake/hooks'
 import { ExternalLink, TYPE } from '../../theme'
-import { DualPoolCard } from './DualPoolCard'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
 
 const PageWrapper = styled(AutoColumn)`
@@ -52,6 +46,8 @@ export default function Earn() {
   // staking info for connected account
   const stakingInfos = useStakingInfo()
 
+  console.log(stakingInfos)
+
   // toggle copy if rewards are inactive
   const stakingRewardsExist = true
 
@@ -72,10 +68,6 @@ export default function Earn() {
 
   const isGenesisOver = COUNTDOWN_END < new Date().getTime()
 
-  const poofUBELP = allPools.find((pool) => pool.stakingToken.address === POOF_DUAL_LP)
-  const mcUSDmcEURLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP1)
-  const moomCELOLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP2)
-
   return (
     <PageWrapper gap="lg" justify="center">
       {isGenesisOver && (
@@ -85,19 +77,19 @@ export default function Earn() {
             <CardSection>
               <AutoColumn gap="md">
                 <RowBetween>
-                  <TYPE.white fontWeight={600}>Ubeswap liquidity mining</TYPE.white>
+                  <TYPE.white fontWeight={600}>Tradegen farming</TYPE.white>
                 </RowBetween>
                 <RowBetween>
                   <TYPE.white fontSize={14}>
-                    Deposit your Liquidity Provider tokens to receive UBE, the Ubeswap protocol governance token.
+                    Deposit your NFT pool tokens to receive TGEN.
                   </TYPE.white>
                 </RowBetween>{' '}
                 <ExternalLink
                   style={{ color: 'white', textDecoration: 'underline' }}
-                  href="https://docs.ubeswap.org/faq"
+                  href="https://docs.tradegen.io"
                   target="_blank"
                 >
-                  <TYPE.white fontSize={14}>Read more about UBE</TYPE.white>
+                  <TYPE.white fontSize={14}>Read more about TGEN</TYPE.white>
                 </ExternalLink>
               </AutoColumn>
             </CardSection>
@@ -108,39 +100,10 @@ export default function Earn() {
 
       {!isGenesisOver && <LaunchCountdown />}
 
-      <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
-        <DataRow style={{ alignItems: 'baseline' }}>
-          <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Dual Pools</TYPE.mediumHeader>
-        </DataRow>
-        {!(mcUSDmcEURLP && poofUBELP && moomCELOLP) && <Loader />}
-        {mcUSDmcEURLP && (
-          <PoolSection>
-            <ErrorBoundary>
-              <DualPoolCard poolAddress={MOO_DUAL_POOL1} underlyingPool={mcUSDmcEURLP} />
-            </ErrorBoundary>
-          </PoolSection>
-        )}
-        {moomCELOLP && (
-          <PoolSection>
-            <ErrorBoundary>
-              <DualPoolCard poolAddress={MOO_DUAL_POOL2} underlyingPool={moomCELOLP} />
-            </ErrorBoundary>
-          </PoolSection>
-        )}
-        {/* Temporarily disable the POOF-UBE dual staking pool
-        poofUBELP && (
-          <PoolSection>
-            <ErrorBoundary>
-              <DualPoolCard poolAddress={POOF_DUAL_POOL} underlyingPool={poofUBELP} />
-            </ErrorBoundary>
-          </PoolSection>
-        )*/}
-      </AutoColumn>
-
       {stakedPools.length > 0 && (
         <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
           <DataRow style={{ alignItems: 'baseline' }}>
-            <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Your Pools</TYPE.mediumHeader>
+            <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Your Farms</TYPE.mediumHeader>
             <div>{/* TODO(igm): show TVL here */}</div>
           </DataRow>
 
@@ -156,7 +119,7 @@ export default function Earn() {
 
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <DataRow style={{ alignItems: 'baseline' }}>
-          <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Available Pools</TYPE.mediumHeader>
+          <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Available Farms</TYPE.mediumHeader>
           <div>
             {!isGenesisOver && (
               <span>
@@ -185,7 +148,7 @@ export default function Earn() {
       {inactivePools.length > 0 && (
         <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
           <DataRow style={{ alignItems: 'baseline' }}>
-            <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Inactive Pools</TYPE.mediumHeader>
+            <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Inactive Farms</TYPE.mediumHeader>
             <div>{/* TODO(igm): show TVL here */}</div>
           </DataRow>
 

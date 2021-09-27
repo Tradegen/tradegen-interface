@@ -5,7 +5,7 @@ import { useSingleCallResult, NEVER_RELOAD, useMultipleContractSingleData } from
 import { ChainId } from '@ubeswap/sdk'
 import { concat } from 'lodash'
 import { POOL_INTERFACE } from '../../constants/abis/pool'
-import { NFT_POOL_INTERFACE } from '../../constants/abis/NFTpool'
+import NFT_POOL_INTERFACE from '../../constants/abis/NFTpool'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 
 export interface Investment {
