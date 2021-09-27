@@ -149,7 +149,7 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
         </PoolInfo>
 
         <StyledInternalLink
-          to={`/farm`}
+          to={`/farm/${stakingInfo.stakingRewardAddress}`}
           style={{ width: '25%', marginLeft: '90%' }}
         >
           <ButtonPrimary padding="8px" borderRadius="8px">

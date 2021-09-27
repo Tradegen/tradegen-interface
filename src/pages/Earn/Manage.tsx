@@ -1,30 +1,26 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
-import { cUSD, JSBI } from '@ubeswap/sdk'
-import QuestionHelper from 'components/QuestionHelper'
+import { cUSD, JSBI, Token } from '@ubeswap/sdk'
 import React, { useCallback, useState } from 'react'
 import { Link, RouteComponentProps, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import { CountUp } from 'use-count-up'
+import useCUSDPrice from 'utils/useCUSDPrice'
+import { NETWORK_CHAIN_ID } from '../../connectors'
 
 import { ButtonEmpty, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
-import DoubleCurrencyLogo from '../../components/DoubleLogo'
 import ClaimRewardModal from '../../components/earn/ClaimRewardModal'
 import StakingModal from '../../components/earn/StakingModal'
 import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import UnstakingModal from '../../components/earn/UnstakingModal'
 import { RowBetween, RowFixed } from '../../components/Row'
-import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_ZERO } from '../../constants'
-import { usePair } from '../../data/Reserves'
-import { useCurrency } from '../../hooks/Tokens'
-import { useColor } from '../../hooks/useColor'
+import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_ZERO, TGEN } from '../../constants'
 import usePrevious from '../../hooks/usePrevious'
 import { useWalletModalToggle } from '../../state/application/hooks'
-import { usePairDualStakingInfo, usePairStakingInfo } from '../../state/stake/hooks'
+import { usePairStakingInfo } from '../../state/stake/hooks'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLinkIcon, TYPE } from '../../theme'
-import { currencyId } from '../../utils/currencyId'
-import { useStakingPoolValue } from './useStakingPoolValue'
+import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
@@ -86,28 +82,52 @@ const DataRow = styled(RowBetween)`
   `};
 `
 
+/*
+{stakingInfo && (
+        <>
+          <StakingModal
+            isOpen={showStakingModal}
+            onDismiss={() => setShowStakingModal(false)}
+            stakingInfo={stakingInfo}
+            userLiquidityUnstaked={userLiquidityUnstaked}
+          />
+          <UnstakingModal
+            isOpen={showUnstakingModal}
+            onDismiss={() => setShowUnstakingModal(false)}
+            stakingInfo={stakingInfo}
+          />
+          <ClaimRewardModal
+            isOpen={showClaimRewardModal}
+            onDismiss={() => setShowClaimRewardModal(false)}
+            stakingInfo={stakingInfo}
+          />
+        </>
+      )}*/
+
 export default function Manage({
   match: {
-    params: { currencyIdA, currencyIdB, stakingAddress },
+    params: { stakingAddress },
   },
-}: RouteComponentProps<{ currencyIdA: string; currencyIdB: string; stakingAddress: string }>) {
+}: RouteComponentProps<{ stakingAddress: string }>) {
   const { address: account, network } = useContractKit()
   const { chainId } = network
   const location = useLocation()
 
-  // get currencies and pair
-  const [tokenA, tokenB] = [useCurrency(currencyIdA) ?? undefined, useCurrency(currencyIdB) ?? undefined]
+  const stakingInfo = usePairStakingInfo(undefined, stakingAddress)
 
-  const [, stakingTokenPair] = usePair(tokenA, tokenB)
-  const singleStakingInfo = usePairStakingInfo(stakingTokenPair, stakingAddress)
-  const dualStakingInfo = usePairDualStakingInfo(singleStakingInfo)
-  const isDualFarm = location.pathname.includes('dualfarm')
+  console.log(stakingInfo);
 
-  const stakingInfo = isDualFarm ? dualStakingInfo : singleStakingInfo
+  const name = stakingInfo?.name ?? "";
+  const poolAddress = stakingInfo?.stakingToken;
 
   // detect existing unstaked LP position to show add button if none found
   const userLiquidityUnstaked = useTokenBalance(account ?? undefined, stakingInfo?.stakedAmount?.token)
   const showAddLiquidityButton = Boolean(stakingInfo?.stakedAmount?.equalTo('0') && userLiquidityUnstaked?.equalTo('0'))
+
+  const stakedC1 = stakingInfo?.stakedC1 ? BigInt(BigInt(stakingInfo?.stakedC1?.numerator.toString()) / BigInt(stakingInfo?.stakedC1?.denominator.toString())) : BigInt(0);
+  const stakedC2 = stakingInfo?.stakedC2 ? BigInt(BigInt(stakingInfo?.stakedC2?.numerator.toString()) / BigInt(stakingInfo?.stakedC2?.denominator.toString())) : BigInt(0);
+  const stakedC3 = stakingInfo?.stakedC3 ? BigInt(BigInt(stakingInfo?.stakedC3?.numerator.toString()) / BigInt(stakingInfo?.stakedC3?.denominator.toString())) : BigInt(0);
+  const stakedC4 = stakingInfo?.stakedC4 ? BigInt(BigInt(stakingInfo?.stakedC4?.numerator.toString()) / BigInt(stakingInfo?.stakedC4?.denominator.toString())) : BigInt(0);
 
   // toggle for staking modal and unstaking modal
   const [showStakingModal, setShowStakingModal] = useState(false)
@@ -117,16 +137,31 @@ export default function Manage({
   // fade cards if nothing staked or nothing earned yet
   const disableTop = !stakingInfo?.stakedAmount || stakingInfo.stakedAmount.equalTo(JSBI.BigInt(0))
 
-  const token = tokenA === cUSD[chainId] ? tokenB : tokenA
-  const backgroundColor = useColor(token ?? undefined)
+  const backgroundColor = '#2172E5';
 
-  // get CUSD value of staked LP tokens
-  const {
-    valueCUSD: valueOfTotalStakedAmountInCUSD,
-    userValueCUSD,
-    userAmountTokenA,
-    userAmountTokenB,
-  } = useStakingPoolValue(stakingInfo)
+  //get the USD value of staked TGEN
+  let TGENToken = new Token(NETWORK_CHAIN_ID, TGEN, 18);
+  let price = useCUSDPrice(TGENToken);
+  let stringPrice = price?.raw.numerator.toString();
+  let stringPrice2 = price?.raw.denominator.toString();
+  const TGENPrice = (stringPrice && stringPrice2) ? BigInt(BigInt(stringPrice) * BigInt(1e18) / BigInt(stringPrice2)) : BigInt(0);
+  console.log(TGENPrice);
+
+  const totalStakedAmount = stakingInfo?.totalStakedAmount ? stakingInfo?.totalStakedAmount.raw.toString() : "0";
+  const totalRewardRateNumerator = stakingInfo?.totalRewardRate ? stakingInfo?.totalRewardRate.numerator.toString() : "0";
+  const totalRewardRateDenominator = stakingInfo?.totalRewardRate ? stakingInfo?.totalRewardRate.denominator.toString() : "0";
+
+  const tokenPrice = stakingInfo?.tokenPrice?.toString() ?? "0";
+  const poolValue = BigInt(totalStakedAmount) * BigInt(tokenPrice);
+
+  const rewardRate = totalRewardRateDenominator == "0" ? BigInt(0) : BigInt(totalRewardRateNumerator) * BigInt(BIG_INT_SECONDS_IN_WEEK.toString()) / BigInt(totalRewardRateDenominator);
+
+  console.log(rewardRate);
+  
+  const valueOfTGENInUSD = (BigInt(TGENPrice) != BigInt(0)) ? (BigInt(TGENPrice) * BigInt(rewardRate) * BigInt(52) / BigInt(1e36)) : BigInt(0);
+  const userValueUSD = (stakingInfo?.stakedAmount && stakingInfo?.totalStakedAmount && BigInt(stakingInfo.totalStakedAmount.toExact()) != BigInt(0)) ?
+                        valueOfTGENInUSD * BigInt(stakingInfo.stakedAmount?.toExact()) / BigInt(stakingInfo.totalStakedAmount.toExact()) : BigInt(0);
+  const apr = (BigInt(poolValue) != BigInt(0)) ? BigInt(valueOfTGENInUSD) / BigInt(poolValue) * BigInt(100) : BigInt(0)
 
   const ubeCountUpAmount = stakingInfo?.earnedAmountUbe?.toFixed(6) ?? '0'
   const ubeCountUpAmountPrevious = usePrevious(ubeCountUpAmount) ?? '0'
@@ -147,26 +182,17 @@ export default function Manage({
     <PageWrapper gap="lg" justify="center">
       <RowBetween style={{ gap: '24px' }}>
         <TYPE.mediumHeader style={{ margin: 0 }}>
-          {tokenA?.symbol}-{tokenB?.symbol} Liquidity Mining
+          {name} - Farming
         </TYPE.mediumHeader>
-        <DoubleCurrencyLogo currency0={tokenA ?? undefined} currency1={tokenB ?? undefined} size={24} />
       </RowBetween>
 
       <DataRow style={{ gap: '24px' }}>
         <PoolData>
           <AutoColumn gap="sm">
-            <TYPE.body style={{ margin: 0 }}>Total deposits</TYPE.body>
+            <TYPE.body style={{ margin: 0 }}>Total staked</TYPE.body>
             <TYPE.body fontSize={24} fontWeight={500}>
-              {valueOfTotalStakedAmountInCUSD
-                ? `$${
-                    valueOfTotalStakedAmountInCUSD.lessThan('1')
-                      ? valueOfTotalStakedAmountInCUSD.toFixed(2, {
-                          groupSeparator: ',',
-                        })
-                      : valueOfTotalStakedAmountInCUSD.toFixed(0, {
-                          groupSeparator: ',',
-                        })
-                  }`
+              {poolValue
+                ? '$' + poolValue
                 : '-'}
             </TYPE.body>
           </AutoColumn>
@@ -176,10 +202,10 @@ export default function Manage({
             <TYPE.body style={{ margin: 0 }}>Pool Rate</TYPE.body>
             <TYPE.body fontSize={24} fontWeight={500}>
               {stakingInfo?.active
-                ? stakingInfo?.ubeRewardRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ??
+                ? rewardRate.toString() ??
                   '-'
                 : '0'}
-              {` ${stakingInfo?.rewardToken?.symbol ?? 'UBE'} / week`}
+              {` TGEN / week`}
             </TYPE.body>
           </AutoColumn>
         </PoolData>
@@ -192,11 +218,11 @@ export default function Manage({
           <CardSection>
             <AutoColumn gap="md">
               <RowBetween>
-                <TYPE.white fontWeight={600}>Step 1. Get UBE-LP Liquidity tokens</TYPE.white>
+                <TYPE.white fontWeight={600}>Step 1. Get NFT pool tokens</TYPE.white>
               </RowBetween>
               <RowBetween style={{ marginBottom: '1rem' }}>
                 <TYPE.white fontSize={14}>
-                  {`UBE-LP tokens are required. Once you've added liquidity to the ${tokenA?.symbol}-${tokenB?.symbol} pool you can stake your liquidity tokens on this page.`}
+                  {`NFT pool tokens are required. Once you've in the the '${name}' pool you can stake your pool tokens on this page.`}
                 </TYPE.white>
               </RowBetween>
               <ButtonPrimary
@@ -204,36 +230,15 @@ export default function Manage({
                 borderRadius="8px"
                 width={'fit-content'}
                 as={Link}
-                to={`/add/${tokenA && currencyId(tokenA)}/${tokenB && currencyId(tokenB)}`}
+                to={poolAddress ? `/NFTPool/${poolAddress}` : '/investments'}
               >
-                {`Add ${tokenA?.symbol}-${tokenB?.symbol} liquidity`}
+                {`Invest in '${name}'`}
               </ButtonPrimary>
             </AutoColumn>
           </CardSection>
           <CardBGImage />
           <CardNoise />
         </VoteCard>
-      )}
-
-      {stakingInfo && (
-        <>
-          <StakingModal
-            isOpen={showStakingModal}
-            onDismiss={() => setShowStakingModal(false)}
-            stakingInfo={stakingInfo}
-            userLiquidityUnstaked={userLiquidityUnstaked}
-          />
-          <UnstakingModal
-            isOpen={showUnstakingModal}
-            onDismiss={() => setShowUnstakingModal(false)}
-            stakingInfo={stakingInfo}
-          />
-          <ClaimRewardModal
-            isOpen={showClaimRewardModal}
-            onDismiss={() => setShowClaimRewardModal(false)}
-            stakingInfo={stakingInfo}
-          />
-        </>
       )}
 
       <PositionInfo gap="lg" justify="center" dim={showAddLiquidityButton}>
@@ -243,21 +248,46 @@ export default function Manage({
               <CardNoise />
               <AutoColumn gap="md">
                 <RowBetween>
-                  <TYPE.white fontWeight={600}>Your liquidity deposits</TYPE.white>
+                  <TYPE.white fontWeight={600}>Your stake</TYPE.white>
                 </RowBetween>
                 <RowBetween style={{ alignItems: 'baseline' }}>
                   <TYPE.white fontSize={36} fontWeight={600}>
-                    {stakingInfo?.stakedAmount?.toSignificant(6) ?? '-'}
+                    {stakedC1.toString() ?? '-'}
                   </TYPE.white>
                   <RowFixed>
                     <TYPE.white>
-                      UBE-LP {tokenA?.symbol}-{tokenB?.symbol}
+                      C1 pool tokens
                     </TYPE.white>
-                    {stakingInfo && (
-                      <PairLinkIcon
-                        href={`https://info.ubeswap.org/pair/${stakingInfo.stakingToken.address.toLowerCase()}`}
-                      />
-                    )}
+                  </RowFixed>
+                </RowBetween>
+                <RowBetween style={{ alignItems: 'baseline' }}>
+                  <TYPE.white fontSize={36} fontWeight={600}>
+                    {stakedC2.toString() ?? '-'}
+                  </TYPE.white>
+                  <RowFixed>
+                    <TYPE.white>
+                      C2 pool tokens
+                    </TYPE.white>
+                  </RowFixed>
+                </RowBetween>
+                <RowBetween style={{ alignItems: 'baseline' }}>
+                  <TYPE.white fontSize={36} fontWeight={600}>
+                    {stakedC3.toString() ?? '-'}
+                  </TYPE.white>
+                  <RowFixed>
+                    <TYPE.white>
+                      C3 pool tokens
+                    </TYPE.white>
+                  </RowFixed>
+                </RowBetween>
+                <RowBetween style={{ alignItems: 'baseline' }}>
+                  <TYPE.white fontSize={36} fontWeight={600}>
+                    {stakedC4.toString() ?? '-'}
+                  </TYPE.white>
+                  <RowFixed>
+                    <TYPE.white>
+                      C4 pool tokens
+                    </TYPE.white>
                   </RowFixed>
                 </RowBetween>
                 {stakingInfo?.stakedAmount && stakingInfo.stakedAmount.greaterThan('0') && (
@@ -265,17 +295,10 @@ export default function Manage({
                     <RowFixed>
                       <TYPE.white>
                         Current value:{' '}
-                        {userValueCUSD
-                          ? `$${userValueCUSD.toFixed(2, {
-                              separator: ',',
-                            })}`
+                        {userValueUSD
+                          ? `${formatNumber(userValueUSD)}`
                           : '--'}
                       </TYPE.white>
-                      <QuestionHelper
-                        text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
-                          userAmountTokenA?.token.symbol
-                        }, ${userAmountTokenB?.toFixed(0, { groupSeparator: ',' })} ${userAmountTokenB?.token.symbol}`}
-                      />
                     </RowFixed>
                   </RowBetween>
                 )}
@@ -322,35 +345,9 @@ export default function Manage({
                         ?.multiply(BIG_INT_SECONDS_IN_WEEK)
                         ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
                     : '0'}
-                  {` ${isDualFarm ? 'UBE' : stakingInfo?.rewardToken?.symbol ?? 'UBE'} / week`}
+                  {`TGEN / week`}
                 </TYPE.black>
               </RowBetween>
-              {isDualFarm && (
-                <RowBetween style={{ alignItems: 'baseline' }}>
-                  <TYPE.largeHeader fontSize={36} fontWeight={600}>
-                    <CountUp
-                      key={countUpAmount}
-                      isCounting
-                      decimalPlaces={4}
-                      start={parseFloat(countUpAmountPrevious)}
-                      end={parseFloat(countUpAmount)}
-                      thousandsSeparator={','}
-                      duration={1}
-                    />
-                  </TYPE.largeHeader>
-                  <TYPE.black fontSize={16} fontWeight={500}>
-                    <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
-                      ⚡
-                    </span>
-                    {dualStakingInfo?.active
-                      ? dualStakingInfo?.rewardRate
-                          ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                          ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
-                      : '0'}
-                    {` ${dualStakingInfo?.rewardToken?.symbol} / week`}
-                  </TYPE.black>
-                </RowBetween>
-              )}
             </AutoColumn>
           </StyledBottomCard>
         </BottomSection>
@@ -358,14 +355,14 @@ export default function Manage({
           <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px' }}>
             ⭐️
           </span>
-          When you withdraw, the contract will automagically claim UBE on your behalf!
+          When you withdraw, the contract will automagically claim TGEN on your behalf!
         </TYPE.main>
 
         {!showAddLiquidityButton && (
           <DataRow style={{ marginBottom: '1rem' }}>
             {stakingInfo && stakingInfo.active && (
               <ButtonPrimary padding="8px" borderRadius="8px" width="160px" onClick={handleDepositClick}>
-                {stakingInfo?.stakedAmount?.greaterThan(JSBI.BigInt(0)) ? 'Deposit' : 'Deposit UBE-LP Tokens'}
+                {stakingInfo?.stakedAmount?.greaterThan(JSBI.BigInt(0)) ? 'Deposit' : 'Deposit NFT pool Tokens'}
               </ButtonPrimary>
             )}
 
@@ -389,15 +386,9 @@ export default function Manage({
           </DataRow>
         )}
         {!userLiquidityUnstaked ? null : userLiquidityUnstaked.equalTo('0') ? null : !stakingInfo?.active ? null : (
-          <TYPE.main>{userLiquidityUnstaked.toSignificant(6)} UBE LP tokens available</TYPE.main>
+          <TYPE.main>{userLiquidityUnstaked.toSignificant(6)} NFT pool tokens available</TYPE.main>
         )}
       </PositionInfo>
     </PageWrapper>
   )
 }
-
-const PairLinkIcon = styled(ExternalLinkIcon)`
-  svg {
-    stroke: ${(props) => props.theme.primary1};
-  }
-`
