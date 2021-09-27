@@ -45,10 +45,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
       setAttempting(true)
       await doTransaction(stakingContract, 'getReward', {
         args: [],
-        overrides: {
-          gasLimit: 350000,
-        },
-        summary: `Claim accumulated UBE rewards`,
+        summary: `Claim accumulated TGEN rewards`,
       })
         .catch(console.error)
         .finally(() => {
@@ -77,18 +74,18 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
             <AutoColumn justify="center" gap="md">
               <TYPE.body fontWeight={600} fontSize={36}>
                 {stakingInfo?.earnedAmountUbe?.toSignificant(6)}{' '}
-                {stakingInfo?.dualRewards ? 'UBE' : stakingInfo?.rewardToken?.symbol ?? 'UBE'}
+                {stakingInfo?.dualRewards ? 'TGEN' : stakingInfo?.rewardToken?.symbol ?? 'TGEN'}
               </TYPE.body>
               {stakingInfo?.dualRewards && (
                 <TYPE.body fontWeight={600} fontSize={36}>
-                  {stakingInfo?.earnedAmount?.toSignificant(6)} {stakingInfo?.rewardToken?.symbol ?? 'UBE'}
+                  {stakingInfo?.earnedAmount?.toSignificant(6)} {stakingInfo?.rewardToken?.symbol ?? 'TGEN'}
                 </TYPE.body>
               )}
               <TYPE.body>Unclaimed rewards</TYPE.body>
             </AutoColumn>
           )}
           <TYPE.subHeader style={{ textAlign: 'center' }}>
-            When you claim without withdrawing your liquidity remains in the mining pool.
+            When you claim without withdrawing your tokens remains in the staking pool.
           </TYPE.subHeader>
           <ButtonError disabled={!!error} error={!!error && !!stakingInfo?.stakedAmount} onClick={onClaimReward}>
             {error ?? 'Claim'}
@@ -99,7 +96,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
         <LoadingView onDismiss={wrappedOnDismiss}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.body fontSize={20}>
-              Claiming {stakingInfo?.earnedAmount?.toSignificant(6)} {stakingInfo?.rewardToken?.symbol ?? 'UBE'}
+              Claiming {stakingInfo?.earnedAmount?.toSignificant(6)} {stakingInfo?.rewardToken?.symbol ?? 'TGEN'}
             </TYPE.body>
           </AutoColumn>
         </LoadingView>
@@ -108,7 +105,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
         <SubmittedView onDismiss={wrappedOnDismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Claimed {stakingInfo?.rewardToken?.symbol ?? 'UBE'}!</TYPE.body>
+            <TYPE.body fontSize={20}>Claimed {stakingInfo?.rewardToken?.symbol ?? 'TGEN'}!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

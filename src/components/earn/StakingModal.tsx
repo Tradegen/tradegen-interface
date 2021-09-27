@@ -1,32 +1,17 @@
-import { useProvider } from '@celo-tools/use-contractkit'
-import { Pair, TokenAmount } from '@ubeswap/sdk'
-import Loader from 'components/Loader'
 import { useDoTransaction } from 'components/swap/routing'
 import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 
-import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
-import { usePairContract, useStakingContract } from '../../hooks/useContract'
-import useTransactionDeadline from '../../hooks/useTransactionDeadline'
-import { StakingInfo, useDerivedStakeInfo } from '../../state/stake/hooks'
+import { useStakingContract } from '../../hooks/useContract'
+import { StakingInfo } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
-import { maxAmountSpend } from '../../utils/maxAmountSpend'
-import { ButtonConfirmed, ButtonError } from '../Button'
+import { ButtonError } from '../Button'
 import { AutoColumn } from '../Column'
-import CurrencyInputPanel from '../CurrencyInputPanel'
 import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
-import ProgressCircles from '../ProgressSteps'
-import { AutoRow, RowBetween } from '../Row'
-
-const HypotheticalRewardRate = styled.div<{ dim: boolean }>`
-  display: flex;
-  justify-content: space-between;
-  padding-right: 20px;
-  padding-left: 20px;
-
-  opacity: ${({ dim }) => (dim ? 0.5 : 1)};
-`
+import { RowBetween } from '../Row'
+import InputPanel from './InputPanel'
+import { ButtonPrimary } from '../../components/Button'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -37,31 +22,73 @@ interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
   stakingInfo: StakingInfo
-  userLiquidityUnstaked: TokenAmount | undefined
+  availableC1: string
+  availableC2: string
+  availableC3: string
+  availableC4: string
 }
 
-export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiquidityUnstaked }: StakingModalProps) {
-  const library = useProvider()
+let tokenClass:number = 1;
+let maxAvailableTokens:string = "0";
+let C1:string = "0";
+let C2:string = "0";
+let C3:string = "0";
+let C4:string = "0";
 
-  // track and parse user input
-  const [typedValue, setTypedValue] = useState('')
-  const { parsedAmount, error } = useDerivedStakeInfo(typedValue, stakingInfo.stakingToken, userLiquidityUnstaked)
-  const parsedAmountWrapped = parsedAmount
+function updateTokenClass(newTokenClass:number)
+{
+    console.log("update token class:");
+    console.log(newTokenClass);
 
-  let hypotheticalUbeRewardRate: TokenAmount = new TokenAmount(stakingInfo.ubeRewardRate.token, '0')
-  let hypotheticalRewardRate: TokenAmount = new TokenAmount(stakingInfo.rewardRate.token, '0')
-  if (parsedAmountWrapped?.greaterThan('0')) {
-    hypotheticalUbeRewardRate = stakingInfo.getHypotheticalRewardRate(
-      stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
-      stakingInfo.totalStakedAmount.add(parsedAmountWrapped),
-      stakingInfo.totalUBERewardRate
-    )
-    hypotheticalRewardRate = stakingInfo.getHypotheticalRewardRate(
-      stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
-      stakingInfo.totalStakedAmount.add(parsedAmountWrapped),
-      stakingInfo.totalRewardRate
-    )
-  }
+    tokenClass = newTokenClass;
+    maxAvailableTokens = getMaxAvailableTokens();
+
+    console.log(maxAvailableTokens);
+}
+
+function getMaxAvailableTokens()
+{
+    if (tokenClass == 1)
+    {
+        return C1;
+    }
+
+    if (tokenClass == 2)
+    {
+        return C2;
+    }
+
+    if (tokenClass == 3)
+    {
+        return C3;
+    }
+
+    if (tokenClass == 4)
+    {
+        return C4;
+    }
+
+    return "0";
+}
+
+export default function StakingModal({ isOpen, onDismiss, stakingInfo, availableC1, availableC2, availableC3, availableC4 }: StakingModalProps) {
+
+  C1 = availableC1;
+  C2 = availableC2;
+  C3 = availableC3;
+  C4 = availableC4;
+
+  maxAvailableTokens = getMaxAvailableTokens();
+
+  console.log(tokenClass);
+  console.log(maxAvailableTokens);
+
+  const [typedValue, setTypedValue] = useState('');
+  const parsedAmount = (BigInt(typedValue) > BigInt(maxAvailableTokens) || BigInt(typedValue) == BigInt(0)) ? BigInt(0) : BigInt(typedValue);
+  const error = (BigInt(typedValue) > BigInt(maxAvailableTokens) || BigInt(typedValue) == BigInt(0)) ? 'Enter an amount' : undefined;
+
+  console.log(parsedAmount);
+  console.log(error);
 
   // state for pending and submitted txn views
   const [attempting, setAttempting] = useState<boolean>(false)
@@ -72,33 +99,22 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
     onDismiss()
   }, [onDismiss])
 
-  // pair contract for this token to be staked
-  const dummyPair = new Pair(new TokenAmount(stakingInfo.tokens[0], '0'), new TokenAmount(stakingInfo.tokens[1], '0'))
-  const pairContract = usePairContract(dummyPair.liquidityToken.address)
-
-  // approval data for stake
-  const deadline = useTransactionDeadline()
-  const [approval, approveCallback] = useApproveCallback(parsedAmount, stakingInfo.stakingRewardAddress)
-
   const stakingContract = useStakingContract(stakingInfo.stakingRewardAddress)
   const doTransaction = useDoTransaction()
 
   async function onStake() {
     setAttempting(true)
-    if (stakingContract && parsedAmount && deadline) {
-      if (approval === ApprovalState.APPROVED) {
-        const response = await doTransaction(stakingContract, 'stake', {
-          args: [`0x${parsedAmount.raw.toString(16)}`],
-          overrides: {
-            gasLimit: 350000,
-          },
-          summary: `Stake deposited liquidity`,
+    if (stakingContract && parsedAmount && BigInt(maxAvailableTokens) != BigInt(0)) {
+      await doTransaction(stakingContract, 'stake', {
+        args: [`0x${parsedAmount.toString(16)}`, tokenClass],
+        summary: `Stake NFT pool tokens`,
+      })
+        .then((response) => {
+          setHash(response.hash)
         })
-        setHash(response.hash)
-      } else {
-        setAttempting(false)
-        throw new Error('Attempting to stake without approval or a signature. Please contact support.')
-      }
+        .catch(() => {
+          setAttempting(false)
+        })
     }
   }
 
@@ -108,19 +124,11 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
   }, [])
 
   // used for max input button
-  const maxAmountInput = maxAmountSpend(userLiquidityUnstaked)
-  const atMaxAmount = Boolean(maxAmountInput && parsedAmount?.equalTo(maxAmountInput))
+  const maxAmountInput = BigInt(maxAvailableTokens)
+  const atMaxAmount = Boolean(maxAmountInput && parsedAmount == BigInt(maxAmountInput))
   const handleMax = useCallback(() => {
-    maxAmountInput && onUserInput(maxAmountInput.toExact())
+    maxAmountInput && onUserInput(maxAmountInput.toString())
   }, [maxAmountInput, onUserInput])
-
-  async function onAttemptToApprove() {
-    if (!pairContract || !library || !deadline) throw new Error('missing dependencies')
-    const liquidityAmount = parsedAmount
-    if (!liquidityAmount) throw new Error('missing liquidity amount')
-
-    approveCallback()
-  }
 
   return (
     <Modal isOpen={isOpen} onDismiss={wrappedOnDismiss} maxHeight={90}>
@@ -130,73 +138,48 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
             <TYPE.mediumHeader>Deposit</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
-          <CurrencyInputPanel
+          <p>Available C{tokenClass.toString()}: {maxAvailableTokens.toString()}</p>
+          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateTokenClass(1)}}>
+            {'C1'}
+          </ButtonPrimary>
+          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateTokenClass(2)}}>
+            {'C2'}
+          </ButtonPrimary>
+          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateTokenClass(3)}}>
+            {'C3'}
+          </ButtonPrimary>
+          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateTokenClass(4)}}>
+            {'C4'}
+          </ButtonPrimary>
+          <InputPanel
             value={typedValue}
             onUserInput={onUserInput}
             onMax={handleMax}
             showMaxButton={!atMaxAmount}
-            currency={stakingInfo.totalStakedAmount.token}
-            pair={dummyPair}
+            currency={undefined}
+            pair={undefined}
             label={''}
             disableCurrencySelect={true}
-            customBalanceText={'Available to deposit: '}
+            customBalanceText={undefined}
             id="stake-liquidity-token"
+            availableTokens={maxAvailableTokens.toString()}
           />
 
-          <HypotheticalRewardRate dim={!hypotheticalUbeRewardRate.greaterThan('0')}>
-            <div>
-              <TYPE.black fontWeight={600}>Weekly Rewards</TYPE.black>
-            </div>
-
-            <div>
-              <TYPE.black>
-                {hypotheticalUbeRewardRate
-                  .multiply((60 * 60 * 24 * 7).toString())
-                  .toSignificant(4, { groupSeparator: ',' })}{' '}
-                UBE / week
-              </TYPE.black>
-              {stakingInfo?.dualRewards && (
-                <TYPE.black>
-                  {hypotheticalRewardRate
-                    .multiply((60 * 60 * 24 * 7).toString())
-                    .toSignificant(4, { groupSeparator: ',' })}{' '}
-                  {stakingInfo?.rewardToken?.symbol} / week
-                </TYPE.black>
-              )}
-            </div>
-          </HypotheticalRewardRate>
-
           <RowBetween>
-            <ButtonConfirmed
-              mr="0.5rem"
-              onClick={onAttemptToApprove}
-              confirmed={approval === ApprovalState.APPROVED}
-              disabled={approval !== ApprovalState.NOT_APPROVED}
-            >
-              {approval === ApprovalState.PENDING ? (
-                <AutoRow gap="6px" justify="center">
-                  Approving <Loader stroke="white" />
-                </AutoRow>
-              ) : (
-                'Approve'
-              )}
-            </ButtonConfirmed>
             <ButtonError
-              disabled={!!error || approval !== ApprovalState.APPROVED}
+              disabled={!!error}
               error={!!error && !!parsedAmount}
               onClick={onStake}
             >
-              {error ?? 'Deposit'}
+              {error ?? 'Stake'}
             </ButtonError>
           </RowBetween>
-          <ProgressCircles steps={[approval === ApprovalState.APPROVED]} disabled={true} />
         </ContentWrapper>
       )}
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOnDismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.largeHeader>Depositing Liquidity</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>{parsedAmount?.toSignificant(4)} UBE LP</TYPE.body>
+            <TYPE.body fontSize={20}>Staking {typedValue} C{tokenClass.toString()} NFT pool tokens</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -204,7 +187,7 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
         <SubmittedView onDismiss={wrappedOnDismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Deposited {parsedAmount?.toSignificant(4)} UBE LP</TYPE.body>
+            <TYPE.body fontSize={20}>Staked C{tokenClass.toString()} NFT pool tokens!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

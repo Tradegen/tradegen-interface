@@ -14,10 +14,10 @@ import StakingModal from '../../components/earn/StakingModal'
 import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import UnstakingModal from '../../components/earn/UnstakingModal'
 import { RowBetween, RowFixed } from '../../components/Row'
-import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_ZERO, TGEN } from '../../constants'
+import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_ZERO, TGEN, ZERO_ADDRESS } from '../../constants'
 import usePrevious from '../../hooks/usePrevious'
 import { useWalletModalToggle } from '../../state/application/hooks'
-import { usePairStakingInfo } from '../../state/stake/hooks'
+import { usePairStakingInfo, useTokenBalancePerClass, useStakedBalancePerClass } from '../../state/stake/hooks'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLinkIcon, TYPE } from '../../theme'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
@@ -82,52 +82,36 @@ const DataRow = styled(RowBetween)`
   `};
 `
 
-/*
-{stakingInfo && (
-        <>
-          <StakingModal
-            isOpen={showStakingModal}
-            onDismiss={() => setShowStakingModal(false)}
-            stakingInfo={stakingInfo}
-            userLiquidityUnstaked={userLiquidityUnstaked}
-          />
-          <UnstakingModal
-            isOpen={showUnstakingModal}
-            onDismiss={() => setShowUnstakingModal(false)}
-            stakingInfo={stakingInfo}
-          />
-          <ClaimRewardModal
-            isOpen={showClaimRewardModal}
-            onDismiss={() => setShowClaimRewardModal(false)}
-            stakingInfo={stakingInfo}
-          />
-        </>
-      )}*/
-
 export default function Manage({
   match: {
     params: { stakingAddress },
   },
 }: RouteComponentProps<{ stakingAddress: string }>) {
   const { address: account, network } = useContractKit()
-  const { chainId } = network
-  const location = useLocation()
 
   const stakingInfo = usePairStakingInfo(undefined, stakingAddress)
 
   console.log(stakingInfo);
 
   const name = stakingInfo?.name ?? "";
-  const poolAddress = stakingInfo?.stakingToken;
+  const poolAddress = stakingInfo?.stakingToken.address ?? ZERO_ADDRESS;
+
+  const tokenBalancesPerClass = useTokenBalancePerClass(poolAddress, account ?? ZERO_ADDRESS);
+  console.log(tokenBalancesPerClass);
+
+  const stakedC1 = useStakedBalancePerClass(stakingAddress, account ?? ZERO_ADDRESS, 1) ?? BigInt(0);
+  const stakedC2 = useStakedBalancePerClass(stakingAddress, account ?? ZERO_ADDRESS, 2) ?? BigInt(0);
+  const stakedC3 = useStakedBalancePerClass(stakingAddress, account ?? ZERO_ADDRESS, 3) ?? BigInt(0);
+  const stakedC4 = useStakedBalancePerClass(stakingAddress, account ?? ZERO_ADDRESS, 4) ?? BigInt(0);
 
   // detect existing unstaked LP position to show add button if none found
   const userLiquidityUnstaked = useTokenBalance(account ?? undefined, stakingInfo?.stakedAmount?.token)
   const showAddLiquidityButton = Boolean(stakingInfo?.stakedAmount?.equalTo('0') && userLiquidityUnstaked?.equalTo('0'))
 
-  const stakedC1 = stakingInfo?.stakedC1 ? BigInt(BigInt(stakingInfo?.stakedC1?.numerator.toString()) / BigInt(stakingInfo?.stakedC1?.denominator.toString())) : BigInt(0);
-  const stakedC2 = stakingInfo?.stakedC2 ? BigInt(BigInt(stakingInfo?.stakedC2?.numerator.toString()) / BigInt(stakingInfo?.stakedC2?.denominator.toString())) : BigInt(0);
-  const stakedC3 = stakingInfo?.stakedC3 ? BigInt(BigInt(stakingInfo?.stakedC3?.numerator.toString()) / BigInt(stakingInfo?.stakedC3?.denominator.toString())) : BigInt(0);
-  const stakedC4 = stakingInfo?.stakedC4 ? BigInt(BigInt(stakingInfo?.stakedC4?.numerator.toString()) / BigInt(stakingInfo?.stakedC4?.denominator.toString())) : BigInt(0);
+  const availableC1 = tokenBalancesPerClass[0] ?? BigInt(0);
+  const availableC2 = tokenBalancesPerClass[1] ?? BigInt(0);
+  const availableC3 = tokenBalancesPerClass[2] ?? BigInt(0);
+  const availableC4 = tokenBalancesPerClass[3] ?? BigInt(0);
 
   // toggle for staking modal and unstaking modal
   const [showStakingModal, setShowStakingModal] = useState(false)
@@ -210,6 +194,34 @@ export default function Manage({
           </AutoColumn>
         </PoolData>
       </DataRow>
+
+      {stakingInfo && (
+        <>
+          <StakingModal
+            isOpen={showStakingModal}
+            onDismiss={() => setShowStakingModal(false)}
+            stakingInfo={stakingInfo}
+            availableC1={availableC1.toString()}
+            availableC2={availableC2.toString()}
+            availableC3={availableC3.toString()}
+            availableC4={availableC4.toString()}
+          />
+          <UnstakingModal
+            isOpen={showUnstakingModal}
+            onDismiss={() => setShowUnstakingModal(false)}
+            stakingInfo={stakingInfo}
+            availableC1={stakedC1.toString()}
+            availableC2={stakedC2.toString()}
+            availableC3={stakedC3.toString()}
+            availableC4={stakedC4.toString()}
+          />
+          <ClaimRewardModal
+            isOpen={showClaimRewardModal}
+            onDismiss={() => setShowClaimRewardModal(false)}
+            stakingInfo={stakingInfo}
+          />
+        </>
+      )}
 
       {showAddLiquidityButton && (
         <VoteCard>

@@ -1,8 +1,6 @@
 import { ChainId, useContractKit } from '@celo-tools/use-contractkit'
 import { BigNumber } from '@ethersproject/bignumber'
 import { ChainId as UbeswapChainId, JSBI, Pair, Token, TokenAmount } from '@ubeswap/sdk'
-import { POOL_MANAGER } from 'constants/poolManager'
-import { UBE } from 'constants/tokens'
 import { TGEN, POOL_MANAGER_ADDRESS } from '../../constants'
 import { NETWORK_CHAIN_ID } from 'connectors'
 import { PoolManager } from 'generated/'
@@ -15,7 +13,7 @@ import useCUSDPrice from 'utils/useCUSDPrice'
 import NFT_POOL_INTERFACE from '../../constants/abis/NFTpool'
 import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'
 // Interfaces
-import { usePoolManagerContract, useTokenContract } from '../../hooks/useContract'
+import { usePoolManagerContract, useTokenContract, useNFTPoolContract, useStakingContract } from '../../hooks/useContract'
 import {
   NEVER_RELOAD,
   useMultipleContractSingleData,
@@ -587,4 +585,34 @@ export function useDerivedUnstakeInfo(
     parsedAmount,
     error,
   }
+}
+
+export function useTokenBalancePerClass(NFTPoolAddress:string, userAddress:string): bigint[] {
+  const NFTPoolContract = useNFTPoolContract(NFTPoolAddress);
+
+  const balances = useSingleCallResult(NFTPoolContract, 'getTokenBalancePerClass', [userAddress]);
+
+  console.log(NFTPoolAddress);
+  console.log(userAddress);
+  console.log(balances);
+  
+  return useMemo(() => {
+    return !balances || balances.loading
+      ? [BigInt(0), BigInt(0), BigInt(0), BigInt(0)]
+      : [balances?.result?.[0], balances?.result?.[1], balances?.result?.[2], balances?.result?.[3]];
+  }, [balances])
+}
+
+export function useStakedBalancePerClass(stakingRewardsAddress:string, userAddress:string, tokenClass:number): bigint {
+  const StakingRewardsContract = useStakingContract(stakingRewardsAddress);
+
+  const balance = useSingleCallResult(StakingRewardsContract, 'balanceOf', [userAddress, tokenClass]);
+
+  console.log(balance);
+  
+  return useMemo(() => {
+    return !balance || balance.loading
+      ? BigInt(0)
+      : balance?.result?.[0];
+  }, [balance])
 }
