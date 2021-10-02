@@ -1,6 +1,6 @@
 {
-  "name": "@ubeswap/interface",
-  "description": "Ubeswap Interface",
+  "name": "@tradegen/interface",
+  "description": "Tradegen Interface",
   "homepage": ".",
   "private": true,
   "devDependencies": {
