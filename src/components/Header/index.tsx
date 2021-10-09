@@ -269,7 +269,6 @@ export default function Header() {
   const { t } = useTranslation()
 
   const userCELOBalance = useTokenBalance(account ?? undefined, CELO[chainId])
-  const [darkMode, toggleDarkMode] = useDarkModeManager()
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
   const aggregateBalance: TokenAmount | undefined = useAggregateTGENBalance()
   const cUSDBalance: TokenAmount | undefined = useAggregateCUSDBalance()
@@ -305,9 +304,9 @@ export default function Header() {
           <StyledNavLink id="farm-nav-link" to="/stake">
             Stake
           </StyledNavLink>
-          <StyledNavLink id={`stake-nav-link`} to="/farm">
+          <StyledExternalLink id={`stake-nav-link`} href={'https://info.tradegen.io'}>
             Charts <span style={{ fontSize: '11px' }}>↗</span>
-          </StyledNavLink>
+          </StyledExternalLink>
           <StyledNavLink id={`stake-nav-link`} to="/farm">
             Marketplace <span style={{ fontSize: '11px' }}>↗</span>
           </StyledNavLink>
