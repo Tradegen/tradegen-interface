@@ -307,9 +307,6 @@ export default function Header() {
           <StyledExternalLink id={`stake-nav-link`} href={'https://info.tradegen.io'}>
             Charts <span style={{ fontSize: '11px' }}>↗</span>
           </StyledExternalLink>
-          <StyledNavLink id={`stake-nav-link`} to="/farm">
-            Marketplace <span style={{ fontSize: '11px' }}>↗</span>
-          </StyledNavLink>
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
