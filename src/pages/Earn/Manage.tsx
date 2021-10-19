@@ -392,7 +392,7 @@ export default function Manage({
             )}
             {stakingInfo && !stakingInfo.active && (
               <TYPE.main style={{ textAlign: 'center' }} fontSize={14}>
-                Staking Rewards inactive for this pair.
+                Staking Rewards inactive for this pool.
               </TYPE.main>
             )}
           </DataRow>

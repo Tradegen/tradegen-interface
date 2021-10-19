@@ -201,7 +201,7 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
             <TYPE.white>
               {`${stakingInfo.nextPeriodRewards.toFixed(0, {
                 groupSeparator: ',',
-              })} ${stakingInfo.nextPeriodRewards.token.symbol} / week`}
+              })} TGEN / week`}
             </TYPE.white>
           </RowBetween>
         )}
@@ -227,13 +227,7 @@ export const PoolCard: React.FC<Props> = ({ stakingInfo, dualRewards }: Props) =
                             ?.multiply(BIG_INT_SECONDS_IN_WEEK)
                             ?.toSignificant(4, { groupSeparator: ',' })
                         : '0'
-                    } ${stakingInfo.dualRewards ? 'UBE' : stakingInfo?.rewardToken?.symbol}${
-                      stakingInfo.dualRewards
-                        ? ` + ${stakingInfo.rewardRate
-                            ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                            ?.toSignificant(4, { groupSeparator: ',' })} ${stakingInfo?.rewardToken?.symbol}`
-                        : ''
-                    } / week`
+                    } TGEN / week`
                   : '-'}
               </TYPE.black>
             </RowBetween>
