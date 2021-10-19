@@ -46,7 +46,7 @@ export default function UnstakingModal({ isOpen, onDismiss, tokenBalance }: Stak
       setAttempting(true)
       await doTransaction(stakingContract, 'vest', {
         args: [],
-        summary: `Withdraw from TGEN-cUSD stake`,
+        summary: `Withdraw from TGEN-CELO stake`,
       })
         .then((response) => {
           setHash(response.hash)
@@ -78,7 +78,7 @@ export default function UnstakingModal({ isOpen, onDismiss, tokenBalance }: Stak
               <TYPE.body fontWeight={600} fontSize={36}>
                 { formatBalance(tokenBalance, 18) }
               </TYPE.body>
-              <TYPE.body>Staked TGEN-cUSD</TYPE.body>
+              <TYPE.body>Staked TGEN-CELO</TYPE.body>
             </AutoColumn>
           )}
           <ButtonError disabled={!!error} error={!!error && !!tokenBalance} onClick={onWithdraw}>
@@ -89,7 +89,7 @@ export default function UnstakingModal({ isOpen, onDismiss, tokenBalance }: Stak
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOndismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.body fontSize={20}>Withdrawing {formatBalance(tokenBalance, 18)} TGEN-cUSD</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrawing {formatBalance(tokenBalance, 18)} TGEN-CELO</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -97,7 +97,7 @@ export default function UnstakingModal({ isOpen, onDismiss, tokenBalance }: Stak
         <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Withdrew TGEN-cUSD!</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrew TGEN-CELO!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

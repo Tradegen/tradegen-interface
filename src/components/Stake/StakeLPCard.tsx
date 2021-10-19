@@ -103,7 +103,7 @@ export function StakeLPCard() {
       <TopSection>
         <PoolInfo style={{ marginLeft: '8px' }}>
           <TYPE.white fontWeight={600} fontSize={[18, 24]}>
-            TGEN-cUSD
+            TGEN-CELO
           </TYPE.white>
           {apy && apy.greaterThan('0') && (
             <TYPE.small className="apr" fontWeight={400} fontSize={14}>
@@ -127,7 +127,7 @@ export function StakeLPCard() {
           <TYPE.white>Total staked</TYPE.white>
           <TYPE.white>
             {valueOfTotalStakedAmountInCUSD
-              ? TVL.toString() + ' TGEN-cUSD'
+              ? TVL.toString() + ' TGEN-CELO'
               : '-'}
           </TYPE.white>
         </RowBetween>

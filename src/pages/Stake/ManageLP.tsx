@@ -157,7 +157,7 @@ export default function ManageLP() {
     <PageWrapper gap="lg" justify="center">
       <RowBetween style={{ gap: '24px' }}>
         <TYPE.mediumHeader style={{ margin: 0 }}>
-          TGEN-cUSD Staking
+          TGEN-CELO Staking
         </TYPE.mediumHeader>
       </RowBetween>
 
@@ -189,11 +189,11 @@ export default function ManageLP() {
           <CardSection>
             <AutoColumn gap="md">
             <RowBetween>
-                <TYPE.white fontWeight={600}>Step 1. Get TGEN tokens</TYPE.white>
+                <TYPE.white fontWeight={600}>Step 1. Get TGEN-CELO LP tokens</TYPE.white>
               </RowBetween>
               <RowBetween style={{ marginBottom: '1rem' }}>
                 <TYPE.white fontSize={14}>
-                  {`TGEN tokens are required. After you have TGEN tokens, you can stake them on this page.`}
+                  {`TGEN-CELO LP tokens are required. After you have TGEN-CELO LP tokens, you can stake them on this page.`}
                 </TYPE.white>
               </RowBetween>
               <ButtonPrimary
@@ -203,7 +203,7 @@ export default function ManageLP() {
                 as={Link}
                 to={`https://app.ubeswap.org/#/swap`}
               >
-                {`Add TGEN-cUSD liquidity`}
+                {`Add TGEN-CELO liquidity`}
               </ButtonPrimary>
             </AutoColumn>
           </CardSection>
@@ -243,7 +243,7 @@ export default function ManageLP() {
                   </TYPE.white>
                   <RowFixed>
                     <TYPE.white>
-                      TGEN-cUSD
+                      TGEN-CELO
                     </TYPE.white>
                   </RowFixed>
                 </RowBetween>
@@ -331,12 +331,12 @@ export default function ManageLP() {
           </DataRow>
         )}
         {userLiquidityUnstaked && userLiquidityUnstaked.toString() != "0" && (
-          <TYPE.main>{formatBalance(userLiquidityUnstaked.raw.toString())} TGEN-cUSD tokens available</TYPE.main>
+          <TYPE.main>{formatBalance(userLiquidityUnstaked.raw.toString())} TGEN-CELO tokens available</TYPE.main>
         )}
         {nextVestQuantity.toString() != "0" && nextVestTimestamp.toString() != "0" && (
             <>
           <TYPE.main>Next vesting timestamp: {Number(nextVestTimestamp.toString())}</TYPE.main>
-          <TYPE.main>Next vesting quantity: {formatBalance(nextVestQuantity)} TGEN-cUSD</TYPE.main>
+          <TYPE.main>Next vesting quantity: {formatBalance(nextVestQuantity)} TGEN-CELO</TYPE.main>
           </>
         )}
       </PositionInfo>
