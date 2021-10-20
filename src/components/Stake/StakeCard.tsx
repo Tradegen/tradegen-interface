@@ -44,7 +44,7 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
 
 const TopSection = styled.div`
   display: grid;
-  grid-template-columns: 48px 1fr 120px;
+  grid-template-columns: 1fr 120px;
   grid-gap: 0px;
   align-items: center;
   padding: 1rem;
@@ -110,7 +110,7 @@ export function StakeCard() {
 
         <StyledInternalLink
           to={`/stake/TGEN`}
-          style={{ width: '25%', marginLeft: '90%' }}
+          style={{ width: '75%', marginLeft: '0%' }}
         >
           <ButtonPrimary padding="8px" borderRadius="8px">
             {'Stake'}
