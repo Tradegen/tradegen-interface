@@ -15,7 +15,7 @@ import { useWalletModalToggle } from '../../state/application/hooks'
 const ItemWrapper = styled.div`
   margin-top: 1rem;
   margin-bottom: 1rem;
-  min-width:700px;
+  min-width:1000px;
 `
 
 const NoResults = styled.div`
@@ -47,6 +47,39 @@ const TitleRow = styled.div`
   display: flex;
   background-color: none;
   margin-top: 30px;
+`
+
+const FirstRow = styled.div`
+  width: 100%;
+  display: flex;
+  background-color: none;
+  margin-top: 30px;
+  margin-bottom: 80px;
+`
+
+const FirstRowLeft = styled.div`
+  width: 30%;
+  color: white;
+  float: left;
+  background-color: none;
+  font-size: 30px;
+`
+
+const FirstRowRight = styled.div`
+  width: 60%;
+  color: white;
+  float: right;
+  background-color: none;
+  font-size: 16px;
+  display: flex;
+`
+
+const FirstRowButtonWrapper = styled.div`
+  width: 35%;
+  background-color: none;
+  margin-left: 4%;
+  display: flex;
+  float: right;
 `
 
 const ButtonWrapper = styled.div`
@@ -120,6 +153,8 @@ export function UserInvestments(props:any) {
                         <InvestmentCard>
                             <InvestmentCardContent>
                                 <p>{investment.name}</p>
+                            </InvestmentCardContent>
+                            <InvestmentCardContent>
                                 <p>{investment.type}</p>
                             </InvestmentCardContent>
                             <InvestmentCardContent>
@@ -231,15 +266,24 @@ export function InvestmentList() {
     return investments ? (
         <>
             <div>
+                <FirstRow>
+                    <FirstRowLeft>
+                        Investments
+                    </FirstRowLeft>
+                    <FirstRowRight>
+                        <FirstRowButtonWrapper>
+                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreatePoolClick}>
+                                {'Create Pool'}
+                            </ButtonPrimary>
+                        </FirstRowButtonWrapper>
+                        <FirstRowButtonWrapper>
+                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreateNFTPoolClick}>
+                                {'Create NFT Pool'}
+                            </ButtonPrimary>
+                        </FirstRowButtonWrapper>
+                    </FirstRowRight>
+                </FirstRow>
                 <ButtonWrapper>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreatePoolClick}>
-                        {'Create Pool'}
-                    </ButtonPrimary>
-                    <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreateNFTPoolClick}>
-                        {'Create NFT Pool'}
-                    </ButtonPrimary>
-                    <Buffer/>
                     <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("all")}}>
                         {'All Investments'}
                     </ButtonPrimary>
