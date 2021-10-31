@@ -7,36 +7,40 @@ import { ButtonPrimary } from '../../components/Button'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { ZERO_ADDRESS } from '../../constants'
+import StakingModal from '../../components/pools/DepositModal'
+import UnstakingModal from '../../components/pools/WithdrawModal'
+import { useWalletModalToggle } from '../../state/application/hooks'
+import React, { useCallback, useState } from 'react'
 
-const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 700;
-  color: rgba(191, 191, 191, 1);
+const FirstRow = styled.div`
+  width: 100%;
+  display: flex;
+  background-color: none;
+  margin-top: 30px;
+  margin-bottom: 60px;
 `
 
-const ColumnWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  grid-column: span 2/span 2;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  cursor: pointer;
+const FirstRowLeft = styled.div`
+  width: 30%;
+  color: white;
+  float: left;
+  background-color: none;
+  font-size: 30px;
 `
 
-const ColumnWrapper2 = styled.div`
+const FirstRowRight = styled.div`
+  width: 70%;
+  color: white;
+  float: right;
+  background-color: none;
+  font-size: 16px;
   display: flex;
-  align-items: center;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  cursor: pointer;
 `
 
 const ItemWrapper = styled.div`
   margin-top: 1rem;
   margin-bottom: 1rem;
+  min-width:1000px;
 `
 
 const NoResults = styled.div`
@@ -44,9 +48,36 @@ const NoResults = styled.div`
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
   text-align: center;
+  min-width:1000px;
+`
+
+const Buffer = styled.div`
+  width: 30%;
+  background-color: none;
+  height: 15px;
+`
+
+const FirstRowButtonWrapper = styled.div`
+  width: 30%;
+  background-color: none;
+  margin-left: 4%;
+  float: right;
 `
 
 export function PoolInfo(props:any) {
+
+    const [showStakingModal, setShowStakingModal] = useState(false)
+    const [showUnstakingModal, setShowUnstakingModal] = useState(false)
+
+    const toggleWalletModal = useWalletModalToggle()
+
+    const handleDepositClick = useCallback(() => {
+    if (props.account) {
+        setShowStakingModal(true)
+    } else {
+        toggleWalletModal()
+    }
+    }, [props.account, toggleWalletModal])
     
     let data = usePoolInfo(props.address);
     const poolInfo = useMemo(() => {
@@ -76,6 +107,28 @@ export function PoolInfo(props:any) {
             <div>
                 <ItemWrapper>
                     <ErrorBoundary key={poolInfo.address}>
+                        <FirstRow>
+                            <FirstRowLeft>
+                                {poolInfo.name}
+                            </FirstRowLeft>
+                            <FirstRowRight>
+                                <Buffer/>
+                                {props.account && (
+                                    <>
+                                        <FirstRowButtonWrapper>
+                                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
+                                                {'Deposit'}
+                                            </ButtonPrimary>
+                                        </FirstRowButtonWrapper>
+                                        <FirstRowButtonWrapper>
+                                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
+                                                {'Withdraw'}
+                                            </ButtonPrimary>
+                                        </FirstRowButtonWrapper>
+                                    </>
+                                )}
+                            </FirstRowRight>
+                        </FirstRow>
                         <p>Name: {poolInfo.name}</p>
                         <p>Address: {poolInfo.address}</p>
                         <p>Manager: {poolInfo.manager}</p>
@@ -97,6 +150,19 @@ export function PoolInfo(props:any) {
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>
+
+            <StakingModal
+                isOpen={showStakingModal}
+                onDismiss={() => setShowStakingModal(false)}
+                poolAddress={props.address}
+                cUSDBalance={props.cUSDBalance}
+            />
+            <UnstakingModal
+                isOpen={showUnstakingModal}
+                onDismiss={() => setShowUnstakingModal(false)}
+                poolAddress={props.address}
+                tokenBalance={props.tokenBalance}
+            />
         </>
     ) : (
         <NoResults>No results.</NoResults>

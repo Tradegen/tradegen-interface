@@ -53,8 +53,7 @@ export default function PoolPage({
 
     return (
         <>
-            <p>Pool Info</p>
-            <PoolInfo address={id}></PoolInfo>
+            <PoolInfo address={id} account={account} tokenBalance={tokenBalance} cUSDBalance={cUSDBalance}></PoolInfo>
             <UserInvestmentInfo poolAddress={id}></UserInvestmentInfo>
             <ButtonWrapper>
                 <Buffer/>
