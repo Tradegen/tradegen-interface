@@ -321,7 +321,7 @@ export function InvestmentList() {
                 {filter != "myInvestments" && filter != "managedInvestments" &&
                     <ItemWrapper>
                         {investments?.length === 0 ? (
-                            <Loader style={{ margin: 'auto' }} />
+                            <Loader style={{ marginLeft: '50%', marginTop: '10%' }} />
                         ) : (
                         investments.map((investment:Investment) => (
                             <ErrorBoundary key={investment.address}>
