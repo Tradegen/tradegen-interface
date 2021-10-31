@@ -6,7 +6,7 @@ import { ErrorBoundary } from '@sentry/react'
 import Loader from '../../components/Loader'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import { StyledInternalLink, TYPE } from '../../theme'
-import { ButtonPrimary } from '../../components/Button'
+import { ButtonTransparent, ButtonPrimary } from '../../components/Button'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import CreatePoolModal from '../../components/investments/CreatePoolModal'
 import CreateNFTPoolModal from '../../components/investments/CreateNFTPoolModal'
@@ -54,7 +54,7 @@ const FirstRow = styled.div`
   display: flex;
   background-color: none;
   margin-top: 30px;
-  margin-bottom: 80px;
+  margin-bottom: 60px;
 `
 
 const FirstRowLeft = styled.div`
@@ -66,7 +66,7 @@ const FirstRowLeft = styled.div`
 `
 
 const FirstRowRight = styled.div`
-  width: 60%;
+  width: 70%;
   color: white;
   float: right;
   background-color: none;
@@ -75,21 +75,21 @@ const FirstRowRight = styled.div`
 `
 
 const FirstRowButtonWrapper = styled.div`
-  width: 35%;
+  width: 30%;
   background-color: none;
   margin-left: 4%;
-  display: flex;
   float: right;
 `
 
 const ButtonWrapper = styled.div`
-  width: 50%;
+  width: 100%;
   background-color: none;
-  margin-left: 25%;
+  margin-left: 0%;
+  display: flex;
 `
 
 const Buffer = styled.div`
-  width: 100%;
+  width: 30%;
   background-color: none;
   height: 15px;
 `
@@ -271,6 +271,7 @@ export function InvestmentList() {
                         Investments
                     </FirstRowLeft>
                     <FirstRowRight>
+                        <Buffer/>
                         <FirstRowButtonWrapper>
                             <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleCreatePoolClick}>
                                 {'Create Pool'}
@@ -284,25 +285,21 @@ export function InvestmentList() {
                     </FirstRowRight>
                 </FirstRow>
                 <ButtonWrapper>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("all")}}>
+                    <ButtonTransparent padding="8px" onClick={() => {handleFilterChange("all")}}>
                         {'All Investments'}
-                    </ButtonPrimary>
-                    <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("pools")}}>
+                    </ButtonTransparent>
+                    <ButtonTransparent padding="8px" onClick={() => {handleFilterChange("pools")}}>
                         {'Pools'}
-                    </ButtonPrimary>
-                    <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("NFTPools")}}>
+                    </ButtonTransparent>
+                    <ButtonTransparent padding="8px" onClick={() => {handleFilterChange("NFTPools")}}>
                         {'NFT Pools'}
-                    </ButtonPrimary>
-                    <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("myInvestments")}}>
+                    </ButtonTransparent>
+                    <ButtonTransparent padding="8px" onClick={() => {handleFilterChange("myInvestments")}}>
                         {'My Investments'}
-                    </ButtonPrimary>
-                    <Buffer/>
-                    <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange("managedInvestments")}}>
+                    </ButtonTransparent>
+                    <ButtonTransparent padding="8px" onClick={() => {handleFilterChange("managedInvestments")}}>
                         {'Managed Investments'}
-                    </ButtonPrimary>
+                    </ButtonTransparent>
                 </ButtonWrapper>
                 <TitleRow>
                     <InvestmentCardContent>

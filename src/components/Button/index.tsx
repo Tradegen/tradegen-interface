@@ -38,6 +38,28 @@ const Base = styled(RebassButton)<{
   }
 `
 
+export const ButtonTransparent = styled(RebassButton)`
+  background: none;
+  color: #C3C5CB;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  text-align: left !important;
+  align-items: left !important;
+  &:focus {
+    font-weight: 600;
+    color: white;
+  }
+  &:hover {
+    font-weight: 600;
+    color: white;
+  }
+  &:active {
+    font-weight: 600;
+    color: white;
+  }
+`
+
 export const ButtonPrimary = styled(Base)`
   background-color: #5271FF;
   color: white;
