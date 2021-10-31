@@ -64,6 +64,64 @@ const FirstRowButtonWrapper = styled.div`
   float: right;
 `
 
+const MiddleRow = styled.div`
+  width: 100%;
+  display: flex;
+  background-color: none;
+  margin-top: 30px;
+  margin-bottom: 60px;
+`
+
+const MiddleRowItem = styled.div`
+  width: 30%;
+  color: white;
+  background-color: rgba(86,86,86,0.15);
+  margin-left: 4%;
+  height: 60px;
+  border: 1px solid rgba(86,86,86,0.15);
+  border-radius: 8px;
+  text-align: center;
+  padding-top: 5px;
+`
+
+const MiddleRowItemTop = styled.div`
+  width: 100%;
+  display: block;
+  color: #C3C5CB;
+`
+
+const MiddleRowItemBottom = styled.div`
+  width: 100%;
+  display: block;
+  margin-top: 5px;
+`
+
+const FactsheetTitle = styled.div`
+  width: 100%;
+  font-size: 22px;
+  color: white;
+`
+
+const FactsheetContent = styled.div`
+  width: 100%;
+  background-color: rgba(86,86,86,0.15);
+  border: 1px solid rgba(86,86,86,0.15);
+  border-radius: 8px;
+  padding-top: 5px;
+  margin-top: 30px;
+  padding-left: 20px;
+`
+
+function getColour(totalReturn:string)
+{
+    if (totalReturn.charAt(0) == '-')
+    {
+        return 'rgba(248,113,113,1)'
+    }
+
+    return 'rgba(52,211,153,1)'
+}
+
 export function PoolInfo(props:any) {
 
     const [showStakingModal, setShowStakingModal] = useState(false)
@@ -129,13 +187,41 @@ export function PoolInfo(props:any) {
                                 )}
                             </FirstRowRight>
                         </FirstRow>
-                        <p>Name: {poolInfo.name}</p>
-                        <p>Address: {poolInfo.address}</p>
-                        <p>Manager: {poolInfo.manager}</p>
-                        <p>Performance fee: {Number(poolInfo.performanceFee) / 100}%</p>
-                        <p>Token price: {formatNumber(Number(poolInfo.tokenPrice) / 100, true, true, 18)}</p>
-                        <p>TVL: {formatNumber(Number(poolInfo.TVL) / 100, true, true, 18)}</p>
-                        <p>Total Return: {poolInfo.totalReturn}</p>
+                        <MiddleRow>
+                            <MiddleRowItem style={{marginLeft: '0%'}}>
+                                <MiddleRowItemTop>
+                                    TVL
+                                </MiddleRowItemTop>
+                                <MiddleRowItemBottom>
+                                    {formatNumber(Number(poolInfo.TVL) / 100, true, true, 18)}
+                                </MiddleRowItemBottom>
+                            </MiddleRowItem>
+                            <MiddleRowItem>
+                                <MiddleRowItemTop>
+                                    Token Price
+                                </MiddleRowItemTop>
+                                <MiddleRowItemBottom>
+                                    {formatNumber(Number(poolInfo.tokenPrice) / 100, true, true, 18)}
+                                </MiddleRowItemBottom>
+                            </MiddleRowItem>
+                            <MiddleRowItem>
+                                <MiddleRowItemTop>
+                                    Total Return
+                                </MiddleRowItemTop>
+                                <MiddleRowItemBottom style={{color:getColour(poolInfo.totalReturn)}}>
+                                    {poolInfo.totalReturn}
+                                </MiddleRowItemBottom>
+                            </MiddleRowItem>
+                        </MiddleRow>
+                        <FactsheetTitle>
+                            Factsheet
+                        </FactsheetTitle>
+                        <FactsheetContent>
+                            <p>Name: {poolInfo.name}</p>
+                            <p>Address: {poolInfo.address}</p>
+                            <p>Manager: {poolInfo.manager}</p>
+                            <p>Performance fee: {Number(poolInfo.performanceFee) / 100}%</p>
+                        </FactsheetContent>
                         <p>Positions:</p>
                         <ItemWrapper>
                             {combinedPositions.length === 0 ? (
