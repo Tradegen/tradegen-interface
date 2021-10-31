@@ -37,7 +37,7 @@ const InvestmentCard = styled.div`
 `
 
 const InvestmentCardContent = styled.div`
-  width: 24%;
+  width: 19%;
   text-align: center;
 `
 
@@ -87,6 +87,16 @@ function filterInvestments(investments:Investment[], filter:string)
     return [];
 }
 
+function getColour(totalReturn:string)
+{
+    if (totalReturn.charAt(0) == '-')
+    {
+        return 'rgba(248,113,113,1)'
+    }
+
+    return 'rgba(52,211,153,1)'
+}
+
 export function UserInvestments(props:any) {
     console.log(props.userAddress);
 
@@ -119,7 +129,7 @@ export function UserInvestments(props:any) {
                                 <p>{formatNumber(Number(investment.USDBalance) / 100, true, true, 18)}</p>
                             </InvestmentCardContent>
                             <InvestmentCardContent>
-                                <p>{investment.totalReturn}</p>
+                                <p style={{color:getColour(investment.totalReturn)}}>{investment.totalReturn}</p>
                             </InvestmentCardContent>
                         </InvestmentCard>
                     </StyledInternalLink>
@@ -156,6 +166,8 @@ export function ManagedInvestments(props:any) {
                         <InvestmentCard>
                             <InvestmentCardContent>
                                 <p>{investment.name}</p>
+                            </InvestmentCardContent>
+                            <InvestmentCardContent>
                                 <p>{investment.type}</p>
                             </InvestmentCardContent>
                             <InvestmentCardContent>
@@ -165,7 +177,7 @@ export function ManagedInvestments(props:any) {
                                 <p>{formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}/token</p>
                             </InvestmentCardContent>
                             <InvestmentCardContent>
-                                <p>{investment.totalReturn}</p>
+                                <p style={{color:getColour(investment.totalReturn)}}>{investment.totalReturn}</p>
                             </InvestmentCardContent>
                         </InvestmentCard>
                     </StyledInternalLink>
@@ -253,6 +265,9 @@ export function InvestmentList() {
                         Name
                     </InvestmentCardContent>
                     <InvestmentCardContent>
+                        Type
+                    </InvestmentCardContent>
+                    <InvestmentCardContent>
                         {filter == "myInvestments" ? "Tokens" : "TVL"}
                     </InvestmentCardContent>
                     <InvestmentCardContent>
@@ -276,6 +291,8 @@ export function InvestmentList() {
                                     <InvestmentCard>
                                         <InvestmentCardContent>
                                             <p>{investment.name}</p>
+                                        </InvestmentCardContent>
+                                        <InvestmentCardContent>
                                             <p>{investment.type}</p>
                                         </InvestmentCardContent>
                                         <InvestmentCardContent>
@@ -285,7 +302,7 @@ export function InvestmentList() {
                                             <p>{formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}/token</p>
                                         </InvestmentCardContent>
                                         <InvestmentCardContent>
-                                            <p>{investment.totalReturn}</p>
+                                            <p style={{color:getColour(investment.totalReturn)}}>{investment.totalReturn}</p>
                                         </InvestmentCardContent>
                                     </InvestmentCard>
                                 </StyledInternalLink>

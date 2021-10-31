@@ -1,15 +1,16 @@
 import { Alfajores, Baklava, Mainnet } from '@celo-tools/use-contractkit'
 import { ChainId, parseNetwork } from '@ubeswap/sdk'
 
+/*
 const networkChainIDFromHostname: ChainId = window.location.hostname.includes('alfajores')
   ? ChainId.ALFAJORES
   : window.location.hostname.includes('baklava')
   ? ChainId.BAKLAVA
-  : ChainId.MAINNET
+  : ChainId.MAINNET*/
 
-export const NETWORK_CHAIN_ID: ChainId = process.env.REACT_APP_CHAIN_ID
-  ? parseNetwork(parseInt(process.env.REACT_APP_CHAIN_ID))
-  : networkChainIDFromHostname
+const networkChainIDFromHostname: ChainId = ChainId.ALFAJORES
+
+export const NETWORK_CHAIN_ID: ChainId = ChainId.ALFAJORES
 
 const chainIdToName = (chainId: ChainId): string => {
   switch (chainId) {
@@ -26,8 +27,8 @@ const chainIdToName = (chainId: ChainId): string => {
 
 export const NETWORK_CHAIN_NAME: string = chainIdToName(NETWORK_CHAIN_ID)
 
-export const NETWORK =
-  NETWORK_CHAIN_ID === ChainId.ALFAJORES
+export const NETWORK = Alfajores
+  /*NETWORK_CHAIN_ID === ChainId.ALFAJORES
     ? Alfajores
     : NETWORK_CHAIN_ID === ChainId.MAINNET
     ? Mainnet
@@ -35,6 +36,6 @@ export const NETWORK =
     ? Baklava
     : (() => {
         throw new Error('Unknown network ' + NETWORK_CHAIN_ID)
-      })()
+      })()*/
 
 console.log('Loading Ubeswap interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)
