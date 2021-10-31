@@ -19,7 +19,7 @@ const ItemWrapper = styled.div`
 `
 
 const NoResults = styled.div`
-  width: 100%;
+  min-width:1000px;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
   text-align: center;
@@ -34,6 +34,10 @@ const InvestmentCard = styled.div`
   margin-top: 30px;
   border: 1px solid #5271FF;
   border-radius: 8px;
+  &:hover {
+    background-color: rgba(86,86,86,0.15)};
+    text-decoration: none;
+  }
 `
 
 const InvestmentCardContent = styled.div`
@@ -148,7 +152,7 @@ export function UserInvestments(props:any) {
                 <ErrorBoundary key={investment.address}>
                     <StyledInternalLink
                         to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
-                        style={{ width: '100%' }}
+                        style={{ width: '100%', textDecoration: 'none' }}
                     >
                         <InvestmentCard>
                             <InvestmentCardContent>
@@ -196,7 +200,7 @@ export function ManagedInvestments(props:any) {
                 <ErrorBoundary key={investment.address}>
                     <StyledInternalLink
                         to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
-                        style={{ width: '100%' }}
+                        style={{ width: '100%', textDecoration: 'none' }}
                     >
                         <InvestmentCard>
                             <InvestmentCardContent>
@@ -327,7 +331,7 @@ export function InvestmentList() {
                             <ErrorBoundary key={investment.address}>
                                 <StyledInternalLink
                                     to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
-                                    style={{ width: '100%' }}
+                                    style={{ width: '100%', textDecoration: 'none' }}
                                 >
                                     <InvestmentCard>
                                         <InvestmentCardContent>
