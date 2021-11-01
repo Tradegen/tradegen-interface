@@ -36,19 +36,9 @@ export default function NFTPoolPage({
     console.log(account);
     account = account ?? ZERO_ADDRESS;
 
-    const [showStakingModal, setShowStakingModal] = useState(false)
-    const [showUnstakingModal, setShowUnstakingModal] = useState(false)
-
     const cUSDBalance = useStableCoinBalance(cUSD[chainId].address, account).toString()
 
     const NFTPoolContract = useNFTPoolContract(id);
-
-    const tokenBalances = useUserBalance(NFTPoolContract, account);
-    const availableC1 = tokenBalances[0] ?? BigInt(0);
-    const availableC2 = tokenBalances[1] ?? BigInt(0);
-    const availableC3 = tokenBalances[2] ?? BigInt(0);
-    const availableC4 = tokenBalances[3] ?? BigInt(0);
-
     let totalSupply = useTotalSupply(NFTPoolContract);
     let maxSupply = useMaxSupply(NFTPoolContract);
     let tokenPrice = useTokenPrice(NFTPoolContract);
@@ -56,52 +46,9 @@ export default function NFTPoolPage({
     maxSupply = maxSupply ?? BigInt(0);
     tokenPrice = tokenPrice ?? BigInt(0);
 
-    const toggleWalletModal = useWalletModalToggle()
-
-    const handleDepositClick = useCallback(() => {
-    if (account) {
-        setShowStakingModal(true)
-    } else {
-        toggleWalletModal()
-    }
-    }, [account, toggleWalletModal])
-
     return (
         <>
-            <p>NFT Pool Info</p>
-            <NFTPoolInfo address={id}></NFTPoolInfo>
-
-            {account && <UserInvestmentInfo poolAddress={id} userAddress={account}></UserInvestmentInfo>}
-
-            <ButtonWrapper>
-                <Buffer/>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
-                    {'Deposit'}
-                </ButtonPrimary>
-                <Buffer/>
-                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
-                    {'Withdraw'}
-                </ButtonPrimary>
-            </ButtonWrapper>
-
-            <StakingModal
-                isOpen={showStakingModal}
-                onDismiss={() => setShowStakingModal(false)}
-                poolAddress={id}
-                cUSDBalance={cUSDBalance}
-                maxSupply={maxSupply}
-                totalSupply={totalSupply}
-                tokenPrice={tokenPrice}
-            />
-            <UnstakingModal
-                isOpen={showUnstakingModal}
-                onDismiss={() => setShowUnstakingModal(false)}
-                poolAddress={id}
-                availableC1={availableC1.toString()}
-                availableC2={availableC2.toString()}
-                availableC3={availableC3.toString()}
-                availableC4={availableC4.toString()}
-            />
+            <NFTPoolInfo address={id} account={account} cUSDBalance={cUSDBalance} totalSupply={totalSupply} maxSupply={maxSupply} tokenPrice={tokenPrice}></NFTPoolInfo>
         </>
     )
 }

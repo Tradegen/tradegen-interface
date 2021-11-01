@@ -16,6 +16,8 @@ export interface NFTPoolInfo {
   seedPrice: bigint | null,
   positionAddresses: string[],
   positionBalances: bigint[],
+  positionNames: string[],
+  positionSymbols: string[],
   tokenBalancesPerClass: bigint[]
 }
 
@@ -187,6 +189,10 @@ export function useNFTPoolInfo(NFTPoolAddress:string): NFTPoolInfo {
   const positionsAndTotal = usePositionsAndTotal(NFTPoolContract);
   const tokenBalancesPerClass = useAvailableTokensPerClass(NFTPoolContract);
 
+  let positions = (!positionsAndTotal || positionsAndTotal[0] === undefined) ? [] : positionsAndTotal[0];
+  const symbols = usePositionSymbols(positions);
+  const names = usePositionNames(positions);
+
   let totalReturn = "0%";
   if (!tokenPrice || !seedPrice || BigInt(seedPrice) == BigInt(0))
   {
@@ -215,6 +221,8 @@ export function useNFTPoolInfo(NFTPoolAddress:string): NFTPoolInfo {
     seedPrice: (!seedPrice) ? BigInt(0) : BigInt(seedPrice) / BigInt(1e16),
     positionAddresses: (!positionsAndTotal || positionsAndTotal[0] === undefined) ? [] : positionsAndTotal[0],
     positionBalances: (!positionsAndTotal || positionsAndTotal[1] === undefined) ? [] : positionsAndTotal[1],
+    positionNames: names,
+    positionSymbols: symbols,
     tokenBalancesPerClass: (!tokenBalancesPerClass) ? [BigInt(0), BigInt(0), BigInt(0), BigInt(0)] : tokenBalancesPerClass
   }
 }
@@ -239,8 +247,14 @@ export function useTotalBalance(NFTPoolAddress:string, userAddress:string): bigi
   return balance ?? BigInt(0)
 }
 
-export function usePositionNames(positions:string[]): string[] {
+export function usePositionSymbols(positions:string[]): string[] {
   const names = useMultipleContractSingleData(positions, ERC20_INTERFACE, 'symbol')?.map((element:any) => (element?.result ? element?.result[0] : null));
+
+  return names ?? [];
+}
+
+export function usePositionNames(positions:string[]): string[] {
+  const names = useMultipleContractSingleData(positions, ERC20_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
 
   return names ?? [];
 }
