@@ -60,7 +60,7 @@ const Buffer = styled.div`
 const FirstRowButtonWrapper = styled.div`
   width: 30%;
   background-color: none;
-  margin-left: 4%;
+  margin-left: 3%;
   float: right;
 `
 
@@ -110,6 +110,7 @@ const FactsheetContent = styled.div`
   padding-top: 5px;
   margin-top: 30px;
   padding-left: 20px;
+  margin-bottom: 30px;
 `
 
 function getColour(totalReturn:string)
@@ -170,7 +171,20 @@ export function PoolInfo(props:any) {
                                 {poolInfo.name}
                             </FirstRowLeft>
                             <FirstRowRight>
-                                <Buffer/>
+                                {poolInfo.manager == props.account ? (
+                                    <FirstRowButtonWrapper>
+                                        <StyledInternalLink
+                                            to={`/manage_pool/${props.address}`}
+                                            style={{ width: '100%' }}
+                                        >
+                                            <ButtonPrimary padding="8px" borderRadius="8px">
+                                                {'Manage Pool'}
+                                            </ButtonPrimary>
+                                        </StyledInternalLink>
+                                    </FirstRowButtonWrapper>
+                                ) : (
+                                    <Buffer/>
+                                )}
                                 {props.account && (
                                     <>
                                         <FirstRowButtonWrapper>
@@ -213,6 +227,17 @@ export function PoolInfo(props:any) {
                                 </MiddleRowItemBottom>
                             </MiddleRowItem>
                         </MiddleRow>
+                        {props.tokenBalance && props.positionValue && (
+                            <>
+                                <FactsheetTitle>
+                                    Your Investment
+                                </FactsheetTitle>
+                                <FactsheetContent>
+                                    <p>Token balance: {formatBalance(props.tokenBalance)}</p>
+                                    <p>USD value: {props.positionValue}</p>
+                                </FactsheetContent>
+                            </>
+                        ) }
                         <FactsheetTitle>
                             Factsheet
                         </FactsheetTitle>

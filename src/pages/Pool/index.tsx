@@ -1,10 +1,10 @@
 import { PoolInfo } from '../../features/pools/PoolInfo'
-import { UserInvestmentInfo } from '../../features/pools/UserInvestmentInfo'
 import { useUserInvestmentInfo, useStableCoinBalance } from '../../features/pools/hooks'
 import { RouteComponentProps } from 'react-router-dom'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { cUSD } from '@ubeswap/sdk'
 import { ZERO_ADDRESS } from '../../constants'
+import { formatNumber } from '../../functions/format'
 
 export default function PoolPage({
         match: {
@@ -18,13 +18,13 @@ export default function PoolPage({
     account = account ?? ZERO_ADDRESS;
 
     const investmentInfo = useUserInvestmentInfo(id)
-    const tokenBalance = investmentInfo ? investmentInfo.userBalance.toString() : '0'
+    const tokenBalance = investmentInfo ? investmentInfo.userBalance.toString() : undefined
+    const positionValue = investmentInfo ? formatNumber(Number(investmentInfo.userUSDBalance / BigInt(1e16)) / 100, true, true, 18) : undefined
     const cUSDBalance = useStableCoinBalance(cUSD[chainId].address, account).toString()
 
     return (
         <>
-            <PoolInfo address={id} account={account} tokenBalance={tokenBalance} cUSDBalance={cUSDBalance}></PoolInfo>
-            <UserInvestmentInfo poolAddress={id}></UserInvestmentInfo>
+            <PoolInfo address={id} account={account} tokenBalance={tokenBalance} cUSDBalance={cUSDBalance} positionValue={positionValue}></PoolInfo>
         </>
     )
 }
