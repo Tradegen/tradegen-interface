@@ -16,6 +16,7 @@ export interface PoolInfo {
   performanceFee: number,
   positionAddresses: string[],
   positionBalances: bigint[],
+  positionSymbols: string[],
   positionNames: string[]
 }
 
@@ -149,6 +150,7 @@ export function usePoolInfo(poolAddress:string): PoolInfo {
   const positionsAndTotal = usePositionsAndTotal(poolContract);
 
   let positions = (!positionsAndTotal || positionsAndTotal[0] === undefined) ? [] : positionsAndTotal[0];
+  const symbols = usePositionSymbols(positions);
   const names = usePositionNames(positions);
 
   let totalReturn = "0%";
@@ -178,6 +180,7 @@ export function usePoolInfo(poolAddress:string): PoolInfo {
     performanceFee: (!performanceFee) ? 0 : Number(performanceFee),
     positionAddresses: (!positionsAndTotal || positionsAndTotal[0] === undefined) ? [] : positionsAndTotal[0],
     positionBalances: (!positionsAndTotal || positionsAndTotal[1] === undefined) ? [] : positionsAndTotal[1],
+    positionSymbols: symbols,
     positionNames: names
   }
 }
@@ -209,8 +212,14 @@ export function useStableCoinBalance(cUSD:string, userAddress:string): bigint {
   return balance ?? BigInt(0)
 }
 
-export function usePositionNames(positions:string[]): string[] {
+export function usePositionSymbols(positions:string[]): string[] {
   const names = useMultipleContractSingleData(positions, ERC20_INTERFACE, 'symbol')?.map((element:any) => (element?.result ? element?.result[0] : null));
+
+  return names ?? [];
+}
+
+export function usePositionNames(positions:string[]): string[] {
+  const names = useMultipleContractSingleData(positions, ERC20_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
 
   return names ?? [];
 }

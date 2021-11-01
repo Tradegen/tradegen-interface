@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { usePoolInfo, usePositionNames } from '../../features/pools/hooks'
+import { usePoolInfo } from '../../features/pools/hooks'
 import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
@@ -11,6 +11,19 @@ import StakingModal from '../../components/pools/DepositModal'
 import UnstakingModal from '../../components/pools/WithdrawModal'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import React, { useCallback, useState } from 'react'
+
+const TitleRow = styled.div`
+  width: 100%;
+  color: white;
+  display: flex;
+  background-color: none;
+  margin-top: 30px;
+`
+
+const TitleRowContent = styled.div`
+  width: 24%;
+  text-align: left;
+`
 
 const FirstRow = styled.div`
   width: 100%;
@@ -144,7 +157,7 @@ export function PoolInfo(props:any) {
     }, [data]);
 
     let combinedPositions = [];
-    if (!poolInfo.positionBalances || !poolInfo.positionNames || poolInfo.positionBalances.length != poolInfo.positionNames.length)
+    if (!poolInfo.positionBalances || !poolInfo.positionNames || !poolInfo.positionSymbols || poolInfo.positionBalances.length != poolInfo.positionNames.length)
     {
         combinedPositions = [];
     }
@@ -153,7 +166,9 @@ export function PoolInfo(props:any) {
         for (var i = 0; i < poolInfo.positionNames.length; i++)
         {
             combinedPositions.push({
-                symbol: poolInfo.positionNames[i],
+                symbol: poolInfo.positionSymbols[i],
+                name: poolInfo.positionNames[i],
+                type: "Asset",
                 balance: poolInfo.positionBalances[i]
             });
         }
@@ -247,17 +262,47 @@ export function PoolInfo(props:any) {
                             <p>Manager: {poolInfo.manager}</p>
                             <p>Performance fee: {Number(poolInfo.performanceFee) / 100}%</p>
                         </FactsheetContent>
-                        <p>Positions:</p>
-                        <ItemWrapper>
-                            {combinedPositions.length === 0 ? (
-                                <div>No positions yet.</div>
-                            ) : (
-                            combinedPositions.map((element:any) => (
-                                <ErrorBoundary key={element.symbol}>
-                                    <p>{element.symbol}: {formatBalance(element.balance)}</p>
-                                </ErrorBoundary>
-                            )))}
-                        </ItemWrapper>
+                        {combinedPositions.length > 0 && (
+                            <>
+                                <FactsheetTitle>
+                                    Positions
+                                </FactsheetTitle>
+                                <FactsheetContent style={{paddingTop: '20px', paddingBottom: '20px'}}>
+                                    <TitleRow style={{marginTop: '0px'}}>
+                                        <TitleRowContent>
+                                            Symbol
+                                        </TitleRowContent>
+                                        <TitleRowContent>
+                                            Name
+                                        </TitleRowContent>
+                                        <TitleRowContent>
+                                            Type
+                                        </TitleRowContent>
+                                        <TitleRowContent>
+                                            Balance
+                                        </TitleRowContent>
+                                    </TitleRow>
+                                    {combinedPositions.map((element:any) => (
+                                        <ErrorBoundary key={element.symbol}>
+                                            <TitleRow>
+                                                <TitleRowContent>
+                                                    {element.symbol}
+                                                </TitleRowContent>
+                                                <TitleRowContent>
+                                                    {element.name}
+                                                </TitleRowContent>
+                                                <TitleRowContent>
+                                                    {element.type}
+                                                </TitleRowContent>
+                                                <TitleRowContent>
+                                                    {formatBalance(element.balance)}
+                                                </TitleRowContent>
+                                            </TitleRow>
+                                        </ErrorBoundary>
+                                    ))}
+                                </FactsheetContent>
+                            </>
+                        )}
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>
