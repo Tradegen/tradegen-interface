@@ -156,7 +156,7 @@ export class NetworkConnector extends AbstractConnector {
     invariant(defaultChainId, 'defaultChainId is a required argument')
     super({ supportedChainIds: Object.keys(CHAIN_INFO).map((k): number => Number(k)) })
 
-    this.currentChainId = ChainId.ALFAJORES//NETWORK_CHAIN_ID
+    this.currentChainId = ChainId.MAINNET
     this.providers = {
       [ChainId.MAINNET]: new MiniRpcProvider(ChainId.MAINNET),
       [ChainId.ALFAJORES]: new MiniRpcProvider(ChainId.ALFAJORES),
