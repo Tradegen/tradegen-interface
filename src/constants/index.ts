@@ -5,7 +5,7 @@ import { UBE } from './tokens'
 
 export { UBE } from './tokens'
 
-export const ROUTER_ADDRESS = '0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121'
+export const ROUTER_ADDRESS = '0xe3d8bd6aed4f159bc8000a9cd47cffdb95f96121'
 
 export const UBESWAP_MOOLA_ROUTER_ADDRESS = moolaRouterAddresses.UbeswapMoolaRouter
 

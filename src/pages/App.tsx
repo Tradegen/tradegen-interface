@@ -99,11 +99,6 @@ export default function App() {
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
             <Switch>
               <Route exact strict path="/pool" component={Pool} />
-              <Route exact strict path="/farm" component={Earn} />
-              <Route exact strict path="/farm/:stakingAddress" component={Manage} />
-              <Route exact strict path="/stake" component={Stake} />
-              <Route exact strict path="/stake/TGEN" component={ManageTGEN} />
-              <Route exact strict path="/stake/LP" component={ManageLP} />
               <Route exact strict path="/manage_pool/:id" component={ManagePoolPage} />
               <Route exact strict path="/manage_NFTpool/:id" component={ManageNFTPoolPage} />
               <Route exact strict path="/NFTpool/:id" component={NFTPoolPage} />
