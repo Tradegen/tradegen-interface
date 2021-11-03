@@ -53,7 +53,7 @@ export function useAvailableTokensPerClass(
   
     return useMemo(() => {
       return !balances || balances.loading
-        ? []
+        ? [BigInt(0), BigInt(0), BigInt(0), BigInt(0)]
         : [balances?.result?.[0], balances?.result?.[1], balances?.result?.[2], balances?.result?.[3]];
     }, [balances])
 }
@@ -107,7 +107,7 @@ export function useManager(
   
     return useMemo(() => {
       return !manager || manager.loading
-        ? []
+        ? ""
         : manager?.result?.[0];
     }, [manager])
 }
@@ -223,7 +223,7 @@ export function useNFTPoolInfo(NFTPoolAddress:string): NFTPoolInfo {
     positionBalances: (!positionsAndTotal || positionsAndTotal[1] === undefined) ? [] : positionsAndTotal[1],
     positionNames: names,
     positionSymbols: symbols,
-    tokenBalancesPerClass: (!tokenBalancesPerClass) ? [BigInt(0), BigInt(0), BigInt(0), BigInt(0)] : tokenBalancesPerClass
+    tokenBalancesPerClass: (!tokenBalancesPerClass || !tokenBalancesPerClass[0] || !tokenBalancesPerClass[1] || !tokenBalancesPerClass[2] || !tokenBalancesPerClass[3]) ? [BigInt(0), BigInt(0), BigInt(0), BigInt(0)] : tokenBalancesPerClass
   }
 }
 

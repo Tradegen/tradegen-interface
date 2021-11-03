@@ -156,6 +156,8 @@ export function NFTPoolInfo(props:any) {
         return data;
     }, [data]);
 
+    console.log(poolInfo);
+
     const investmentInfo = useUserInvestmentInfo(props.address, props.account);
     const positionValue = investmentInfo ? formatNumber(Number(investmentInfo.userUSDBalance / BigInt(1e16)) / 100, true, true, 18) : undefined
     const availableC1 = investmentInfo.userBalances[0] ?? BigInt(0);
