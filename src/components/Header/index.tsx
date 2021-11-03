@@ -10,7 +10,7 @@ import { Moon, Sun } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
-import { useAggregateTGENBalance, useAggregateCUSDBalance, useTokenBalance } from 'state/wallet/hooks'
+import { useAggregateCUSDBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 import { ExternalLink } from 'theme/components'
@@ -270,10 +270,7 @@ export default function Header() {
 
   const userCELOBalance = useTokenBalance(account ?? undefined, CELO[chainId])
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
-  const aggregateBalance: TokenAmount | undefined = useAggregateTGENBalance()
   const cUSDBalance: TokenAmount | undefined = useAggregateCUSDBalance()
-  const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
-  const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
   const countUpValue2 = cUSDBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious2 = usePrevious(countUpValue2) ?? '0'
 
@@ -304,9 +301,6 @@ export default function Header() {
           <StyledNavLink id="farm-nav-link" to="/stake">
             Stake
           </StyledNavLink>
-          <StyledExternalLink id={`stake-nav-link`} href={'https://info.tradegen.io'}>
-            Charts <span style={{ fontSize: '11px' }}>↗</span>
-          </StyledExternalLink>
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
@@ -316,33 +310,6 @@ export default function Header() {
               <NetworkCard title={NETWORK_LABELS[chainId]}>{NETWORK_LABELS[chainId]}</NetworkCard>
             )}
           </HideSmall>
-
-          {aggregateBalance && (
-            <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
-              <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
-                {account && (
-                  <HideSmall>
-                    <TYPE.white
-                      style={{
-                        paddingRight: '.4rem',
-                      }}
-                    >
-                      <CountUp
-                        key={countUpValue}
-                        isCounting
-                        start={parseFloat(countUpValuePrevious)}
-                        end={parseFloat(countUpValue)}
-                        thousandsSeparator={','}
-                        duration={1}
-                      />
-                    </TYPE.white>
-                  </HideSmall>
-                )}
-                TGEN
-              </UBEAmount>
-              <CardNoise />
-            </UBEWrapper>
-          )}
 
           {cUSDBalance && (
             <UBEWrapper>
