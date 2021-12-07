@@ -311,7 +311,7 @@ export function PoolInfo(props:any) {
                 isOpen={showStakingModal}
                 onDismiss={() => setShowStakingModal(false)}
                 poolAddress={props.address}
-                cUSDBalance={props.cUSDBalance}
+                mcUSDBalance={props.mcUSDBalance}
             />
             <UnstakingModal
                 isOpen={showUnstakingModal}

@@ -33,3 +33,14 @@ export const cUSD = makeTokens(
   'cUSD',
   'Celo Dollar'
 )
+
+export const mcUSD = makeTokens(
+  {
+    [ChainId.MAINNET]: '0x918146359264C492BD6934071c6Bd31C854EDBc3',
+    [ChainId.ALFAJORES]: '0x71DB38719f9113A36e14F409bAD4F07B58b4730b',
+    [ChainId.BAKLAVA]: '0x71DB38719f9113A36e14F409bAD4F07B58b4730b',
+  },
+  18,
+  'mcUSD',
+  'Moola Interest Bearing Celo Dollar'
+)

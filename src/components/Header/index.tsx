@@ -10,7 +10,7 @@ import { Moon, Sun } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
-import { useAggregateCUSDBalance, useTokenBalance } from 'state/wallet/hooks'
+import { useAggregateMCUSDBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 import { ExternalLink } from 'theme/components'
@@ -270,8 +270,8 @@ export default function Header() {
 
   const userCELOBalance = useTokenBalance(account ?? undefined, CELO[chainId])
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
-  const cUSDBalance: TokenAmount | undefined = useAggregateCUSDBalance()
-  const countUpValue2 = cUSDBalance?.toFixed(0) ?? '0'
+  const mcUSDBalance: TokenAmount | undefined = useAggregateMCUSDBalance()
+  const countUpValue2 = mcUSDBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious2 = usePrevious(countUpValue2) ?? '0'
 
   return (
@@ -311,7 +311,7 @@ export default function Header() {
             )}
           </HideSmall>
 
-          {cUSDBalance && (
+          {mcUSDBalance && (
             <UBEWrapper>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (
@@ -332,7 +332,7 @@ export default function Header() {
                     </TYPE.white>
                   </HideSmall>
                 )}
-                cUSD
+                mcUSD
               </UBEAmount>
               <CardNoise />
             </UBEWrapper>

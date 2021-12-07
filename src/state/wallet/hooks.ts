@@ -1,6 +1,6 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
-import { UBE, cUSD } from 'constants/tokens'
+import { UBE, mcUSD } from 'constants/tokens'
 import { useMemo } from 'react'
 import { TGEN } from '../../constants'
 import { NETWORK_CHAIN_ID } from '../../connectors'
@@ -109,20 +109,20 @@ export function useAggregateUbeBalance(): TokenAmount | undefined {
   return ubeBalance
 }
 
-// get the total cUSD for account
-export function useAggregateCUSDBalance(): TokenAmount | undefined {
+// get the total mcUSD for account
+export function useAggregateMCUSDBalance(): TokenAmount | undefined {
   const {
     address,
     network: { chainId },
   } = useContractKit()
 
-  const cusd = chainId ? cUSD[chainId] : undefined
+  const mcusd = chainId ? mcUSD[chainId] : undefined
 
-  const cUSDBalance: TokenAmount | undefined = useTokenBalance(address ?? undefined, cusd)
+  const mcUSDBalance: TokenAmount | undefined = useTokenBalance(address ?? undefined, mcusd)
 
-  if (!cusd) return undefined
+  if (!mcusd) return undefined
 
-  return cUSDBalance
+  return mcUSDBalance
 }
 
 // get the total owned, unclaimed, and unharvested UBE for account

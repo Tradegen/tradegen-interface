@@ -1,5 +1,5 @@
 import { useProvider, useContractKit } from '@celo-tools/use-contractkit'
-import { Pair, TokenAmount, Token, cUSD } from '@ubeswap/sdk'
+import { TokenAmount } from '@ubeswap/sdk'
 import Loader from 'components/Loader'
 import { useDoTransaction } from 'components/swap/routing'
 import React, { useCallback, useState } from 'react'
@@ -18,6 +18,7 @@ import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import ProgressCircles from '../ProgressSteps'
 import { AutoRow, RowBetween } from '../Row'
+import { mcUSD } from '../../constants/tokens'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -28,17 +29,17 @@ interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
   poolAddress: string
-  cUSDBalance: string
+  mcUSDBalance: string
 }
 
-export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalance }: StakingModalProps) {
+export default function StakingModal({ isOpen, onDismiss, poolAddress, mcUSDBalance }: StakingModalProps) {
   const library = useProvider()
   const { address: account, network } = useContractKit()
   const { chainId } = network
 
   // track and parse user input
   const [typedValue, setTypedValue] = useState('')
-  const { parsedAmount, error } = useDerivedStakeInfo(typedValue, cUSD[chainId], new TokenAmount(cUSD[chainId], cUSDBalance))
+  const { parsedAmount, error } = useDerivedStakeInfo(typedValue, mcUSD[chainId], new TokenAmount(mcUSD[chainId], mcUSDBalance))
 
   // state for pending and submitted txn views
   const [attempting, setAttempting] = useState<boolean>(false)
@@ -78,7 +79,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
   }, [])
 
   // used for max input button
-  const maxAmountInput = maxAmountSpend(new TokenAmount(cUSD[chainId], cUSDBalance))
+  const maxAmountInput = maxAmountSpend(new TokenAmount(mcUSD[chainId], mcUSDBalance))
   const atMaxAmount = Boolean(maxAmountInput && parsedAmount?.equalTo(maxAmountInput))
   const handleMax = useCallback(() => {
     maxAmountInput && onUserInput(maxAmountInput.toExact())
@@ -105,7 +106,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
             onUserInput={onUserInput}
             onMax={handleMax}
             showMaxButton={!atMaxAmount}
-            currency={cUSD[chainId]}
+            currency={mcUSD[chainId]}
             pair={undefined}
             label={''}
             disableCurrencySelect={true}
@@ -143,7 +144,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
         <LoadingView onDismiss={wrappedOnDismiss}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Depositing into Pool</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>{parsedAmount?.toSignificant(4)} cUSD</TYPE.body>
+            <TYPE.body fontSize={20}>{parsedAmount?.toSignificant(4)} mcUSD</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -151,7 +152,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalan
         <SubmittedView onDismiss={wrappedOnDismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Deposited {parsedAmount?.toSignificant(4)} cUSD</TYPE.body>
+            <TYPE.body fontSize={20}>Deposited {parsedAmount?.toSignificant(4)} mcUSD</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}
