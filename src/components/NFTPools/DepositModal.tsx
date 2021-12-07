@@ -1,5 +1,5 @@
 import { useProvider, useContractKit } from '@celo-tools/use-contractkit'
-import { Pair, TokenAmount, Token, cUSD } from '@ubeswap/sdk'
+import { Pair, TokenAmount } from '@ubeswap/sdk'
 import Loader from 'components/Loader'
 import { useDoTransaction } from 'components/swap/routing'
 import React, { useCallback, useState } from 'react'
@@ -21,6 +21,7 @@ import ProgressCircles from '../ProgressSteps'
 import { AutoRow, RowBetween } from '../Row'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import InputPanel from './InputPanel'
+import { mcUSD } from '../../constants/tokens'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -31,26 +32,26 @@ interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
   poolAddress: string
-  cUSDBalance: string,
+  mcUSDBalance: string,
   maxSupply: bigint,
   totalSupply: bigint,
   tokenPrice: bigint
 }
 
-export default function StakingModal({ isOpen, onDismiss, poolAddress, cUSDBalance, maxSupply, totalSupply, tokenPrice }: StakingModalProps) {
+export default function StakingModal({ isOpen, onDismiss, poolAddress, mcUSDBalance, maxSupply, totalSupply, tokenPrice }: StakingModalProps) {
   const library = useProvider()
   const { address: account, network } = useContractKit()
   const { chainId } = network
 
   const remainingTokens = BigInt(maxSupply - totalSupply);
-  const maxTokensFromBalance = (BigInt(tokenPrice) == BigInt(0)) ? BigInt(0) : BigInt(BigInt(cUSDBalance) / BigInt(tokenPrice));
+  const maxTokensFromBalance = (BigInt(tokenPrice) == BigInt(0)) ? BigInt(0) : BigInt(BigInt(mcUSDBalance) / BigInt(tokenPrice));
   const maxAvailableTokens = remainingTokens < maxTokensFromBalance ? remainingTokens : maxTokensFromBalance;
 
   // track and parse user input
   const [typedValue, setTypedValue] = useState('')
   const parsedAmount = (BigInt(typedValue) > BigInt(maxAvailableTokens) || BigInt(typedValue) == BigInt(0)) ? BigInt(0) : BigInt(typedValue);
   const error = (BigInt(typedValue) > BigInt(maxAvailableTokens) || BigInt(typedValue) == BigInt(0)) ? 'Enter an amount' : undefined;
-  const positionValue = new TokenAmount(cUSD[chainId], (BigInt(typedValue) * BigInt(tokenPrice)).toString())
+  const positionValue = new TokenAmount(mcUSD[chainId], (BigInt(typedValue) * BigInt(tokenPrice)).toString())
 
   console.log(parsedAmount);
   console.log(error);

@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { cUSD } from '@ubeswap/sdk'
+import { mcUSD } from '../../constants/tokens'
 import { ZERO_ADDRESS } from '../../constants'
 import { useNFTPoolContract } from '../../hooks/useContract'
 
@@ -30,7 +31,7 @@ export default function NFTPoolPage({
     console.log(account);
     account = account ?? ZERO_ADDRESS;
 
-    const cUSDBalance = useStableCoinBalance(cUSD[chainId].address, account).toString()
+    const mcUSDBalance = useStableCoinBalance(mcUSD[chainId].address, account).toString()
 
     const NFTPoolContract = useNFTPoolContract(id);
     let totalSupply = useTotalSupply(NFTPoolContract);
@@ -42,7 +43,7 @@ export default function NFTPoolPage({
 
     return (
         <>
-            <NFTPoolInfo address={id} account={account} cUSDBalance={cUSDBalance} totalSupply={totalSupply} maxSupply={maxSupply} tokenPrice={tokenPrice}></NFTPoolInfo>
+            <NFTPoolInfo address={id} account={account} mcUSDBalance={mcUSDBalance} totalSupply={totalSupply} maxSupply={maxSupply} tokenPrice={tokenPrice}></NFTPoolInfo>
         </>
     )
 }

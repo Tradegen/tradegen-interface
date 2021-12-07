@@ -357,7 +357,7 @@ export function NFTPoolInfo(props:any) {
                 isOpen={showStakingModal}
                 onDismiss={() => setShowStakingModal(false)}
                 poolAddress={props.address}
-                cUSDBalance={props.cUSDBalance}
+                mcUSDBalance={props.mcUSDBalance}
                 maxSupply={props.maxSupply}
                 totalSupply={props.totalSupply}
                 tokenPrice={props.tokenPrice}
