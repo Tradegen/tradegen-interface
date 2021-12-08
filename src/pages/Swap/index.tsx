@@ -12,6 +12,7 @@ import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
 import { MaxUint256 } from '@ethersproject/constants'
+import { getPath } from 'constants/paths'
 
 import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonConfirmed, ButtonError, ButtonLight, ButtonPrimary } from '../../components/Button'
@@ -87,7 +88,8 @@ export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
       return !(token.address in defaultTokens)
     })
 
-  const { address: account } = useContractKit()
+  const { address: account, network: network } = useContractKit()
+  const { chainId } = network
 
   const theme = useContext(ThemeContext)
 
@@ -107,18 +109,25 @@ export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
   const { address: recipientAddress } = useENS(recipient)
   const trade = v2Trade
 
+  console.log(currencies[Field.INPUT])
+
   const parsedAmounts = {
     [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.inputAmount,
     [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
   }
 
-  console.log(parsedAmount);
-  console.log(parsedAmount?.raw.toString())
-  console.log(trade)
+  console.log(trade);
 
   let approvalAmount = parsedAmount ? parsedAmount?.raw.toString() : '0';
-  let fromToken = trade ? trade?.inputAmount.token.address : ZERO_ADDRESS;
-  let toToken = trade ? trade?.outputAmount.token.address : ZERO_ADDRESS;
+  let fromToken = trade ? trade?.inputAmount.token.symbol : "";
+  let toToken = trade ? trade?.outputAmount.token.symbol : "";
+
+  console.log(fromToken);
+  console.log(toToken);
+
+  let path = getPath(fromToken, toToken) ?? [ZERO_ADDRESS, ZERO_ADDRESS];
+
+  console.log(path);
 
   let params = web3.eth.abi.encodeFunctionCall({
     name: 'approve',
@@ -151,10 +160,8 @@ export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
         type: 'uint256',
         name: 'deadline'
     }]
-  }, [approvalAmount, '0', [fromToken, toToken], poolAddress, MaxUint256.toString()]);
+  }, [approvalAmount, '0', path, poolAddress, MaxUint256.toString()]);
 
-  console.log(fromToken);
-  console.log(toToken);
   console.log(params2);
 
   const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
