@@ -25,9 +25,6 @@ const paths = {
 
 //Get optimal path on mainnet
 export function getPath(from, to) {
-    console.log(typeof(from));
-    console.log(typeof(to));
-
     if (typeof(from) !== "string" || typeof(to) !== "string")
     {
         return undefined;
@@ -48,20 +45,24 @@ export function getPath(from, to) {
     //swap from mcUSD to token
     if (from == "mcUSD")
     {
-        return paths[to];
+        return paths[to].slice();
     }
 
     //swap from token to mcUSD
     if (to == "mcUSD")
     {
-        var temp = paths[from];
+        var temp = paths[to].slice();
         return temp.reverse();
     }
 
     //Reverse array, remove "mcUSD", and concat
-    var temp = paths[from];
-    var temp2 = paths[to];
+    var temp = paths[from].slice();
+    console.log(paths);
+    var temp2 = paths[to].slice();
+    console.log(temp2);
     temp = temp.reverse();
+    console.log(temp);
     temp.pop();
+    console.log(temp);
     return temp.concat(temp2);
 }
