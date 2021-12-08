@@ -51,7 +51,7 @@ export function getPath(from, to) {
     //swap from token to mcUSD
     if (to == "mcUSD")
     {
-        var temp = paths[to].slice();
+        var temp = paths[from].slice();
         return temp.reverse();
     }
 
