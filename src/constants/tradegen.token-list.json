@@ -1,0 +1,77 @@
+{
+    "name": "Tradegen",
+    "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/logo.png",
+    "keywords": ["celo", "tradegen", "defi"],
+    "timestamp": "2021-12-06T20:06:12.237Z",
+    "tokens": [
+      {
+        "address": "0x00400FcbF0816bebB94654259de7273f4A05c762",
+        "name": "Poof",
+        "symbol": "POOF",
+        "chainId": 42220,
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_POOF.png"
+      },
+      {
+        "address": "0x00Be915B9dCf56a3CBE739D9B9c202ca692409EC",
+        "name": "Ubeswap",
+        "symbol": "UBE",
+        "chainId": 42220,
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_UBE.png"
+      },
+      {
+        "address": "0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4",
+        "name": "Optics v1 WETH",
+        "symbol": "WETH",
+        "chainId": 42220,
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_WETH.png"
+      },
+      {
+        "address": "0x173234922eB27d5138c5e481be9dF5261fAeD450",
+        "name": "Allbridge SOL",
+        "symbol": "SOL",
+        "chainId": 42220,
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_SOL.png"
+      },
+      {
+        "address": "0x17700282592D6917F6A73D0bF8AcCf4D578c131e",
+        "name": "Moola",
+        "symbol": "MOO",
+        "chainId": 42220,
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_MOO.png"
+      },
+      {
+        "address": "0x32A9FE697a32135BFd313a6Ac28792DaE4D9979d",
+        "name": "Celo Moss Carbon Credit",
+        "symbol": "cMCO2",
+        "chainId": 42220,
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_cMCO2.png"
+      },
+      {
+        "address": "0x471EcE3750Da237f93B8E339c536989b8978a438",
+        "name": "Celo",
+        "symbol": "CELO",
+        "chainId": 42220,
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_CELO.png"
+      },
+      {
+        "address": "0x918146359264C492BD6934071c6Bd31C854EDBc3",
+        "name": "Moola cUSD",
+        "symbol": "mcUSD",
+        "chainId": 42220,
+        "decimals": 18,
+        "logoURI": "https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_mcUSD.png"
+      }
+    ],
+    "version": {
+      "major": 4,
+      "minor": 1,
+      "patch": 32
+    }
+  }
