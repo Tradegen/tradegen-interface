@@ -63,6 +63,7 @@ interface SwapProps {
 export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
   const loadedUrlParams = useDefaultsFromURLSearch()
 
+  console.log(loadedUrlParams)
   console.log(poolAddress);
   console.log(manager);
 

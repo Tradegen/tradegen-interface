@@ -6,7 +6,7 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import { useAllInactiveTokens, useIsUserAddedToken } from '../../hooks/Tokens'
-import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
+import { useDefaultTokenList, WrappedTokenInfo } from '../../state/lists/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import { isTokenOnList } from '../../utils'
@@ -99,7 +99,7 @@ function CurrencyRow({
   const { address: account } = useContractKit()
 
   const key = currencyKey(currency)
-  const selectedTokenList = useCombinedActiveList()
+  const selectedTokenList = useDefaultTokenList()
   const isOnSelectedList = isTokenOnList(selectedTokenList, currency)
   const customAdded = useIsUserAddedToken(currency)
   const balance = useCurrencyBalance(poolAddress ? poolAddress : account ?? undefined, currency)

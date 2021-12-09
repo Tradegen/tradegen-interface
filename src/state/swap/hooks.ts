@@ -7,6 +7,7 @@ import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { mcUSD } from '../../constants/tokens'
 import { ROUTER_ADDRESS } from '../../constants'
 import { useCurrency } from '../../hooks/Tokens'
 import useENS from '../../hooks/useENS'
@@ -204,10 +205,10 @@ function parseCurrencyFromURLParameter(urlParam: any, chainId: ChainId): string 
   if (typeof urlParam === 'string') {
     const valid = isAddress(urlParam)
     if (valid) return valid
-    if (urlParam.toUpperCase() === 'CUSD') return cUSD[chainId].address
-    if (valid === false) return cUSD[chainId].address
+    if (urlParam.toUpperCase() === 'MCUSD') return mcUSD[chainId].address
+    if (valid === false) return mcUSD[chainId].address
   }
-  return cUSD[chainId].address ?? ''
+  return mcUSD[chainId].address ?? ''
 }
 
 function parseTokenAmountURLParameter(urlParam: any): string {
