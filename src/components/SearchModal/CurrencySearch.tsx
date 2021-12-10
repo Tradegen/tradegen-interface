@@ -203,28 +203,9 @@ export function CurrencySearch({
           </Text>
           <CloseIcon onClick={onDismiss} />
         </RowBetween>
-        <Row>
-          <SearchInput
-            type="text"
-            id="token-search-input"
-            placeholder={t('tokenSearchPlaceholder')}
-            autoComplete="off"
-            value={searchQuery}
-            ref={inputRef as RefObject<HTMLInputElement>}
-            onChange={handleInput}
-            onKeyDown={handleEnter}
-          />
-        </Row>
-        {showCommonBases && (
-          <CommonBases chainId={chainId} onSelect={handleCurrencySelect} selectedCurrency={selectedCurrency} />
-        )}
       </PaddedColumn>
       <Separator />
-      {searchToken && !searchTokenIsAdded ? (
-        <Column style={{ padding: '20px 0', height: '100%' }}>
-          <ImportRow token={searchToken} showImportView={showImportView} setImportToken={setImportToken} />
-        </Column>
-      ) : filteredSortedTokens?.length > 0 || (showExpanded && inactiveTokens && inactiveTokens.length > 0) ? (
+      {filteredSortedTokens?.length > 0 || (showExpanded && inactiveTokens && inactiveTokens.length > 0) ? (
         <div style={{ flex: '1' }}>
           <AutoSizer disableWidth>
             {({ height }) => (
@@ -271,38 +252,6 @@ export function CurrencySearch({
             )}
         </Column>
       )}
-
-      {inactiveTokens &&
-        inactiveTokens.length > 0 &&
-        !(searchToken && !searchTokenIsAdded) &&
-        (searchQuery.length > 1 || showExpanded) &&
-        (filteredSortedTokens?.length !== 0 || showExpanded) && (
-          // button fixed to bottom
-          <Row align="center" width="100%" justify="center" style={{ position: 'absolute', bottom: '80px', left: 0 }}>
-            <ButtonLight
-              width="fit-content"
-              borderRadius="12px"
-              padding="8px 12px"
-              onClick={() => setShowExpanded(!showExpanded)}
-            >
-              {!showExpanded
-                ? `Show ${inactiveTokens.length} more inactive ${inactiveTokens.length === 1 ? 'token' : 'tokens'}`
-                : 'Hide expanded search'}
-            </ButtonLight>
-          </Row>
-        )}
-      <Footer>
-        <Row justify="center">
-          <ButtonText onClick={showManageView} color={theme.blue1} className="list-token-manage-button">
-            <RowFixed>
-              <IconWrapper size="16px" marginRight="6px">
-                <Edit />
-              </IconWrapper>
-              <TYPE.main color={theme.blue1}>Manage</TYPE.main>
-            </RowFixed>
-          </ButtonText>
-        </Row>
-      </Footer>
     </ContentWrapper>
   )
 }
