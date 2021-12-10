@@ -8,7 +8,6 @@ import { useIsTransactionUnsupported } from 'hooks/Trades'
 import useENS from 'hooks/useENS'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ArrowDown } from 'react-feather'
-import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
 import { MaxUint256 } from '@ethersproject/constants'
@@ -60,12 +59,12 @@ interface SwapProps {
   isNFTPool: boolean
 }
 
+let disableMenu = true;
+
 export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
   const loadedUrlParams = useDefaultsFromURLSearch()
 
-  console.log(loadedUrlParams)
-  console.log(poolAddress);
-  console.log(manager);
+  console.log(disableMenu);
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
@@ -388,6 +387,7 @@ export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
               otherCurrency={currencies[Field.OUTPUT]}
               id="swap-currency-input"
               poolAddress={poolAddress}
+              disableCurrencySelect={disableMenu}
             />
             <AutoColumn justify="space-between">
               <AutoRow justify={isExpertMode ? 'space-between' : 'center'} style={{ padding: '0 1rem' }}>
@@ -397,8 +397,9 @@ export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
                     onClick={() => {
                       setApprovalSubmitted(false) // reset 2 step UI for approvals
                       onSwitchTokens()
+                      disableMenu = !disableMenu
                     }}
-                    color={currencies[Field.INPUT] && currencies[Field.OUTPUT] ? theme.primary1 : theme.text2}
+                    color={theme.text2}
                   />
                 </ArrowWrapper>
                 {recipient === null && isExpertMode ? (
@@ -418,6 +419,7 @@ export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
               poolAddress={poolAddress}
+              disableCurrencySelect={!disableMenu}
             />
 
             {recipient !== null ? (
