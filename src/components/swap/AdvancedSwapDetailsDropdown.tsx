@@ -13,8 +13,9 @@ const AdvancedDetailsFooter = styled.div<{ show: boolean }>`
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
   color: ${({ theme }) => theme.text2};
-  background-color: ${({ theme }) => theme.advancedBG};
+  background: none;
   z-index: -1;
+  opacity: ${({ show }) => (show ? '1' : '0')};
 
   transform: ${({ show }) => (show ? 'translateY(0%)' : 'translateY(-100%)')};
   transition: transform 300ms ease-in-out;

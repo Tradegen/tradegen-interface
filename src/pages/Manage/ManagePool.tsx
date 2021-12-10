@@ -92,12 +92,12 @@ const MiddleRowItemBottom = styled.div`
 const ItemWrapper = styled.div`
   margin-top: 1rem;
   margin-bottom: 1rem;
-  min-width:1000px;
+  min-width: 1000px;
 `
 
 const SwapWrapper = styled.div`
   width: 100%;
-  padding-left: 25%;
+  padding-left: 0%;
   margin-top: 50px;
 `
 

@@ -360,7 +360,7 @@ export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
       />
       <SwapPoolTabs active={'swap'} />
       <AppBody>
-        <SwapHeader title={actionLabel} />
+        <SwapHeader title={"Swap"} />
         <Wrapper id="swap-page">
           <ConfirmSwapModal
             isOpen={showConfirm}
@@ -459,81 +459,81 @@ export default function Swap({ poolAddress, manager, isNFTPool }: SwapProps) {
                 )}
               </AutoColumn>
             </Card>
-          </AutoColumn>
-          <BottomGrouping>
-            {swapIsUnsupported ? (
-              <ButtonPrimary disabled={true}>
-                <TYPE.main mb="4px">Unsupported Asset</TYPE.main>
-              </ButtonPrimary>
-            ) : !account ? (
-              <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
-            ) : noRoute && userHasSpecifiedInputOutput ? (
-              <GreyCard style={{ textAlign: 'center' }}>
-                <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>
-                {singleHopOnly && <TYPE.main mb="4px">Try enabling multi-hop trades.</TYPE.main>}
-              </GreyCard>
-            ) : showApproveFlow ? (
-              <RowBetween>
-                <ButtonConfirmed
-                  onClick={approveCallback}
-                  disabled={approval !== ApprovalState.NOT_APPROVED || approvalSubmitted}
-                  width="48%"
-                  altDisabledStyle={approval === ApprovalState.PENDING} // show solid button while waiting
-                  confirmed={approval === ApprovalState.APPROVED}
-                >
-                  {approval === ApprovalState.PENDING ? (
-                    <AutoRow gap="6px" justify="center">
-                      Approving <Loader stroke="white" />
-                    </AutoRow>
-                  ) : approvalSubmitted && approval === ApprovalState.APPROVED ? (
-                    'Approved'
-                  ) : (
-                    'Approve ' + currencies[Field.INPUT]?.symbol
-                  )}
-                </ButtonConfirmed>
+            <BottomGrouping>
+              {swapIsUnsupported ? (
+                <ButtonPrimary disabled={true}>
+                  <TYPE.main mb="4px">Unsupported Asset</TYPE.main>
+                </ButtonPrimary>
+              ) : !account ? (
+                <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
+              ) : noRoute && userHasSpecifiedInputOutput ? (
+                <GreyCard style={{ textAlign: 'center' }}>
+                  <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>
+                  {singleHopOnly && <TYPE.main mb="4px">Try enabling multi-hop trades.</TYPE.main>}
+                </GreyCard>
+              ) : showApproveFlow ? (
+                <RowBetween>
+                  <ButtonConfirmed
+                    onClick={approveCallback}
+                    disabled={approval !== ApprovalState.NOT_APPROVED || approvalSubmitted}
+                    width="48%"
+                    altDisabledStyle={approval === ApprovalState.PENDING} // show solid button while waiting
+                    confirmed={approval === ApprovalState.APPROVED}
+                  >
+                    {approval === ApprovalState.PENDING ? (
+                      <AutoRow gap="6px" justify="center">
+                        Approving <Loader stroke="white" />
+                      </AutoRow>
+                    ) : approvalSubmitted && approval === ApprovalState.APPROVED ? (
+                      'Approved'
+                    ) : (
+                      'Approve ' + currencies[Field.INPUT]?.symbol
+                    )}
+                  </ButtonConfirmed>
+                  <ButtonError
+                    onClick={() => {
+                      onSwap()
+                    }}
+                    width="48%"
+                    id="swap-button"
+                    disabled={
+                      !isValid || approval !== ApprovalState.APPROVED || (priceImpactSeverity > 3 && !isExpertMode)
+                    }
+                    error={isValid && priceImpactSeverity > 2}
+                  >
+                    <Text fontSize={16} fontWeight={500}>
+                      {priceImpactSeverity > 3 && !isExpertMode
+                        ? `Price Impact High`
+                        : `${actionLabel}${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
+                    </Text>
+                  </ButtonError>
+                </RowBetween>
+              ) : (
                 <ButtonError
                   onClick={() => {
                     onSwap()
                   }}
-                  width="48%"
                   id="swap-button"
-                  disabled={
-                    !isValid || approval !== ApprovalState.APPROVED || (priceImpactSeverity > 3 && !isExpertMode)
-                  }
-                  error={isValid && priceImpactSeverity > 2}
+                  disabled={!isValid || (priceImpactSeverity > 3 && !isExpertMode) || !!swapCallbackError}
+                  error={isValid && priceImpactSeverity > 2 && !swapCallbackError}
                 >
-                  <Text fontSize={16} fontWeight={500}>
-                    {priceImpactSeverity > 3 && !isExpertMode
-                      ? `Price Impact High`
+                  <Text fontSize={20} fontWeight={500}>
+                    {swapInputError
+                      ? swapInputError
+                      : priceImpactSeverity > 3 && !isExpertMode
+                      ? `Price Impact Too High`
                       : `${actionLabel}${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
                   </Text>
                 </ButtonError>
-              </RowBetween>
-            ) : (
-              <ButtonError
-                onClick={() => {
-                  onSwap()
-                }}
-                id="swap-button"
-                disabled={!isValid || (priceImpactSeverity > 3 && !isExpertMode) || !!swapCallbackError}
-                error={isValid && priceImpactSeverity > 2 && !swapCallbackError}
-              >
-                <Text fontSize={20} fontWeight={500}>
-                  {swapInputError
-                    ? swapInputError
-                    : priceImpactSeverity > 3 && !isExpertMode
-                    ? `Price Impact Too High`
-                    : `${actionLabel}${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
-                </Text>
-              </ButtonError>
-            )}
-            {showApproveFlow && (
-              <Column style={{ marginTop: '1rem' }}>
-                <ProgressSteps steps={[approval === ApprovalState.APPROVED]} />
-              </Column>
-            )}
-            {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
-          </BottomGrouping>
+              )}
+              {showApproveFlow && (
+                <Column style={{ marginTop: '1rem' }}>
+                  <ProgressSteps steps={[approval === ApprovalState.APPROVED]} />
+                </Column>
+              )}
+              {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
+            </BottomGrouping>
+          </AutoColumn>
         </Wrapper>
       </AppBody>
       {!swapIsUnsupported ? (
