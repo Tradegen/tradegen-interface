@@ -38,6 +38,16 @@ const FirstRowLeft = styled.div`
   font-size: 30px;
 `
 
+const FirstRowRight = styled.div`
+  width: 70%;
+  color: white;
+  float: right;
+  background-color: none;
+  font-size: 16px;
+  display: flex;
+  margin-left: 30%;
+`
+
 const FactsheetTitle = styled.div`
   width: 100%;
   font-size: 22px;
@@ -55,16 +65,8 @@ const FactsheetContent = styled.div`
   margin-bottom: 30px;
 `
 
-const MiddleRow = styled.div`
-  width: 100%;
-  display: flex;
-  background-color: none;
-  margin-top: 30px;
-  margin-bottom: 60px;
-`
-
 const MiddleRowItem = styled.div`
-  width: 30%;
+  width: 50%;
   color: white;
   background-color: rgba(86,86,86,0.15);
   margin-left: 4%;
@@ -150,33 +152,25 @@ export default function ManagePoolPage({
                 <FirstRowLeft>
                     {poolInfo.name}
                 </FirstRowLeft>
+                <FirstRowRight>
+                    <MiddleRowItem>
+                        <MiddleRowItemTop>
+                            Token Price
+                        </MiddleRowItemTop>
+                        <MiddleRowItemBottom>
+                            {formatNumber(Number(poolInfo.tokenPrice) / 100, true, true, 18)}
+                        </MiddleRowItemBottom>
+                    </MiddleRowItem>
+                    <MiddleRowItem>
+                        <MiddleRowItemTop>
+                            Total Return
+                        </MiddleRowItemTop>
+                        <MiddleRowItemBottom style={{color:getColour(poolInfo.totalReturn)}}>
+                            {poolInfo.totalReturn}
+                        </MiddleRowItemBottom>
+                    </MiddleRowItem>
+                </FirstRowRight>
             </FirstRow>
-            <MiddleRow>
-                <MiddleRowItem style={{marginLeft: '0%'}}>
-                    <MiddleRowItemTop>
-                        TVL
-                    </MiddleRowItemTop>
-                    <MiddleRowItemBottom>
-                        {formatNumber(Number(poolInfo.TVL) / 100, true, true, 18)}
-                    </MiddleRowItemBottom>
-                </MiddleRowItem>
-                <MiddleRowItem>
-                    <MiddleRowItemTop>
-                        Token Price
-                    </MiddleRowItemTop>
-                    <MiddleRowItemBottom>
-                        {formatNumber(Number(poolInfo.tokenPrice) / 100, true, true, 18)}
-                    </MiddleRowItemBottom>
-                </MiddleRowItem>
-                <MiddleRowItem>
-                    <MiddleRowItemTop>
-                        Total Return
-                    </MiddleRowItemTop>
-                    <MiddleRowItemBottom style={{color:getColour(poolInfo.totalReturn)}}>
-                        {poolInfo.totalReturn}
-                    </MiddleRowItemBottom>
-                </MiddleRowItem>
-            </MiddleRow>
             {combinedPositions.length > 0 && (
                 <>
                     <FactsheetTitle>
