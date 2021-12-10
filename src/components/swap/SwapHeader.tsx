@@ -18,7 +18,6 @@ export default function SwapHeader({ title = 'Swap' }: { title?: string }) {
     <StyledSwapHeader>
       <RowBetween>
         <TYPE.black fontWeight={500}>{title}</TYPE.black>
-        <Settings />
       </RowBetween>
     </StyledSwapHeader>
   )
