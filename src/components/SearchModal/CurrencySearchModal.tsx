@@ -1,5 +1,4 @@
 import { Token } from '@ubeswap/sdk'
-import { TokenList } from '@uniswap/token-lists'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import useLast from '../../hooks/useLast'

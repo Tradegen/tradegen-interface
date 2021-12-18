@@ -8,6 +8,7 @@ import { ZERO_ADDRESS } from '../../constants'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import Swap from '../Swap'
+import Actions from '../../components/pools/Actions'
 
 const TitleRow = styled.div`
   width: 100%;
@@ -96,9 +97,19 @@ const ItemWrapper = styled.div`
 `
 
 const SwapWrapper = styled.div`
-  width: 100%;
+  width: 420px;
   padding-left: 0%;
   margin-top: 50px;
+`
+
+const ActionsWrapper = styled.div`
+  width: 420px;
+  margin-left: 160px;
+  margin-top: 50px;
+`
+
+const BottomWrapper = styled.div`
+  display: flex;
 `
 
 function getColour(totalReturn:string)
@@ -213,13 +224,22 @@ export default function ManagePoolPage({
                 </>
             )}
 
-            <SwapWrapper>
-                <Swap
-                    poolAddress={id}
-                    manager={manager}
-                    isNFTPool={false}
-                ></Swap>
-            </SwapWrapper>
+            <BottomWrapper>
+                <SwapWrapper>
+                    <Swap
+                        poolAddress={id}
+                        manager={manager}
+                        isNFTPool={false}
+                    ></Swap>
+                </SwapWrapper>
+                <ActionsWrapper>
+                    <Actions
+                        poolAddress={id}
+                        manager={manager}
+                        isNFTPool={false}
+                    ></Actions>
+                </ActionsWrapper>
+            </BottomWrapper>
         </ItemWrapper>
     )
 }

@@ -32,6 +32,10 @@ export interface PositionsAndTotal {
     total: bigint
 }
 
+export interface ManagerInfo {
+  manager: string
+}
+
 export function useTokenPrice(
     NFTPoolContract: any,
   ): bigint {
@@ -257,4 +261,18 @@ export function usePositionNames(positions:string[]): string[] {
   const names = useMultipleContractSingleData(positions, ERC20_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
 
   return names ?? [];
+}
+
+export function useManagerInfo(poolAddress:string): ManagerInfo {
+  let { network, account } = useContractKit();
+  const { chainId } = network
+  console.log(account);
+
+  const poolContract = useNFTPoolContract(poolAddress);
+
+  const manager = useManager(poolContract);
+
+  return {
+    manager: manager ?? ""
+  }
 }

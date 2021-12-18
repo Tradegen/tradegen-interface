@@ -32,6 +32,12 @@ export interface PositionsAndTotal {
     total: bigint
 }
 
+export interface ManagerInfo {
+  availableManagerFee: bigint,
+  tokenPriceAtLastFeeMint: bigint,
+  manager: string
+}
+
 export function useTokenPrice(
     poolContract: any,
   ): bigint {
@@ -140,6 +146,32 @@ export function usePositionsAndTotal(
     }, [data])
 }
 
+export function useAvailableManagerFee(
+  poolContract: any,
+): bigint {
+
+  const fee = useSingleCallResult(poolContract, 'availableManagerFee', undefined);
+
+  return useMemo(() => {
+    return !fee || fee.loading
+      ? []
+      : fee?.result?.[0];
+  }, [fee])
+}
+
+export function useTokenPriceAtLastFeeMint(
+  poolContract: any,
+): bigint {
+
+  const price = useSingleCallResult(poolContract, '_tokenPriceAtLastFeeMint', undefined);
+
+  return useMemo(() => {
+    return !price || price.loading
+      ? []
+      : price?.result?.[0];
+  }, [price])
+}
+
 export function usePoolInfo(poolAddress:string): PoolInfo {
   const poolContract = usePoolContract(poolAddress);
   
@@ -222,4 +254,23 @@ export function usePositionNames(positions:string[]): string[] {
   const names = useMultipleContractSingleData(positions, ERC20_INTERFACE, 'name')?.map((element:any) => (element?.result ? element?.result[0] : null));
 
   return names ?? [];
+}
+
+export function useManagerInfo(poolAddress:string): ManagerInfo {
+  let { network, account } = useContractKit();
+  const { chainId } = network
+  console.log(account);
+  account = account ?? ZERO_ADDRESS;
+
+  const poolContract = usePoolContract(poolAddress);
+
+  const availableManagerFee = useAvailableManagerFee(poolContract);
+  const tokenPriceAtLastFeeMint = useTokenPriceAtLastFeeMint(poolContract);
+  const manager = useManager(poolContract);
+
+  return {
+    availableManagerFee: (!availableManagerFee) ? BigInt(0) : BigInt(availableManagerFee) / BigInt(1e12),
+    tokenPriceAtLastFeeMint: (!tokenPriceAtLastFeeMint) ? BigInt(0) : BigInt(tokenPriceAtLastFeeMint) / BigInt(1e16),
+    manager: manager ?? ""
+  }
 }
