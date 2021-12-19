@@ -9,6 +9,7 @@ import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import Swap from '../Swap'
 import Actions from '../../components/NFTPools/Actions'
+import ManagerModal from '../../components/investments/ManagerModal'
 
 const TitleRow = styled.div`
   width: 100%;
@@ -209,24 +210,26 @@ export default function ManageNFTPoolPage({
                                 Balance
                             </TitleRowContent>
                         </TitleRow>
-                        {combinedPositions.map((element:any) => (
-                            <ErrorBoundary key={element.symbol}>
-                                <TitleRow>
-                                    <TitleRowContent>
-                                        {element.symbol}
-                                    </TitleRowContent>
-                                    <TitleRowContent>
-                                        {element.name}
-                                    </TitleRowContent>
-                                    <TitleRowContent>
-                                        {element.type}
-                                    </TitleRowContent>
-                                    <TitleRowContent>
-                                        {formatBalance(element.balance)}
-                                    </TitleRowContent>
-                                </TitleRow>
-                            </ErrorBoundary>
-                        ))}
+                        <>
+                            {combinedPositions.map((element:any) => (
+                                <ErrorBoundary key={element.symbol}>
+                                    <TitleRow>
+                                        <TitleRowContent>
+                                            {element.symbol}
+                                        </TitleRowContent>
+                                        <TitleRowContent>
+                                            {element.name}
+                                        </TitleRowContent>
+                                        <TitleRowContent>
+                                            {element.type}
+                                        </TitleRowContent>
+                                        <TitleRowContent>
+                                            {formatBalance(element.balance)}
+                                        </TitleRowContent>
+                                    </TitleRow>
+                                </ErrorBoundary>
+                            ))}
+                        </>
                     </FactsheetContent>
                 </>
             )}
@@ -247,6 +250,12 @@ export default function ManageNFTPoolPage({
                     ></Actions>
                 </ActionsWrapper>
             </BottomWrapper>
+
+            <ManagerModal
+                isOpen={manager != account}
+                poolAddress={id}
+                onDismiss={() => console.log("dismiss")}
+            />
         </ItemWrapper>
     )
 }

@@ -328,24 +328,26 @@ export function NFTPoolInfo(props:any) {
                                             Balance
                                         </TitleRowContent>
                                     </TitleRow>
-                                    {combinedPositions.map((element:any) => (
-                                        <ErrorBoundary key={element.symbol}>
-                                            <TitleRow>
-                                                <TitleRowContent>
-                                                    {element.symbol}
-                                                </TitleRowContent>
-                                                <TitleRowContent>
-                                                    {element.name}
-                                                </TitleRowContent>
-                                                <TitleRowContent>
-                                                    {element.type}
-                                                </TitleRowContent>
-                                                <TitleRowContent>
-                                                    {formatBalance(element.balance)}
-                                                </TitleRowContent>
-                                            </TitleRow>
-                                        </ErrorBoundary>
-                                    ))}
+                                    <>
+                                        {combinedPositions.map((element:any) => (
+                                            <ErrorBoundary key={element.symbol}>
+                                                <TitleRow>
+                                                    <TitleRowContent>
+                                                        {element.symbol}
+                                                    </TitleRowContent>
+                                                    <TitleRowContent>
+                                                        {element.name}
+                                                    </TitleRowContent>
+                                                    <TitleRowContent>
+                                                        {element.type}
+                                                    </TitleRowContent>
+                                                    <TitleRowContent>
+                                                        {formatBalance(element.balance)}
+                                                    </TitleRowContent>
+                                                </TitleRow>
+                                            </ErrorBoundary>
+                                        ))}
+                                    </>
                                 </FactsheetContent>
                             </>
                         )}
