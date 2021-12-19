@@ -32,25 +32,12 @@ interface StakingModalProps {
   availableC4: string
 }
 
-let tokenClass:number = 1;
-let maxAvailableTokens:string = "0";
 let C1:string = "0";
 let C2:string = "0";
 let C3:string = "0";
 let C4:string = "0";
 
-function updateTokenClass(newTokenClass:number)
-{
-    console.log("update token class:");
-    console.log(newTokenClass);
-
-    tokenClass = newTokenClass;
-    maxAvailableTokens = getMaxAvailableTokens();
-
-    console.log(maxAvailableTokens);
-}
-
-function getMaxAvailableTokens()
+function getMaxAvailableTokens(tokenClass:number)
 {
     if (tokenClass == 1)
     {
@@ -79,14 +66,19 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
   const { address: account, network } = useContractKit()
   const { chainId } = network
 
+  const [filter, setFilter] = useState(1);
+  const handleFilterChange = useCallback((newFilter:number) => {
+    setFilter(newFilter);
+}, [])
+
   C1 = availableC1;
   C2 = availableC2;
   C3 = availableC3;
   C4 = availableC4;
 
-  maxAvailableTokens = getMaxAvailableTokens();
+  let maxAvailableTokens = getMaxAvailableTokens(filter);
 
-  console.log(tokenClass);
+  console.log(filter);
   console.log(maxAvailableTokens);
 
   // monitor call to help UI loading state
@@ -113,7 +105,7 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
     if (poolContract && BigInt(maxAvailableTokens) != BigInt(0)) {
       setAttempting(true)
       await doTransaction(poolContract, 'withdraw', {
-        args: [`0x${parsedAmount.toString(16)}`, tokenClass],
+        args: [`0x${parsedAmount.toString(16)}`, filter],
         summary: `Withdraw from pool`,
       })
         .then((response) => {
@@ -145,17 +137,17 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
             <TYPE.mediumHeader>Withdraw</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
-          <p>Available C{tokenClass.toString()}: {maxAvailableTokens.toString()}</p>
-          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateTokenClass(1)}}>
+          <p>Available C{filter.toString()}: {maxAvailableTokens.toString()}</p>
+          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange(1)}}>
             {'C1'}
           </ButtonPrimary>
-          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateTokenClass(2)}}>
+          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange(2)}}>
             {'C2'}
           </ButtonPrimary>
-          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateTokenClass(3)}}>
+          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange(3)}}>
             {'C3'}
           </ButtonPrimary>
-          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {updateTokenClass(4)}}>
+          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange(4)}}>
             {'C4'}
           </ButtonPrimary>
           <InputPanel
@@ -179,7 +171,7 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOndismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.body fontSize={20}>Withdrawing {typedValue} C{tokenClass.toString()} NFT pool tokens</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrawing {typedValue} C{filter.toString()} NFT pool tokens</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -187,7 +179,7 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
         <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Withdrew C{tokenClass.toString()} NFT pool tokens!</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrew C{filter.toString()} NFT pool tokens!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}
