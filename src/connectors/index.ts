@@ -1,4 +1,4 @@
-import { Alfajores, Baklava, Mainnet } from '@celo-tools/use-contractkit'
+import { Alfajores, Baklava, CeloMainnet } from '@celo-tools/use-contractkit'
 import { ChainId, parseNetwork } from '@ubeswap/sdk'
 
 const networkChainIDFromHostname: ChainId = ChainId.MAINNET
@@ -20,6 +20,6 @@ const chainIdToName = (chainId: ChainId): string => {
 
 export const NETWORK_CHAIN_NAME: string = chainIdToName(NETWORK_CHAIN_ID)
 
-export const NETWORK = Mainnet
+export const NETWORK = CeloMainnet
 
-console.log('Loading Ubeswap interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)
+console.log('Loading Tradegen interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)
