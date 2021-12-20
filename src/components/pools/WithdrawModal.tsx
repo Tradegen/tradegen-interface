@@ -3,6 +3,7 @@ import { TokenAmount, Token } from '@ubeswap/sdk'
 import { useDoTransaction } from 'components/swap/routing'
 import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
+import { ErrorBoundary } from '@sentry/react'
 
 import { usePoolContract } from '../../hooks/useContract'
 import { StakingInfo } from '../../state/stake/hooks'
@@ -21,14 +22,22 @@ const ContentWrapper = styled(AutoColumn)`
   padding: 1rem;
 `
 
+const PositionRow = styled.div`
+  width: 100%;
+  color: white;
+  display: block;
+  background-color: none;
+`
+
 interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
   poolAddress: string,
-  tokenBalance: string
+  tokenBalance: string,
+  combinedPositions: object[]
 }
 
-export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBalance }: StakingModalProps) {
+export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBalance, combinedPositions }: StakingModalProps) {
   const { address: account, network } = useContractKit()
   const { chainId } = network
 
@@ -51,6 +60,8 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBa
     setAttempting(false)
     onDismiss()
   }
+
+  console.log(combinedPositions);
 
   const poolContract = usePoolContract(poolAddress)
 
@@ -93,7 +104,6 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBa
   if (!tokenBalance) {
     error = error ?? 'Enter an amount'
   }
-  console.log(formatBalance(tokenBalance, 18).toString())
   if (Number(typedValue) > Number(formatBalance(tokenBalance, 18).toString())) {
     error = error ?? 'Not enough tokens'
   }
@@ -118,6 +128,18 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBa
             id="stake-liquidity-token"
             availableTokens={tokenBalance ? formatBalance(tokenBalance, 18).toString() : '0'}
           />
+          <PositionRow>
+            You'll receive:
+          </PositionRow>
+          <>
+            {combinedPositions.map((element:any) => (
+                <ErrorBoundary key={element.symbol}>
+                  <PositionRow>
+                    {element.symbol + ': ' + formatBalance((typedValue ? BigInt(Number(typedValue) * 1e18) : BigInt(0)) * BigInt(element.balance) / BigInt(tokenBalance))}
+                  </PositionRow>
+                </ErrorBoundary>
+            ))}
+        </>
           <ButtonError disabled={!!error} error={!!error && !!tokenBalance} onClick={onWithdraw}>
             {error ?? 'Withdraw from pool'}
           </ButtonError>

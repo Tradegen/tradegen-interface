@@ -320,6 +320,7 @@ export function PoolInfo(props:any) {
                 onDismiss={() => setShowUnstakingModal(false)}
                 poolAddress={props.address}
                 tokenBalance={props.tokenBalance}
+                combinedPositions={combinedPositions}
             />
         </>
     ) : (
