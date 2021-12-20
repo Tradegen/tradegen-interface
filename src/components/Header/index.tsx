@@ -259,6 +259,7 @@ export const StyledMenuButton = styled.button`
 `
 
 const NETWORK_LABELS: { [chainId in ChainId]?: string } = {
+  [ChainId.MAINNET]: 'Celo',
   [ChainId.ALFAJORES]: 'Alfajores',
   [ChainId.BAKLAVA]: 'Baklava',
 }
@@ -271,7 +272,7 @@ export default function Header() {
   const userCELOBalance = useTokenBalance(account ?? undefined, CELO[chainId])
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
   const mcUSDBalance: TokenAmount | undefined = useAggregateMCUSDBalance()
-  const countUpValue2 = mcUSDBalance?.toFixed(0) ?? '0'
+  const countUpValue2 = mcUSDBalance?.toFixed(2) ?? '0'
   const countUpValuePrevious2 = usePrevious(countUpValue2) ?? '0'
 
   return (
