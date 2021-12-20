@@ -3,6 +3,7 @@ import { TokenAmount, Token } from '@ubeswap/sdk'
 import { useDoTransaction } from 'components/swap/routing'
 import React, { useState, useCallback } from 'react'
 import styled from 'styled-components'
+import { ErrorBoundary } from '@sentry/react'
 
 import { useNFTPoolContract } from '../../hooks/useContract'
 import { StakingInfo } from '../../state/stake/hooks'
@@ -22,6 +23,13 @@ const ContentWrapper = styled(AutoColumn)`
   padding: 1rem;
 `
 
+const PositionRow = styled.div`
+  width: 100%;
+  color: white;
+  display: block;
+  background-color: none;
+`
+
 interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
@@ -30,6 +38,7 @@ interface StakingModalProps {
   availableC2: string
   availableC3: string
   availableC4: string
+  combinedPositions: object[]
 }
 
 let C1:string = "0";
@@ -62,7 +71,7 @@ function getMaxAvailableTokens(tokenClass:number)
     return "0";
 }
 
-export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availableC1, availableC2, availableC3, availableC4 }: StakingModalProps) {
+export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availableC1, availableC2, availableC3, availableC4, combinedPositions }: StakingModalProps) {
   const { address: account, network } = useContractKit()
   const { chainId } = network
 
@@ -75,6 +84,7 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
   C2 = availableC2;
   C3 = availableC3;
   C4 = availableC4;
+  let tokenBalance = Number(C1) + Number(C2) + Number(C3) + Number(C4);
 
   let maxAvailableTokens = getMaxAvailableTokens(filter);
 
@@ -163,6 +173,18 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
             id="stake-liquidity-token"
             availableTokens={maxAvailableTokens.toString()}
           />
+          <PositionRow>
+            You'll receive:
+          </PositionRow>
+          <>
+            {combinedPositions.map((element:any) => (
+                <ErrorBoundary key={element.symbol}>
+                  <PositionRow>
+                    {element.symbol + ': ' + formatBalance((typedValue ? BigInt(typedValue) : BigInt(0)) * BigInt(element.balance) / BigInt(tokenBalance))}
+                  </PositionRow>
+                </ErrorBoundary>
+            ))}
+        </>
           <ButtonError disabled={!!error} error={!!error && BigInt(maxAvailableTokens) == BigInt(0)} onClick={onWithdraw}>
             {error ?? 'Withdraw'}
           </ButtonError>

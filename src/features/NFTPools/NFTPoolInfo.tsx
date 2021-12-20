@@ -372,6 +372,7 @@ export function NFTPoolInfo(props:any) {
                 availableC2={availableC2.toString()}
                 availableC3={availableC3.toString()}
                 availableC4={availableC4.toString()}
+                combinedPositions={combinedPositions}
             />
         </>
     ) : (
