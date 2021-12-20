@@ -89,7 +89,7 @@ const MiddleRowItem = styled.div`
   width: 30%;
   color: white;
   background-color: rgba(86,86,86,0.15);
-  margin-left: 4%;
+  margin-left: 5%;
   height: 60px;
   border: 1px solid rgba(86,86,86,0.15);
   border-radius: 8px;
