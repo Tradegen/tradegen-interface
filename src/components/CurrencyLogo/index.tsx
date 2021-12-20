@@ -18,14 +18,16 @@ export default function CurrencyLogo({
   currency,
   size = '24px',
   style,
+  id
 }: {
   currency?: Token
   size?: string
   style?: React.CSSProperties
+  id?: string
 }) {
-  const uriLocations = useHttpLocations(currency instanceof WrappedTokenInfo ? currency.logoURI : undefined)
+  let uriLocations = useHttpLocations(currency instanceof WrappedTokenInfo ? currency.logoURI : undefined)
 
-  const srcs: string[] = useMemo(() => {
+  let srcs: string[] = useMemo(() => {
     if (currency instanceof Token) {
       if (currency instanceof WrappedTokenInfo) {
         return [...uriLocations, currency.logoURI ?? currency.address]
@@ -35,6 +37,13 @@ export default function CurrencyLogo({
     }
     return []
   }, [currency, uriLocations])
+
+  if (id == "deposit")
+  {
+    srcs = ["https://raw.githubusercontent.com/tradegen/default-token-list/master/assets/asset_mcUSD.png"]
+  }
+
+  console.log(srcs)
 
   return <StyledLogo size={size} srcs={srcs} alt={`${currency?.symbol ?? 'token'} logo`} style={style} />
 }

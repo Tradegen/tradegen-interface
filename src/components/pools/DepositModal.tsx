@@ -111,7 +111,7 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, mcUSDBala
             label={''}
             disableCurrencySelect={true}
             customBalanceText={'Available to deposit: '}
-            id="stake-liquidity-token"
+            id="deposit"
           />
 
           <RowBetween>
