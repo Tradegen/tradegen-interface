@@ -90,6 +90,10 @@ export default function StakingModal({ isOpen, onDismiss, poolAddress, mcUSDBala
 
   // wrapped onUserInput to clear signatures
   const onUserInput = useCallback((typedValue: string) => {
+    if (typedValue.charAt(typedValue.length - 1) == ".") {
+      typedValue = typedValue.slice(0, -1);
+    }
+    console.log(typedValue)
     setTypedValue(typedValue)
   }, [])
 

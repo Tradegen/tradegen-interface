@@ -129,9 +129,13 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
 
   // wrapped onUserInput to clear signatures
   const onUserInput = useCallback((typedValue: string) => {
+    if (typedValue.charAt(typedValue.length - 1) == ".") {
+      typedValue = typedValue.slice(0, -1);
+    }
+    console.log(typedValue)
     setTypedValue(typedValue)
   }, [])
-
+  
   // used for max input button
   const maxAmountInput = BigInt(maxAvailableTokens)
   const atMaxAmount = Boolean(maxAmountInput && parsedAmount == BigInt(maxAmountInput))
