@@ -329,7 +329,7 @@ export function NFTPoolInfo(props:any) {
                                         </TitleRowContent>
                                     </TitleRow>
                                     <>
-                                        {combinedPositions.map((element:any) => (
+                                        {combinedPositions.map((element:any) => (element.symbol && element.name &&
                                             <ErrorBoundary key={element.symbol}>
                                                 <TitleRow>
                                                     <TitleRowContent>

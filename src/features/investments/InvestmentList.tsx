@@ -27,7 +27,7 @@ const NoResults = styled.div`
 
 const InvestmentCard = styled.div`
   width: 100%;
-  background-color:none;
+  background-color: rgba(86,86,86,0.2);
   color: white;
   text-decoration: none;
   display: flex;
@@ -35,7 +35,7 @@ const InvestmentCard = styled.div`
   border: 1px solid #5271FF;
   border-radius: 8px;
   &:hover {
-    background-color: rgba(86,86,86,0.15)};
+    background-color: rgba(86,86,86,0.1)};
     text-decoration: none;
   }
 `

@@ -211,7 +211,7 @@ export default function ManageNFTPoolPage({
                             </TitleRowContent>
                         </TitleRow>
                         <>
-                            {combinedPositions.map((element:any) => (
+                            {combinedPositions.map((element:any) => (element.symbol && element.name &&
                                 <ErrorBoundary key={element.symbol}>
                                     <TitleRow>
                                         <TitleRowContent>
