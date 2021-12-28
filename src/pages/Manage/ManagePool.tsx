@@ -1,12 +1,11 @@
-import { useUserInvestmentInfo, useStableCoinBalance, usePoolInfo } from '../../features/pools/hooks'
+import { usePoolInfo } from '../../features/pools/hooks'
 import styled from 'styled-components'
 import { RouteComponentProps } from 'react-router-dom'
 import { useContractKit } from '@celo-tools/use-contractkit'
-import React, { useCallback, useState, useMemo } from 'react'
-import { ButtonPrimary } from '../../components/Button'
+import React, { useMemo } from 'react'
 import { ZERO_ADDRESS } from '../../constants'
 import { ErrorBoundary } from '@sentry/react'
-import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
+import { formatNumber, formatBalance } from '../../functions/format'
 import Swap from '../Swap'
 import Actions from '../../components/pools/Actions'
 import ManagerModal from '../../components/investments/ManagerModal'
@@ -58,7 +57,7 @@ const FactsheetTitle = styled.div`
 
 const FactsheetContent = styled.div`
   width: 100%;
-  background-color: rgba(86,86,86,0.15);
+  background-color: #292941;
   border: 1px solid rgba(86,86,86,0.15);
   border-radius: 8px;
   padding-top: 5px;
@@ -70,7 +69,7 @@ const FactsheetContent = styled.div`
 const MiddleRowItem = styled.div`
   width: 50%;
   color: white;
-  background-color: rgba(86,86,86,0.15);
+  background-color: #292941;
   margin-left: 4%;
   height: 60px;
   border: 1px solid rgba(86,86,86,0.15);

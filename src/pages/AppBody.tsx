@@ -5,7 +5,7 @@ export const BodyWrapper = styled.div`
   position: relative;
   max-width: 420px;
   width: 100%;
-  background-color: rgba(86,86,86,0.15);
+  background-color: #292941;
   box-shadow: 0 3px 20px 0  rgb(0 0 0 / 45%);
   border-radius: 30px;
   /* padding: 1rem; */

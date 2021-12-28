@@ -48,7 +48,7 @@ const FactsheetTitle = styled.div`
 
 const FactsheetContent = styled.div`
   width: 100%;
-  background-color: rgba(86,86,86,0.15);
+  background-color: #292941;
   border: 1px solid rgba(86,86,86,0.15);
   border-radius: 8px;
   padding-top: 5px;
@@ -68,7 +68,7 @@ const MiddleRow = styled.div`
 const MiddleRowItem = styled.div`
   width: 30%;
   color: white;
-  background-color: rgba(86,86,86,0.15);
+  background-color: #292941;
   margin-left: 4%;
   height: 60px;
   border: 1px solid rgba(86,86,86,0.15);

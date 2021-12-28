@@ -17,7 +17,7 @@ import { ExternalLink } from 'theme/components'
 import { CountUp } from 'use-count-up'
 
 import Logo from '../../assets/images/logo_with_name.JPG'
-import LogoDark from '../../assets/images/logo_dark.JPG'
+import LogoDark from '../../assets/images/name.png'
 import { useDarkModeManager } from '../../state/user/hooks'
 import { YellowCard } from '../Card'
 import Menu from '../Menu'
@@ -283,7 +283,7 @@ export default function Header() {
       <HeaderRow>
         <Title to="/">
           <TradegenIcon>
-            <img width={'140px'} src={LogoDark} alt="logo" />
+            <img width={'180px'} src={LogoDark} alt="logo" />
           </TradegenIcon>
         </Title>
         <HeaderLinks>
