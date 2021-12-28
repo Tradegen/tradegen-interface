@@ -135,7 +135,7 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, tokenBa
             {combinedPositions.map((element:any) => (
                 <ErrorBoundary key={element.symbol}>
                   <PositionRow>
-                    {element.symbol + ': ' + formatBalance((typedValue ? BigInt(Number(typedValue) * 1e18) : BigInt(0)) * BigInt(element.balance) / BigInt(tokenBalance))}
+                    {element.symbol + ': ' + formatBalance((typedValue ? BigInt(Number(typedValue) * 1e18) : BigInt(0)) * BigInt(element.balance) / (Number(tokenBalance) == 0 ? BigInt(1) : BigInt(tokenBalance)))}
                   </PositionRow>
                 </ErrorBoundary>
             ))}

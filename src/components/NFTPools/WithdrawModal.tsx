@@ -135,7 +135,7 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
     console.log(typedValue)
     setTypedValue(typedValue)
   }, [])
-  
+
   // used for max input button
   const maxAmountInput = BigInt(maxAvailableTokens)
   const atMaxAmount = Boolean(maxAmountInput && parsedAmount == BigInt(maxAmountInput))
@@ -184,7 +184,7 @@ export default function UnstakingModal({ isOpen, onDismiss, poolAddress, availab
             {combinedPositions.map((element:any) => (
                 <ErrorBoundary key={element.symbol}>
                   <PositionRow>
-                    {element.symbol + ': ' + formatBalance((typedValue ? BigInt(typedValue) : BigInt(0)) * BigInt(element.balance) / BigInt(tokenBalance))}
+                    {element.symbol + ': ' + formatBalance((typedValue ? BigInt(typedValue) : BigInt(0)) * (Number(tokenBalance) == 0 ? BigInt(1) : BigInt(tokenBalance)))}
                   </PositionRow>
                 </ErrorBoundary>
             ))}
