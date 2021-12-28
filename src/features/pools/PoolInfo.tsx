@@ -2,11 +2,9 @@ import styled from 'styled-components'
 import { usePoolInfo } from '../../features/pools/hooks'
 import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
-import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
+import { formatNumber, formatBalance } from '../../functions/format'
 import { ButtonPrimary } from '../../components/Button'
 import { StyledInternalLink, TYPE } from '../../theme'
-import { useContractKit } from '@celo-tools/use-contractkit'
-import { ZERO_ADDRESS } from '../../constants'
 import StakingModal from '../../components/pools/DepositModal'
 import UnstakingModal from '../../components/pools/WithdrawModal'
 import { useWalletModalToggle } from '../../state/application/hooks'
@@ -71,7 +69,7 @@ const Buffer = styled.div`
 `
 
 const FirstRowButtonWrapper = styled.div`
-  width: 30%;
+  width: 35%;
   background-color: none;
   margin-left: 3%;
   float: right;
@@ -88,7 +86,7 @@ const MiddleRow = styled.div`
 const MiddleRowItem = styled.div`
   width: 30%;
   color: white;
-  background-color: rgba(86,86,86,0.15);
+  background-color: #292941;
   margin-left: 5%;
   height: 60px;
   border: 1px solid rgba(86,86,86,0.15);
@@ -117,7 +115,7 @@ const FactsheetTitle = styled.div`
 
 const FactsheetContent = styled.div`
   width: 100%;
-  background-color: rgba(86,86,86,0.15);
+  background-color: #292941;
   border: 1px solid rgba(86,86,86,0.15);
   border-radius: 8px;
   padding-top: 5px;

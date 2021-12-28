@@ -216,7 +216,7 @@ html {
 export const ThemedGlobalStyle = createGlobalStyle`
 html {
   color: ${({ theme }) => theme.text1};
-  background-color: #252e42;
+  background-color: #0e0e23;
 }
 
 body {
