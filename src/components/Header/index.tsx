@@ -302,6 +302,9 @@ export default function Header() {
           <StyledNavLink id="farm-nav-link" to="/stake">
             Stake
           </StyledNavLink>
+          <StyledExternalLink id={`stake-nav-link`} href={'https://info.tradegen.io'}>
+            Charts <span style={{ fontSize: '11px' }}>↗</span>
+          </StyledExternalLink>
           <StyledExternalLink id={`stake-nav-link`} href={'https://app.moola.market'}>
             Get mcUSD <span style={{ fontSize: '11px' }}>↗</span>
           </StyledExternalLink>

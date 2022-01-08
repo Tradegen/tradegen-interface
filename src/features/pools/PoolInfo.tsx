@@ -9,6 +9,7 @@ import StakingModal from '../../components/pools/DepositModal'
 import UnstakingModal from '../../components/pools/WithdrawModal'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import React, { useCallback, useState } from 'react'
+import { ExternalLink } from 'theme/components'
 
 const TitleRow = styled.div`
   width: 100%;
@@ -123,6 +124,29 @@ const FactsheetContent = styled.div`
   padding-left: 20px;
   margin-bottom: 30px;
 `
+const StyledExternalLink = styled(ExternalLink).attrs({
+  })<{ isActive?: boolean }>`
+    ${({ theme }) => theme.flexRowNoWrap}
+    border-radius: 3rem;
+    outline: none;
+    cursor: pointer;
+    text-decoration: none !important;
+    color: white;
+    font-size: 1rem;
+    width: fit-content;
+    margin: 0 12px;
+    font-weight: 500;
+    text-align: center
+
+    :hover,
+    :focus {
+        text-decoration: none;
+    }
+  
+    ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+        display: none;
+  `}
+  `
 
 function getColour(totalReturn:string)
 {
@@ -208,6 +232,13 @@ export function PoolInfo(props:any) {
                                         <FirstRowButtonWrapper>
                                             <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
                                                 {'Withdraw'}
+                                            </ButtonPrimary>
+                                        </FirstRowButtonWrapper>
+                                        <FirstRowButtonWrapper>
+                                            <ButtonPrimary padding="8px" borderRadius="8px">
+                                                <StyledExternalLink  id={`stake-nav-link`} href={'https://info.tradegen.io/pool/' + props.address}>
+                                                    {'Charts'}
+                                                </StyledExternalLink>
                                             </ButtonPrimary>
                                         </FirstRowButtonWrapper>
                                     </>

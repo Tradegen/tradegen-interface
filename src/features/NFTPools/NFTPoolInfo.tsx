@@ -5,13 +5,12 @@ import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
 import { ButtonPrimary } from '../../components/Button'
 import { StyledInternalLink, TYPE } from '../../theme'
-import { useContractKit } from '@celo-tools/use-contractkit'
-import { ZERO_ADDRESS } from '../../constants'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import React, { useCallback, useState } from 'react'
 import StakingModal from '../../components/NFTPools/DepositModal'
 import UnstakingModal from '../../components/NFTPools/WithdrawModal'
-import { useNFTPoolContract } from '../../hooks/useContract'
+import { ExternalLink } from 'theme/components'
+
 
 const TitleRow = styled.div`
   width: 100%;
@@ -127,6 +126,30 @@ const FactsheetContent = styled.div`
   margin-bottom: 30px;
 `
 
+const StyledExternalLink = styled(ExternalLink).attrs({
+})<{ isActive?: boolean }>`
+  ${({ theme }) => theme.flexRowNoWrap}
+  align-items: left;
+  border-radius: 3rem;
+  outline: none;
+  cursor: pointer;
+  text-decoration: none !important;
+  color: white;
+  font-size: 1rem;
+  width: fit-content;
+  margin: 0 12px;
+  font-weight: 500;
+
+  :hover,
+  :focus {
+      text-decoration: none;
+  }
+
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+      display: none;
+`}
+`
+
 function getColour(totalReturn:string)
 {
     if (totalReturn.charAt(0) == '-')
@@ -219,6 +242,13 @@ export function NFTPoolInfo(props:any) {
                                         <FirstRowButtonWrapper>
                                             <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
                                                 {'Withdraw'}
+                                            </ButtonPrimary>
+                                        </FirstRowButtonWrapper>
+                                        <FirstRowButtonWrapper>
+                                            <ButtonPrimary padding="8px" borderRadius="8px">
+                                                <StyledExternalLink  id={`stake-nav-link`} href={'https://info.tradegen.io/nftpool/' + props.address}>
+                                                    {'Charts'}
+                                                </StyledExternalLink>
                                             </ButtonPrimary>
                                         </FirstRowButtonWrapper>
                                     </>
