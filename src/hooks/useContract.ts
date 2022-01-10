@@ -22,6 +22,7 @@ import DUAL_REWARDS_ABI from '../constants/abis/moola/MoolaStakingRewards.json'
 import POOL_MANAGER_ABI from '../constants/abis/pool-manager.json'
 import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
+import MARKETPLACE_ABI from '../constants/abis/Marketplace.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { Erc20, MoolaStakingRewards, PoolManager, StakingRewards, PoolFactory, NFTPoolFactory, Pool } from '../generated'
 import { getContract } from '../utils'
@@ -134,4 +135,8 @@ export function useBaseUbeswapAdapterContract(BaseUbeswapAdapterAddress?: string
 
 export function useUbeswapLPTokenPriceAggregatorContract(UbeswapLPTokenPriceAggergatorAddress?: string, withSignerIfPossible?: boolean): Pool | null {
   return useContract(UbeswapLPTokenPriceAggergatorAddress, UBESWAP_LP_TOKEN_PRICE_AGGREGATOR_ABI, withSignerIfPossible) as Pool | null
+}
+
+export function useMarketplaceContract(MarketplaceAddress?: string, withSignerIfPossible?: boolean): Pool | null {
+  return useContract(MarketplaceAddress, MARKETPLACE_ABI, withSignerIfPossible) as Pool | null
 }
