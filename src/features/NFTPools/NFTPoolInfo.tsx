@@ -336,7 +336,15 @@ export function NFTPoolInfo(props:any) {
                             </>
                         ) }
                         {(Number(listingIndex.toString()) > 0) && 
-                            <MarketplaceListingInfo account={props.account} address={props.address} listingIndex={Number(listingIndex.toString())}></MarketplaceListingInfo>
+                            <MarketplaceListingInfo
+                                account={props.account}
+                                address={props.address}
+                                listingIndex={Number(listingIndex.toString())}
+                                availableC1={availableC1.toString()}
+                                availableC2={availableC2.toString()}
+                                availableC3={availableC3.toString()}
+                                availableC4={availableC4.toString()}
+                            ></MarketplaceListingInfo>
                         }
                         <FactsheetTitle>
                             Factsheet

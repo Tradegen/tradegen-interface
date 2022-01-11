@@ -24,21 +24,16 @@ const ContentWrapper = styled(AutoColumn)`
   padding: 1rem;
 `
 
-const PositionRow = styled.div`
-  width: 100%;
-  color: white;
-  display: block;
-  background-color: none;
-`
-
-interface CreateListingModalProps {
+interface UpdateListingModalProps {
   isOpen: boolean
   onDismiss: () => void
   poolAddress: string
+  listingIndex: number
   availableC1: string
   availableC2: string
   availableC3: string
   availableC4: string
+  tokenClass: number
 }
 
 let C1:string = "0";
@@ -71,14 +66,9 @@ function getMaxAvailableTokens(tokenClass:number)
     return "0";
 }
 
-export default function CreateListingModal({ isOpen, onDismiss, poolAddress, availableC1, availableC2, availableC3, availableC4 }: CreateListingModalProps) {
+export default function UpdateListingModal({ isOpen, onDismiss, poolAddress, listingIndex, availableC1, availableC2, availableC3, availableC4, tokenClass }: UpdateListingModalProps) {
   const { address: account, network } = useContractKit()
   const { chainId } = network
-
-  const [filter, setFilter] = useState(1);
-  const handleFilterChange = useCallback((newFilter:number) => {
-    setFilter(newFilter);
-}, [])
 
   C1 = availableC1;
   C2 = availableC2;
@@ -86,9 +76,8 @@ export default function CreateListingModal({ isOpen, onDismiss, poolAddress, ava
   C4 = availableC4;
   let tokenBalance = Number(C1) + Number(C2) + Number(C3) + Number(C4);
 
-  let maxAvailableTokens = getMaxAvailableTokens(filter);
+  let maxAvailableTokens = getMaxAvailableTokens(tokenClass);
 
-  console.log(filter);
   console.log(maxAvailableTokens);
 
   // monitor call to help UI loading state
@@ -112,18 +101,33 @@ export default function CreateListingModal({ isOpen, onDismiss, poolAddress, ava
 
   console.log(parsedAmount);
   console.log(parsedAmount2);
-  console.log(typedValue2);
   console.log(error);
   console.log(error2);
 
   const marketplaceContract = useMarketplaceContract(MARKETPLACE_ADDRESS)
 
-  async function onCreate() {
-    if (marketplaceContract && parsedAmount != BigInt(0) && parsedAmount2 != BigInt(0)) {
+  async function onUpdateQuantity() {
+    if (marketplaceContract && parsedAmount != BigInt(0)) {
       setAttempting(true)
-      await doTransaction(marketplaceContract, 'createListing', {
-        args: [poolAddress, filter, `0x${parsedAmount.toString(16)}`, `0x${parsedAmount2.toString(16)}`],
-        summary: `Create marketplace listing`,
+      await doTransaction(marketplaceContract, 'updateQuantity', {
+        args: [poolAddress, listingIndex, `0x${parsedAmount.toString(16)}`],
+        summary: `Update quantity`,
+      })
+        .then((response) => {
+          setHash(response.hash)
+        })
+        .catch(() => {
+          setAttempting(false)
+        })
+    }
+  }
+
+  async function onUpdatePrice() {
+    if (marketplaceContract && parsedAmount != BigInt(0)) {
+      setAttempting(true)
+      await doTransaction(marketplaceContract, 'updatePrice', {
+        args: [poolAddress, listingIndex, `0x${parsedAmount2.toString(16)}`],
+        summary: `Update price`,
       })
         .then((response) => {
           setHash(response.hash)
@@ -160,22 +164,10 @@ export default function CreateListingModal({ isOpen, onDismiss, poolAddress, ava
       {!attempting && !hash && (
         <ContentWrapper gap="lg">
           <RowBetween>
-            <TYPE.mediumHeader>Create Listing</TYPE.mediumHeader>
+            <TYPE.mediumHeader>Update Listing</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
-          <p>Available C{filter.toString()}: {maxAvailableTokens.toString()}</p>
-          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange(1)}}>
-            {'C1'}
-          </ButtonPrimary>
-          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange(2)}}>
-            {'C2'}
-          </ButtonPrimary>
-          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange(3)}}>
-            {'C3'}
-          </ButtonPrimary>
-          <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => {handleFilterChange(4)}}>
-            {'C4'}
-          </ButtonPrimary>
+          <p>Available C{tokenClass.toString()}: {maxAvailableTokens.toString()}</p>
           <InputPanel
             value={typedValue}
             onUserInput={onUserInput}
@@ -203,15 +195,18 @@ export default function CreateListingModal({ isOpen, onDismiss, poolAddress, ava
             availableTokens={"1,000,000"}
             isQuantity={false}
           />
-          <ButtonError disabled={!!error} error={!!error && BigInt(maxAvailableTokens) == BigInt(0)} onClick={onCreate}>
-            {error ?? 'Sell tokens'}
+          <ButtonError disabled={!!error} error={!!error} onClick={onUpdateQuantity}>
+            {error ?? 'Update quantity'}
+          </ButtonError>
+          <ButtonError disabled={!!error2} error={!!error2} onClick={onUpdatePrice}>
+            {error2 ?? 'Update price'}
           </ButtonError>
         </ContentWrapper>
       )}
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOndismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.body fontSize={20}>Create marketplace listing</TYPE.body>
+            <TYPE.body fontSize={20}>Update marketplace listing</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -219,7 +214,7 @@ export default function CreateListingModal({ isOpen, onDismiss, poolAddress, ava
         <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Created marketplace listing!</TYPE.body>
+            <TYPE.body fontSize={20}>Updated marketplace listing!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

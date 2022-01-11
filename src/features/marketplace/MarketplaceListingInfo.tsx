@@ -18,7 +18,7 @@ import { useMarketplaceContract } from '../../hooks/useContract'
 import { LoadingView, SubmittedView } from '../../components/ModalViews'
 import { RowBetween } from '../../components/Row'
 import { AutoColumn } from '../../components/Column'
-
+import UpdateListingModal from '../../components/Marketplace/UpdateListingModal'
 
 const TitleRow = styled.div`
   width: 100%;
@@ -171,6 +171,8 @@ export function MarketplaceListingInfo(props:any) {
         setAttempting(false)
     }
 
+    const [showUpdateListingModal, setShowUpdateListingModal] = useState(false)
+
     const marketplaceContract = useMarketplaceContract(MARKETPLACE_ADDRESS)
 
     async function onCancel() {
@@ -202,6 +204,11 @@ export function MarketplaceListingInfo(props:any) {
                                 {'Cancel Listing'}
                             </ButtonPrimary>
                         </FirstRowButtonWrapper>
+                        <FirstRowButtonWrapper>
+                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUpdateListingModal(true)}>
+                                {'Update Listing'}
+                            </ButtonPrimary>
+                        </FirstRowButtonWrapper>
                     </ListingRowRight>
                 </ListingRow>
                 <FactsheetContent>
@@ -225,6 +232,18 @@ export function MarketplaceListingInfo(props:any) {
                 </AutoColumn>
                 </SubmittedView>
             )}
+
+            <UpdateListingModal
+                isOpen={showUpdateListingModal}
+                onDismiss={() => setShowUpdateListingModal(false)}
+                poolAddress={props.address}
+                listingIndex={props.listingIndex}
+                availableC1={props.availableC1.toString()}
+                availableC2={props.availableC2.toString()}
+                availableC3={props.availableC3.toString()}
+                availableC4={props.availableC4.toString()}
+                tokenClass={Number(marketplaceListing.tokenClass?.toString())}
+            />
         </>
     )
 }
