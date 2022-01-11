@@ -12,6 +12,13 @@ import StakingModal from '../../components/NFTPools/DepositModal'
 import UnstakingModal from '../../components/NFTPools/WithdrawModal'
 import { ExternalLink } from 'theme/components'
 import CreateListingModal from '../../components/Marketplace/CreateListingModal'
+import { useDoTransaction } from 'components/swap/routing'
+import { MARKETPLACE_ADDRESS } from '../../constants'
+import { useMarketplaceContract } from '../../hooks/useContract'
+import { LoadingView, SubmittedView } from '../../components/ModalViews'
+import { RowBetween } from '../../components/Row'
+import { AutoColumn } from '../../components/Column'
+
 
 const TitleRow = styled.div`
   width: 100%;
@@ -154,18 +161,70 @@ export function MarketplaceListingInfo(props:any) {
     console.log("Marketplace listing: ");
     console.log(marketplaceListing);
 
+    // monitor call to help UI loading state
+    const doTransaction = useDoTransaction()
+    const [hash, setHash] = useState<string | undefined>()
+    const [attempting, setAttempting] = useState(false)
+
+    function wrappedOndismiss() {
+        setHash(undefined)
+        setAttempting(false)
+    }
+
+    const marketplaceContract = useMarketplaceContract(MARKETPLACE_ADDRESS)
+
+    async function onCancel() {
+        if (marketplaceContract) {
+            setAttempting(true)
+            await doTransaction(marketplaceContract, 'removeListing', {
+            args: [props.address, props.listingIndex],
+            summary: `Cancelled marketplace listing`,
+            })
+            .then((response) => {
+                setHash(response.hash)
+            })
+            .catch(() => {
+                setAttempting(false)
+            })
+        }
+    }
+
     return marketplaceListing && (
         <>
             <div>
-                <FactsheetTitle>
-                    Your Marketplace Listing
-                </FactsheetTitle>
+                <ListingRow>
+                    <ListingRowLeft>
+                        Your Marketplace Listing
+                    </ListingRowLeft>
+                    <ListingRowRight>
+                        <FirstRowButtonWrapper>
+                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={onCancel}>
+                                {'Cancel Listing'}
+                            </ButtonPrimary>
+                        </FirstRowButtonWrapper>
+                    </ListingRowRight>
+                </ListingRow>
                 <FactsheetContent>
                     <p>Token Class: {Number(marketplaceListing.tokenClass?.toString()) / 1e18}</p>
                     <p>Quantity: {marketplaceListing.numberOfTokens?.toString()}</p>
                     <p>Price: {marketplaceListing.price?.toString()}</p>
                 </FactsheetContent>
             </div>
+            {attempting && !hash && (
+                <LoadingView onDismiss={wrappedOndismiss}>
+                <AutoColumn gap="12px" justify={'center'}>
+                    <TYPE.body fontSize={20}>Cancel marketplace listing</TYPE.body>
+                </AutoColumn>
+                </LoadingView>
+            )}
+            {hash && (
+                <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
+                <AutoColumn gap="12px" justify={'center'}>
+                    <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
+                    <TYPE.body fontSize={20}>Cancelled marketplace listing!</TYPE.body>
+                </AutoColumn>
+                </SubmittedView>
+            )}
         </>
     )
 }
