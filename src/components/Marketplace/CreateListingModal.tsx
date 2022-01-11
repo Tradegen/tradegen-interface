@@ -107,11 +107,12 @@ export default function CreateListingModal({ isOpen, onDismiss, poolAddress, ava
   const error = (BigInt(typedValue) > BigInt(maxAvailableTokens) || BigInt(typedValue) == BigInt(0)) ? 'Enter an amount' : undefined;
 
   const [typedValue2, setTypedValue2] = useState('');
-  const parsedAmount2 = (Number(typedValue2) > 1000000 || Number(typedValue) == 0) ? BigInt(0) : BigInt(Number(typedValue) * 1e18);
+  const parsedAmount2 = (Number(typedValue2) > 1000000 || Number(typedValue2) == 0) ? BigInt(0) : BigInt(Number(typedValue2) * 1e18);
   const error2 = (parsedAmount2 == BigInt(0)) ? 'Enter a price' : undefined;
 
   console.log(parsedAmount);
   console.log(parsedAmount2);
+  console.log(typedValue2);
   console.log(error);
   console.log(error2);
 
@@ -143,8 +144,8 @@ export default function CreateListingModal({ isOpen, onDismiss, poolAddress, ava
   }, [])
 
   // wrapped onUserInput to clear signatures
-  const onUserInput2 = useCallback((typedValue: string) => {
-    setTypedValue2(typedValue)
+  const onUserInput2 = useCallback((typedValue2: string) => {
+    setTypedValue2(typedValue2)
   }, [])
 
   // used for max input button

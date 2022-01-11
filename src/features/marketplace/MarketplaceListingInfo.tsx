@@ -205,9 +205,9 @@ export function MarketplaceListingInfo(props:any) {
                     </ListingRowRight>
                 </ListingRow>
                 <FactsheetContent>
-                    <p>Token Class: {Number(marketplaceListing.tokenClass?.toString()) / 1e18}</p>
+                    <p>Token Class: {Number(marketplaceListing.tokenClass?.toString())}</p>
                     <p>Quantity: {marketplaceListing.numberOfTokens?.toString()}</p>
-                    <p>Price: {marketplaceListing.price?.toString()}</p>
+                    <p>Price: {formatNumber(Number(marketplaceListing.price) / 1e18, true, true, 18) + '/token'}</p>
                 </FactsheetContent>
             </div>
             {attempting && !hash && (

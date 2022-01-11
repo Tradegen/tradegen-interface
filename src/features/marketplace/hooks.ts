@@ -52,8 +52,8 @@ export function useMarketplaceListingInfo(user:string, asset:string): Marketplac
   return {
     asset: (!marketplaceListing || !marketplaceListing[0]) ? "" : marketplaceListing[0],
     seller: (!marketplaceListing || !marketplaceListing[1]) ? "" : marketplaceListing[1],
-    numberOfTokens: (!marketplaceListing || !marketplaceListing[2]) ? BigInt(0) : marketplaceListing[2],
-    price: (!marketplaceListing || !marketplaceListing[3]) ? BigInt(0) : marketplaceListing[3],
-    tokenClass: (!marketplaceListing || !marketplaceListing[4]) ? BigInt(0) : marketplaceListing[4],
+    tokenClass: (!marketplaceListing || !marketplaceListing[2]) ? BigInt(0) : marketplaceListing[2],
+    numberOfTokens: (!marketplaceListing || !marketplaceListing[3]) ? BigInt(0) : marketplaceListing[3],
+    price: (!marketplaceListing || !marketplaceListing[4]) ? BigInt(0) : marketplaceListing[4]
   }
 }
