@@ -1,6 +1,7 @@
 import { Dispatch, useCallback, useEffect, useMemo, useState } from 'react'
 import { useMarketplaceContract } from '../../hooks/useContract'
 import { useSingleCallResult } from '../../state/multicall/hooks'
+import { MARKETPLACE_ADDRESS } from '../../constants'
 
 export interface MarketplaceListing {
   asset: string | null,
@@ -11,11 +12,11 @@ export interface MarketplaceListing {
 }
 
 export function useListingIndex(
-    MarketplaceContract: any,
     user: string,
     asset: string
   ): bigint {
   
+    const MarketplaceContract = useMarketplaceContract(MARKETPLACE_ADDRESS);
     const index = useSingleCallResult(MarketplaceContract, 'getListingIndex', [user, asset]);
   
     return useMemo(() => {
@@ -34,16 +35,17 @@ export function useMarketplaceListing(
   
     return useMemo(() => {
       return !marketplaceListing || marketplaceListing.loading
-        ? []
-        : marketplaceListing?.result?.[0];
+        ? ["", "", BigInt(0), BigInt(0), BigInt(0)]
+        : [marketplaceListing?.result?.[0], marketplaceListing?.result?.[1], marketplaceListing?.result?.[2], marketplaceListing?.result?.[3], marketplaceListing?.result?.[4]];
     }, [marketplaceListing])
 }
 
-export function useMarketplaceListingInfo(marketplaceAddress:string, user:string, asset:string): MarketplaceListing {
-  const MarketplaceContract = useMarketplaceContract(marketplaceAddress);
+export function useMarketplaceListingInfo(user:string, asset:string): MarketplaceListing {
+  const MarketplaceContract = useMarketplaceContract(MARKETPLACE_ADDRESS);
   
-  let index = useListingIndex(MarketplaceContract, user, asset);
+  let index = useListingIndex(user, asset);
   index = index ?? BigInt(0);
+  console.log("Index: " + index.toString())
 
   const marketplaceListing = useMarketplaceListing(MarketplaceContract, index);
 

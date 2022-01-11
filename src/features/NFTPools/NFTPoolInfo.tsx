@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 import { useNFTPoolInfo, usePositionNames, useUserBalance, useUserInvestmentInfo } from '../../features/NFTPools/hooks'
+import { useListingIndex } from '../../features/marketplace/hooks'
+import { MarketplaceListingInfo } from '../../features/marketplace/MarketplaceListingInfo'
 import { useMemo } from 'react'
 import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatPercent, formatBalance } from '../../functions/format'
@@ -10,7 +12,7 @@ import React, { useCallback, useState } from 'react'
 import StakingModal from '../../components/NFTPools/DepositModal'
 import UnstakingModal from '../../components/NFTPools/WithdrawModal'
 import { ExternalLink } from 'theme/components'
-
+import CreateListingModal from '../../components/Marketplace/CreateListingModal'
 
 const TitleRow = styled.div`
   width: 100%;
@@ -109,10 +111,32 @@ const MiddleRowItemBottom = styled.div`
   margin-top: 5px;
 `
 
+const ListingRow = styled.div`
+  width: 100%;
+  display: flex;
+  background-color: none;
+`
+
 const FactsheetTitle = styled.div`
   width: 100%;
   font-size: 22px;
   color: white;
+`
+
+const ListingRowLeft = styled.div`
+  width: 30%;
+  font-size: 22px;
+  color: white;
+  float: left;
+  background-color: none;
+`
+
+const ListingRowRight = styled.div`
+  width: 70%;
+  color: white;
+  float: right;
+  background-color: none;
+  font-size: 16px;
 `
 
 const FactsheetContent = styled.div`
@@ -163,6 +187,7 @@ function getColour(totalReturn:string)
 export function NFTPoolInfo(props:any) {
     const [showStakingModal, setShowStakingModal] = useState(false)
     const [showUnstakingModal, setShowUnstakingModal] = useState(false)
+    const [showCreateListingModal, setShowCreateListingModal] = useState(false)
 
     const toggleWalletModal = useWalletModalToggle()
 
@@ -180,6 +205,10 @@ export function NFTPoolInfo(props:any) {
     }, [data]);
 
     console.log(poolInfo);
+
+    let listingIndex = useListingIndex(props.account, props.address);
+    console.log("Marketplace listing: ");
+    console.log(listingIndex);
 
     const investmentInfo = useUserInvestmentInfo(props.address, props.account);
     const positionValue = investmentInfo ? formatNumber(Number(investmentInfo.userUSDBalance / BigInt(1e16)) / 100, true, true, 18) : undefined
@@ -283,9 +312,20 @@ export function NFTPoolInfo(props:any) {
                         </MiddleRow>
                         {positionValue && (
                             <>
-                                <FactsheetTitle>
-                                    Your Investment
-                                </FactsheetTitle>
+                                <ListingRow>
+                                    <ListingRowLeft>
+                                        Your Investment
+                                    </ListingRowLeft>
+                                    {listingIndex && (Number(listingIndex.toString()) == 0) && (
+                                        <ListingRowRight>
+                                            <FirstRowButtonWrapper>
+                                                <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowCreateListingModal(true)}>
+                                                    {'Create Listing'}
+                                                </ButtonPrimary>
+                                            </FirstRowButtonWrapper>
+                                        </ListingRowRight>
+                                    )}
+                                </ListingRow>
                                 <FactsheetContent>
                                     <p>C1 tokens: {availableC1.toString()}</p>
                                     <p>C2 tokens: {availableC2.toString()}</p>
@@ -295,6 +335,9 @@ export function NFTPoolInfo(props:any) {
                                 </FactsheetContent>
                             </>
                         ) }
+                        {(Number(listingIndex.toString()) > 0) && 
+                            <MarketplaceListingInfo account={props.account} address={props.address}></MarketplaceListingInfo>
+                        }
                         <FactsheetTitle>
                             Factsheet
                         </FactsheetTitle>
@@ -403,6 +446,15 @@ export function NFTPoolInfo(props:any) {
                 availableC3={availableC3.toString()}
                 availableC4={availableC4.toString()}
                 combinedPositions={combinedPositions}
+            />
+            <CreateListingModal
+                isOpen={showCreateListingModal}
+                onDismiss={() => setShowCreateListingModal(false)}
+                poolAddress={props.address}
+                availableC1={availableC1.toString()}
+                availableC2={availableC2.toString()}
+                availableC3={availableC3.toString()}
+                availableC4={availableC4.toString()}
             />
         </>
     ) : (
