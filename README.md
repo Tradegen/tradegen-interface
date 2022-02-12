@@ -2,7 +2,6 @@
 
 An open source interface for Tradegen -- a protocol for decentralized asset management on Celo.
 
-- Website: [www.tradegen.io](https://www.tradegen.io/)
 - Email: [info@tradegen.io](mailto:info@tradegen.io)
 
 ## Development
