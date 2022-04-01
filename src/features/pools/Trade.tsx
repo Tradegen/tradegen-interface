@@ -10,18 +10,13 @@ import UnstakingModal from '../../components/pools/WithdrawModal'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import React, { useCallback, useState } from 'react'
 import { ExternalLink } from 'theme/components'
+import Deposit from './Deposit'
+import Withdraw from './Withdraw'
 
-const TitleRow = styled.div`
+const BottomRow = styled.div`
   width: 100%;
-  color: black;
   display: flex;
-  background-color: none;
-  margin-top: 30px;
-`
-
-const TitleRowContent = styled.div`
-  width: 24%;
-  text-align: left;
+  justify-content: center;
 `
 
 const FirstRow = styled.div`
@@ -47,6 +42,7 @@ const FirstRowRight = styled.div`
   background-color: none;
   font-size: 16px;
   display: flex;
+  padding-left: 55%;
 `
 
 const ItemWrapper = styled.div`
@@ -61,51 +57,6 @@ const NoResults = styled.div`
   padding-bottom: 1.5rem;
   text-align: center;
   min-width:1000px;
-`
-
-const Buffer = styled.div`
-  width: 30%;
-  background-color: none;
-  height: 15px;
-`
-
-const FirstRowButtonWrapper = styled.div`
-  width: 35%;
-  background-color: none;
-  margin-left: 3%;
-  float: right;
-`
-
-const MiddleRow = styled.div`
-  width: 100%;
-  display: flex;
-  background-color: none;
-  margin-top: 30px;
-  margin-bottom: 60px;
-`
-
-const MiddleRowItem = styled.div`
-  width: 30%;
-  color: black;
-  background-color: white;
-  margin-left: 5%;
-  height: 60px;
-  border: 0.07143rem solid #E6E9EC;
-  border-radius: 8px;
-  text-align: center;
-  padding-top: 5px;
-`
-
-const MiddleRowItemTop = styled.div`
-  width: 100%;
-  display: block;
-  color: #83888C;
-`
-
-const MiddleRowItemBottom = styled.div`
-  width: 100%;
-  display: block;
-  margin-top: 5px;
 `
 
 const FactsheetTitle = styled.div`
@@ -125,39 +76,6 @@ const FactsheetContent = styled.div`
   padding-left: 20px;
   margin-bottom: 30px;
 `
-const StyledExternalLink = styled(ExternalLink).attrs({
-  })<{ isActive?: boolean }>`
-    ${({ theme }) => theme.flexRowNoWrap}
-    border-radius: 3rem;
-    outline: none;
-    cursor: pointer;
-    text-decoration: none !important;
-    color: white;
-    font-size: 1rem;
-    width: fit-content;
-    margin: 0 12px;
-    font-weight: 500;
-    text-align: center
-
-    :hover,
-    :focus {
-        text-decoration: none;
-    }
-  
-    ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-        display: none;
-  `}
-  `
-
-function getColour(totalReturn:string)
-{
-    if (totalReturn.charAt(0) == '-')
-    {
-        return 'rgba(248,113,113,1)'
-    }
-
-    return 'rgba(52,211,153,1)'
-}
 
 export function TradePool(props:any) {
 
@@ -209,69 +127,16 @@ export function TradePool(props:any) {
                                 {poolInfo.name}
                             </FirstRowLeft>
                             <FirstRowRight>
-                                {poolInfo.manager == props.account ? (
-                                    <FirstRowButtonWrapper>
-                                        <StyledInternalLink
-                                            to={`/manage_pool/${props.address}`}
-                                            style={{ width: '100%' }}
-                                        >
-                                            <ButtonPrimary padding="8px" borderRadius="8px">
-                                                {'Manage Pool'}
-                                            </ButtonPrimary>
-                                        </StyledInternalLink>
-                                    </FirstRowButtonWrapper>
-                                ) : (
-                                    <Buffer/>
-                                )}
-                                {props.account && (
-                                    <>
-                                        <FirstRowButtonWrapper>
-                                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
-                                                {'Deposit'}
-                                            </ButtonPrimary>
-                                        </FirstRowButtonWrapper>
-                                        <FirstRowButtonWrapper>
-                                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
-                                                {'Withdraw'}
-                                            </ButtonPrimary>
-                                        </FirstRowButtonWrapper>
-                                        <FirstRowButtonWrapper>
-                                            <ButtonPrimary padding="8px" borderRadius="8px">
-                                                <StyledExternalLink  id={`stake-nav-link`} href={'https://info.tradegen.io/pool/' + props.address}>
-                                                    {'Charts'}
-                                                </StyledExternalLink>
-                                            </ButtonPrimary>
-                                        </FirstRowButtonWrapper>
-                                    </>
-                                )}
+                                <StyledInternalLink
+                                    to={`/pool/${props.address}`}
+                                    style={{ width: '100%' }}
+                                >
+                                    <ButtonPrimary padding="8px" borderRadius="8px" width="120px">
+                                        {'Pool Info'}
+                                    </ButtonPrimary>
+                                </StyledInternalLink>
                             </FirstRowRight>
                         </FirstRow>
-                        <MiddleRow>
-                            <MiddleRowItem style={{marginLeft: '0%'}}>
-                                <MiddleRowItemTop>
-                                    TVL
-                                </MiddleRowItemTop>
-                                <MiddleRowItemBottom>
-                                    {formatNumber(Number(poolInfo.TVL) / 100, true, true, 18)}
-                                </MiddleRowItemBottom>
-                            </MiddleRowItem>
-                            <MiddleRowItem>
-                                <MiddleRowItemTop>
-                                    Token Price
-                                </MiddleRowItemTop>
-                                <MiddleRowItemBottom>
-                                    {formatNumber(Number(poolInfo.tokenPrice) / 100, true, true, 18)}
-                                </MiddleRowItemBottom>
-                            </MiddleRowItem>
-                            <MiddleRowItem>
-                                <MiddleRowItemTop>
-                                    Total Return
-                                </MiddleRowItemTop>
-                                <MiddleRowItemBottom style={{color:getColour(poolInfo.totalReturn)}}>
-                                    {poolInfo.totalReturn}
-                                </MiddleRowItemBottom>
-                            </MiddleRowItem>
-                        </MiddleRow>
                         {props.tokenBalance && props.positionValue && (
                             <>
                                 <FactsheetTitle>
@@ -283,75 +148,25 @@ export function TradePool(props:any) {
                                 </FactsheetContent>
                             </>
                         ) }
-                        <FactsheetTitle>
-                            Factsheet
-                        </FactsheetTitle>
-                        <FactsheetContent>
-                            <p>Name: {poolInfo.name}</p>
-                            <p>Address: {poolInfo.address}</p>
-                            <p>Manager: {poolInfo.manager}</p>
-                            <p>Performance fee: {Number(poolInfo.performanceFee) / 100}%</p>
-                        </FactsheetContent>
-                        {combinedPositions.length > 0 && (
-                            <>
-                                <FactsheetTitle>
-                                    Positions
-                                </FactsheetTitle>
-                                <FactsheetContent style={{paddingTop: '20px', paddingBottom: '20px'}}>
-                                    <TitleRow style={{marginTop: '0px'}}>
-                                        <TitleRowContent>
-                                            Symbol
-                                        </TitleRowContent>
-                                        <TitleRowContent>
-                                            Name
-                                        </TitleRowContent>
-                                        <TitleRowContent>
-                                            Type
-                                        </TitleRowContent>
-                                        <TitleRowContent>
-                                            Balance
-                                        </TitleRowContent>
-                                    </TitleRow>
-                                    <>
-                                        {combinedPositions.map((element:any) => (element.symbol && element.name &&
-                                            <ErrorBoundary key={element.symbol}>
-                                                <TitleRow>
-                                                    <TitleRowContent>
-                                                        {element.symbol}
-                                                    </TitleRowContent>
-                                                    <TitleRowContent>
-                                                        {element.name}
-                                                    </TitleRowContent>
-                                                    <TitleRowContent>
-                                                        {element.type}
-                                                    </TitleRowContent>
-                                                    <TitleRowContent>
-                                                        {formatBalance(element.balance)}
-                                                    </TitleRowContent>
-                                                </TitleRow>
-                                            </ErrorBoundary>
-                                        ))}
-                                    </>
-                                </FactsheetContent>
-                            </>
-                        )}
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>
 
-            <StakingModal
-                isOpen={showStakingModal}
-                onDismiss={() => setShowStakingModal(false)}
-                poolAddress={props.address}
-                mcUSDBalance={props.mcUSDBalance}
-            />
-            <UnstakingModal
-                isOpen={showUnstakingModal}
-                onDismiss={() => setShowUnstakingModal(false)}
-                poolAddress={props.address}
-                tokenBalance={props.tokenBalance}
-                combinedPositions={combinedPositions}
-            />
+            <BottomRow>
+                <Deposit
+                    isOpen={showStakingModal}
+                    onDismiss={() => setShowStakingModal(false)}
+                    poolAddress={props.address}
+                    mcUSDBalance={props.mcUSDBalance}
+                />
+                <Withdraw
+                    isOpen={showUnstakingModal}
+                    onDismiss={() => setShowUnstakingModal(false)}
+                    poolAddress={props.address}
+                    tokenBalance={props.tokenBalance}
+                    combinedPositions={combinedPositions}
+                />
+            </BottomRow>
         </>
     ) : (
         <NoResults>No results.</NoResults>

@@ -122,10 +122,18 @@ const ListItem = ({ item, index }) => {
             <DataText area="price">{formatNumber(Number(item.tokenPrice) / 100, true, true, 18)}/token</DataText>
             <DataText area="roi" style={{color:getColour(item.totalReturn)}}>{item.totalReturn}</DataText>
             <DataText>
-                <ButtonPrimary padding="8px" borderRadius="8px" width="80px">
+                <ButtonPrimary padding="8px" borderRadius="8px" width="80px" marginLeft="10px">
+                    <StyledInternalLink
+                        to={(item.type == "Pool" ? `/trade_pool/${item.address}` : `/trade_NFTPool/${item.address}`)}
+                        style={{ width: '50px', textDecoration: 'none', color: 'white' }}
+                    >
+                        {'Trade'}
+                    </StyledInternalLink>
+                </ButtonPrimary>
+                <ButtonPrimary padding="8px" borderRadius="8px" width="80px" marginLeft="10px" backgroundColor="#CCDFFF !important">
                     <StyledInternalLink
                         to={(item.type == "Pool" ? `/pool/${item.address}` : `/NFTPool/${item.address}`)}
-                        style={{ width: '50px', textDecoration: 'none', color: 'white' }}
+                        style={{ width: '50px', textDecoration: 'none', color: '#5271FF' }}
                     >
                         {'View'}
                     </StyledInternalLink>
