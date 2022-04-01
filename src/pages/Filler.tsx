@@ -2,7 +2,7 @@ export default function Filler() {
 
   return (
     <>
-      <p>Coming soon!</p>
+      <p style={{color: 'black', fontSize: '24px'}}>Coming soon!</p>
     </>
   )
 }
