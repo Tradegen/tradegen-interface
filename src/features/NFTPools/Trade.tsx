@@ -57,12 +57,6 @@ const NoResults = styled.div`
   min-width:1000px;
 `
 
-const FirstRowButtonWrapper = styled.div`
-  width: 35%;
-  background-color: none;
-  margin-left: 3%;
-  float: right;
-`
 const ListingRow = styled.div`
   width: 100%;
   display: flex;

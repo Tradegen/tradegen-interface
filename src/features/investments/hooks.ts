@@ -144,7 +144,7 @@ export function useInvestments(): Investment[] {
     }
 
     investments.push({
-      type: "NFT Pool",
+      type: "Capped Pool",
       address: NFTPoolAddresses[i],
       tokenPrice: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(NFTPoolTokenPrices[i]) / BigInt(1e16),
       TVL: (NFTPoolValues[i] === null) ? BigInt(0) : BigInt(NFTPoolValues[i]) / BigInt(1e16),

@@ -46,6 +46,7 @@ const DataRow = styled.div`
   background-color: none;
   margin-top: 10px;
   padding-left: 10px;
+  color: black;
 `
 
 const Buffer = styled.div`

@@ -12,7 +12,7 @@ import ManagerModal from '../../components/investments/ManagerModal'
 
 const TitleRow = styled.div`
   width: 100%;
-  color: white;
+  color: black;
   display: flex;
   background-color: none;
   margin-top: 30px;
@@ -33,7 +33,7 @@ const FirstRow = styled.div`
 
 const FirstRowLeft = styled.div`
   width: 30%;
-  color: white;
+  color: black;
   float: left;
   background-color: none;
   font-size: 30px;
@@ -41,7 +41,7 @@ const FirstRowLeft = styled.div`
 
 const FirstRowRight = styled.div`
   width: 70%;
-  color: white;
+  color: black;
   float: right;
   background-color: none;
   font-size: 16px;
@@ -52,13 +52,13 @@ const FirstRowRight = styled.div`
 const FactsheetTitle = styled.div`
   width: 100%;
   font-size: 22px;
-  color: white;
+  color: black;
 `
 
 const FactsheetContent = styled.div`
   width: 100%;
-  background-color: #292941;
-  border: 1px solid rgba(86,86,86,0.15);
+  background-color: white;
+  border: 2px solid #E6E9EC;
   border-radius: 8px;
   padding-top: 5px;
   margin-top: 30px;
@@ -68,11 +68,11 @@ const FactsheetContent = styled.div`
 
 const MiddleRowItem = styled.div`
   width: 50%;
-  color: white;
-  background-color: #292941;
+  color: black;
+  background-color: white;
   margin-left: 4%;
   height: 60px;
-  border: 1px solid rgba(86,86,86,0.15);
+  border: 2px solid #E6E9EC;
   border-radius: 8px;
   text-align: center;
   padding-top: 5px;
@@ -81,7 +81,7 @@ const MiddleRowItem = styled.div`
 const MiddleRowItemTop = styled.div`
   width: 100%;
   display: block;
-  color: #C3C5CB;
+  color: #83888C;
 `
 
 const MiddleRowItemBottom = styled.div`

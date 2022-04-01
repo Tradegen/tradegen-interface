@@ -69,7 +69,7 @@ const PageWrapper = styled.div`
 const DashGrid = styled.div`
   display: grid;
   grid-gap: 1em;
-  grid-template-columns: 200px 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   grid-template-areas: 'name liq vol';
   padding: 0 1.125rem;
   > * {
@@ -83,7 +83,7 @@ const DashGrid = styled.div`
   @media screen and (min-width: 680px) {
     display: grid;
     grid-gap: 1em;
-    grid-template-columns: 180px 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     grid-template-areas: 'name symbol liq vol ';
     > * {
       justify-content: flex-end;
@@ -95,8 +95,8 @@ const DashGrid = styled.div`
   }
   @media screen and (min-width: 1080px) {
     display: grid;
-    grid-gap: 0.5em;
-    grid-template-columns: 1.5fr 0.6fr 1fr 1fr 1fr 1fr;
+    grid-gap: 0.1em;
+    grid-template-columns: 1fr 1fr 1fr 1fr 0.8fr 1fr;
     grid-template-areas: 'name type tvl price roi view';
   }
 `
@@ -119,7 +119,7 @@ const ListItem = ({ item, index }) => {
             <DataText area="name">{item.name}</DataText>
             <DataText area="type">{item.type}</DataText>
             <DataText area="tvl">{formatNumber(Number(item.TVL) / 100, true, true, 16)}</DataText>
-            <DataText area="price">{formatNumber(Number(item.tokenPrice) / 100, true, true, 18)}/token</DataText>
+            <DataText area="price">{formatNumber(Number(item.tokenPrice) / 100, true, true, 18)}</DataText>
             <DataText area="roi" style={{color:getColour(item.totalReturn)}}>{item.totalReturn}</DataText>
             <DataText>
                 <ButtonPrimary padding="8px" borderRadius="8px" width="80px" marginLeft="10px">
@@ -230,20 +230,6 @@ const FirstRowRight = styled.div`
   float: right;
   background-color: none;
   font-size: 16px;
-  display: flex;
-`
-
-const FirstRowButtonWrapper = styled.div`
-  width: 30%;
-  background-color: none;
-  margin-left: 4%;
-  float: right;
-`
-
-const ButtonWrapper = styled.div`
-  width: 100%;
-  background-color: none;
-  margin-left: 0%;
   display: flex;
 `
 

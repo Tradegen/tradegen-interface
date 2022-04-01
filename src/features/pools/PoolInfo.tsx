@@ -130,7 +130,7 @@ const StyledExternalLink = styled(ExternalLink).attrs({
     outline: none;
     cursor: pointer;
     text-decoration: none !important;
-    color: white;
+    color: white !important;
     font-size: 1rem;
     width: fit-content;
     margin: 0 12px;
@@ -213,14 +213,14 @@ export function PoolInfo(props:any) {
                                 {props.account && (
                                     <>
                                         <FirstRowButtonWrapper>
-                                        <ButtonPrimary padding="8px" borderRadius="8px" marginLeft="10px">
                                             <StyledInternalLink
                                                 to={`/trade_pool/${props.address}`}
-                                                style={{ width: '50px', textDecoration: 'none', color: 'white' }}
+                                                style={{ width: '100%' }}
                                             >
-                                                {'Trade'}
+                                                <ButtonPrimary padding="8px" borderRadius="8px">
+                                                    {'Trade'}
+                                                </ButtonPrimary>
                                             </StyledInternalLink>
-                                        </ButtonPrimary>
                                         </FirstRowButtonWrapper>
                                         <FirstRowButtonWrapper>
                                             <ButtonPrimary padding="8px" borderRadius="8px">

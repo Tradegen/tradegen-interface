@@ -159,7 +159,7 @@ const StyledExternalLink = styled(ExternalLink).attrs({
   outline: none;
   cursor: pointer;
   text-decoration: none !important;
-  color: white;
+  color: white !important;
   font-size: 1rem;
   width: fit-content;
   margin: 0 12px;
@@ -262,17 +262,16 @@ export function NFTPoolInfo(props:any) {
                                 ) : (
                                     <Buffer/>
                                 )}
-                                {props.account && (
-                                    <>
+                                <>
                                         <FirstRowButtonWrapper>
-                                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
-                                                {'Deposit'}
-                                            </ButtonPrimary>
-                                        </FirstRowButtonWrapper>
-                                        <FirstRowButtonWrapper>
-                                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
-                                                {'Withdraw'}
-                                            </ButtonPrimary>
+                                            <StyledInternalLink
+                                                to={`/trade_NFTpool/${props.address}`}
+                                                style={{ width: '100%' }}
+                                            >
+                                                <ButtonPrimary padding="8px" borderRadius="8px">
+                                                    {'Trade'}
+                                                </ButtonPrimary>
+                                            </StyledInternalLink>
                                         </FirstRowButtonWrapper>
                                         <FirstRowButtonWrapper>
                                             <ButtonPrimary padding="8px" borderRadius="8px">
@@ -282,7 +281,6 @@ export function NFTPoolInfo(props:any) {
                                             </ButtonPrimary>
                                         </FirstRowButtonWrapper>
                                     </>
-                                )}
                             </FirstRowRight>
                         </FirstRow>
                         <MiddleRow>
@@ -336,17 +334,6 @@ export function NFTPoolInfo(props:any) {
                                 </FactsheetContent>
                             </>
                         ) }
-                        {(Number(listingIndex.toString()) > 0) && 
-                            <MarketplaceListingInfo
-                                account={props.account}
-                                address={props.address}
-                                listingIndex={Number(listingIndex.toString())}
-                                availableC1={availableC1.toString()}
-                                availableC2={availableC2.toString()}
-                                availableC3={availableC3.toString()}
-                                availableC4={availableC4.toString()}
-                            ></MarketplaceListingInfo>
-                        }
                         <FactsheetTitle>
                             Factsheet
                         </FactsheetTitle>

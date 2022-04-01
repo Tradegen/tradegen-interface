@@ -55,6 +55,7 @@ export const Button = styled.button.attrs<{ warning: boolean }, { backgroundColo
 
 export const CloseIcon = styled(X)<{ onClick: () => void }>`
   cursor: pointer;
+  color: #5271FF;
 `
 
 // for wrapper react feather icons

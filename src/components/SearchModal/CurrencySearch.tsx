@@ -29,6 +29,8 @@ const ContentWrapper = styled(Column)`
   width: 100%;
   flex: 1 1;
   position: relative;
+  background-color: white;
+  color: black;
 `
 
 const Footer = styled.div`
