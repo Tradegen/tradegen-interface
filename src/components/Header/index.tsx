@@ -17,9 +17,9 @@ import { ExternalLink } from 'theme/components'
 import { CountUp } from 'use-count-up'
 
 import Logo from '../../assets/images/logo_with_name.JPG'
-import LogoDark from '../../assets/images/name.png'
+import LogoDark from '../../assets/images/logo_with_name.png'
 import { useDarkModeManager } from '../../state/user/hooks'
-import { YellowCard } from '../Card'
+import { BlueCard } from '../Card'
 import Menu from '../Menu'
 import Row, { RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
@@ -30,6 +30,7 @@ const HeaderFrame = styled.div`
   grid-template-columns: 1fr 120px;
   align-items: center;
   justify-content: space-between;
+  background-color: white;
   align-items: center;
   flex-direction: row;
   width: 100%;
@@ -112,15 +113,12 @@ const AccountElement = styled.div<{ active: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: ${({ theme, active }) => (!active ? theme.bg1 : theme.bg3)};
+  background-color: #A0A4A7;
   border-radius: 12px;
   white-space: nowrap;
   width: 100%;
   cursor: pointer;
-
-  :focus {
-    border: 1px solid blue;
-  }
+  border-color: #A0A4A7;
 `
 
 const HideSmall = styled.span`
@@ -129,7 +127,7 @@ const HideSmall = styled.span`
   `};
 `
 
-const NetworkCard = styled(YellowCard)`
+const NetworkCard = styled(BlueCard)`
   border-radius: 12px;
   padding: 8px 12px;
   ${({ theme }) => theme.mediaWidth.upToSmall`
@@ -180,7 +178,7 @@ const StyledNavLink = styled(NavLink).attrs({
   outline: none;
   cursor: pointer;
   text-decoration: none;
-  color: ${({ theme }) => theme.text2};
+  color: #83888C;
   font-size: 1rem;
   width: fit-content;
   margin: 0 12px;
@@ -189,12 +187,12 @@ const StyledNavLink = styled(NavLink).attrs({
   &.${activeClassName} {
     border-radius: 12px;
     font-weight: 600;
-    color: ${({ theme }) => theme.text1};
+    color: #5271FF;
   }
 
   :hover,
   :focus {
-    color: ${({ theme }) => darken(0.1, theme.text1)};
+    color: #5271FF;
   }
 `
 
@@ -207,7 +205,7 @@ const StyledExternalLink = styled(ExternalLink).attrs({
   outline: none;
   cursor: pointer;
   text-decoration: none;
-  color: ${({ theme }) => theme.text2};
+  color: #83888C;
   font-size: 1rem;
   width: fit-content;
   margin: 0 12px;
@@ -274,6 +272,8 @@ export default function Header() {
   const mcUSDBalance: TokenAmount | undefined = useAggregateMCUSDBalance()
   const countUpValue2 = mcUSDBalance?.toFixed(2) ?? '0'
   const countUpValuePrevious2 = usePrevious(countUpValue2) ?? '0'
+  const countUpValue3 = userCELOBalance?.toFixed(2) ?? '0'
+  const countUpValuePrevious3 = usePrevious(countUpValue3) ?? '0'
 
   return (
     <HeaderFrame>
@@ -345,12 +345,34 @@ export default function Header() {
             </UBEWrapper>
           )}
 
+          {userCELOBalance && (
+            <UBEWrapper>
+              <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
+                {account && (
+                  <HideSmall>
+                    <TYPE.white
+                      style={{
+                        paddingRight: '.4rem',
+                      }}
+                    >
+                      <CountUp
+                        key={countUpValue3}
+                        isCounting
+                        start={parseFloat(countUpValuePrevious3)}
+                        end={parseFloat(countUpValue3)}
+                        thousandsSeparator={','}
+                        duration={1}
+                      />
+                    </TYPE.white>
+                  </HideSmall>
+                )}
+                CELO
+              </UBEAmount>
+              <CardNoise />
+            </UBEWrapper>
+          )}
+
           <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
-            {account && userCELOBalance ? (
-              <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
-                {userCELOBalance?.toFixed(2, { groupSeparator: ',' }) ?? '0.00'} CELO
-              </BalanceText>
-            ) : null}
             <Web3Status />
           </AccountElement>
         </HeaderElement>

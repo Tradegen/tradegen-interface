@@ -40,7 +40,7 @@ export function colors(darkMode: boolean): Colors {
   return {
     // base
     white,
-    black,
+    black: 'black',
 
     // text
     text1: darkMode ? '#FFFFFF' : '#000000',
@@ -139,7 +139,7 @@ export const TYPE = {
     return <TextWrapper fontWeight={500} color={'primary1'} {...props} />
   },
   black(props: TextProps) {
-    return <TextWrapper fontWeight={500} color={'text1'} {...props} />
+    return <TextWrapper fontWeight={500} color={'black'} {...props} />
   },
   white(props: TextProps) {
     return <TextWrapper fontWeight={500} color={'white'} {...props} />
@@ -216,7 +216,7 @@ html {
 export const ThemedGlobalStyle = createGlobalStyle`
 html {
   color: ${({ theme }) => theme.text1};
-  background-color: #0e0e23;
+  background-color: #F9F9FB;
 }
 
 body {

@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import { BookOpen, Code, Info, MessageCircle } from 'react-feather'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
+import { darken } from 'polished'
 
 import { ReactComponent as MenuIcon } from '../../assets/images/menu.svg'
 import { useOnClickOutside } from '../../hooks/useOnClickOutside'
@@ -23,7 +24,7 @@ const StyledMenuButton = styled.button`
   margin: 0;
   padding: 0;
   height: 35px;
-  background-color: ${({ theme }) => theme.bg3};
+  background-color: #A0A4A7;
 
   padding: 0.15rem 0.5rem;
   border-radius: 0.5rem;
@@ -32,7 +33,7 @@ const StyledMenuButton = styled.button`
   :focus {
     cursor: pointer;
     outline: none;
-    background-color: ${({ theme }) => theme.bg4};
+    background-color: ${darken(0.1, '#A0A4A7')};
   }
 
   svg {
@@ -52,7 +53,7 @@ const StyledMenu = styled.div`
 
 const MenuFlyout = styled.span`
   min-width: 14rem;
-  background-color: ${({ theme }) => theme.bg3};
+  background-color: white;
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);
   border-radius: 12px;
@@ -64,6 +65,7 @@ const MenuFlyout = styled.span`
   top: 4rem;
   right: 0rem;
   z-index: 100;
+  color: #83888C !important;
 
   ${({ theme }) => theme.mediaWidth.upToMedium`
     top: -17.25rem;
@@ -73,7 +75,7 @@ const MenuFlyout = styled.span`
 const MenuItem = styled(ExternalLink)`
   flex: 1;
   padding: 0.5rem 0.5rem;
-  color: ${({ theme }) => theme.text2};
+  color: #83888C;
   :hover {
     color: ${({ theme }) => theme.text1};
     cursor: pointer;
@@ -117,19 +119,19 @@ export default function Menu() {
       {open && (
         <MenuFlyout>
           <MenuItem id="link" href="https://www.tradegen.io/about">
-            <Info size={14} />
+            <Info size={14} color={'#5271FF'}/>
             About
           </MenuItem>
           <MenuItem id="link" href="https://docs.tradegen.io/">
-            <BookOpen size={14} />
+            <BookOpen size={14} color={'#5271FF'}/>
             Docs
           </MenuItem>
           <MenuItem id="link" href={CODE_LINK}>
-            <Code size={14} />
+            <Code size={14} color={'#5271FF'}/>
             Code
           </MenuItem>
           <MenuItem id="link" href="https://discord.gg/KMM3kVaZNX">
-            <MessageCircle size={14} />
+            <MessageCircle size={14} color={'#5271FF'}/>
             Discord
           </MenuItem>
         </MenuFlyout>

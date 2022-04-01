@@ -20,8 +20,9 @@ import Transaction from './Transaction'
 const HeaderRow = styled.div`
   ${({ theme }) => theme.flexRowNoWrap};
   padding: 1rem 1rem;
+  background-color: white;
   font-weight: 500;
-  color: ${(props) => (props.color === 'blue' ? ({ theme }) => theme.primary1 : 'inherit')};
+  color: black;
   ${({ theme }) => theme.mediaWidth.upToMedium`
     padding: 1rem;
   `};
@@ -62,7 +63,7 @@ const AccountGroupingRow = styled.div`
   justify-content: space-between;
   align-items: center;
   font-weight: 400;
-  color: ${({ theme }) => theme.text1};
+  color: black;
 
   div {
     ${({ theme }) => theme.flexRowNoWrap}
@@ -71,7 +72,7 @@ const AccountGroupingRow = styled.div`
 `
 
 const AccountSection = styled.div`
-  background-color: ${({ theme }) => theme.bg1};
+  background-color: white;
   padding: 0rem 1rem;
   ${({ theme }) => theme.mediaWidth.upToMedium`padding: 0rem 1rem 1.5rem 1rem;`};
 `
@@ -93,14 +94,14 @@ const LowerSection = styled.div`
   padding: 1.5rem;
   flex-grow: 1;
   overflow: auto;
-  background-color: ${({ theme }) => theme.bg2};
+  background-color: white;
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
 
   h5 {
     margin: 0;
     font-weight: 400;
-    color: ${({ theme }) => theme.text3};
+    color: black;
   }
 `
 
@@ -133,7 +134,7 @@ const AddressLink = styled(ExternalLink)<{ hasENS: boolean; isENS: boolean }>`
   font-size: 0.825rem;
   display: flex;
   :hover {
-    color: ${({ theme }) => theme.text2};
+    color: black;
   }
 `
 
@@ -157,7 +158,11 @@ const WalletName = styled.div`
   width: initial;
   font-size: 0.825rem;
   font-weight: 500;
-  color: ${({ theme }) => theme.text3};
+  color: black;
+`
+
+const Wrapper = styled.div`
+  background-color: white;
 `
 
 const IconWrapper = styled.div<{ size?: number }>`
@@ -246,7 +251,7 @@ export default function AccountDetails({
   }, [dispatch, chainId])
 
   return (
-    <>
+    <Wrapper>
       <UpperSection>
         <CloseIcon onClick={toggleWalletModal}>
           <CloseColor />
@@ -349,8 +354,8 @@ export default function AccountDetails({
       </UpperSection>
       {!!pendingTransactions.length || !!confirmedTransactions.length ? (
         <LowerSection>
-          <AutoRow mb={'1rem'} style={{ justifyContent: 'space-between' }}>
-            <TYPE.body>Recent Transactions</TYPE.body>
+          <AutoRow mb={'1rem'} style={{ justifyContent: 'space-between', backgroundColor: 'white !important' }}>
+            <TYPE.black>Recent Transactions</TYPE.black>
             <LinkStyledButton onClick={clearAllTransactionsCallback}>(clear all)</LinkStyledButton>
           </AutoRow>
           {renderTransactions(pendingTransactions)}
@@ -358,9 +363,9 @@ export default function AccountDetails({
         </LowerSection>
       ) : (
         <LowerSection>
-          <TYPE.body color={theme.text1}>Your transactions will appear here...</TYPE.body>
+          <TYPE.body color={'black'}>Your transactions will appear here...</TYPE.body>
         </LowerSection>
       )}
-    </>
+    </Wrapper>
   )
 }

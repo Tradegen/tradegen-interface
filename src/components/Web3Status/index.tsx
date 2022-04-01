@@ -25,6 +25,7 @@ const Web3StatusGeneric = styled(ButtonSecondary)`
   align-items: center;
   padding: 0.5rem;
   border-radius: 12px;
+  border-color: #A0A4A7;
   cursor: pointer;
   user-select: none;
   :focus {
@@ -33,7 +34,6 @@ const Web3StatusGeneric = styled(ButtonSecondary)`
 `
 const Web3StatusError = styled(Web3StatusGeneric)`
   background-color: ${({ theme }) => theme.red1};
-  border: 1px solid ${({ theme }) => theme.red1};
   color: ${({ theme }) => theme.white};
   font-weight: 500;
   :hover,
@@ -43,10 +43,10 @@ const Web3StatusError = styled(Web3StatusGeneric)`
 `
 
 const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
-  background-color: #252e42;
-  border: 1px solid #5271FF;
+  background-color: #CCDFFF;
   color: #5271FF;
   font-weight: 500;
+  border: none;
 
   :hover,
   :focus {
@@ -55,17 +55,13 @@ const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
 `
 
 const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
-  background-color: ${({ pending, theme }) => (pending ? '#5271FF' : theme.bg2)};
-  border: 1px solid ${({ pending, theme }) => (pending ? '#5271FF' : theme.bg3)};
+  background-color: #A0A4A7;
   color: ${({ pending, theme }) => (pending ? theme.white : theme.text1)};
   font-weight: 500;
   :hover,
   :focus {
-    background-color: ${({ pending, theme }) => (pending ? darken(0.05, '#5271FF') : lighten(0.05, theme.bg2))};
-
-    :focus {
-      border: 1px solid ${({ pending, theme }) => (pending ? darken(0.1, '#5271FF') : darken(0.1, theme.bg3))};
-    }
+    background-color: ${darken(0.05, '#A0A4A7')};
+    border-colro: #A0A4A7;
   }
 `
 
