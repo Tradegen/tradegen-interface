@@ -5,8 +5,6 @@ import { ErrorBoundary } from '@sentry/react'
 import { formatNumber, formatBalance } from '../../functions/format'
 import { ButtonPrimary } from '../../components/Button'
 import { StyledInternalLink, TYPE } from '../../theme'
-import StakingModal from '../../components/pools/DepositModal'
-import UnstakingModal from '../../components/pools/WithdrawModal'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import React, { useCallback, useState } from 'react'
 import { ExternalLink } from 'theme/components'
@@ -161,18 +159,7 @@ function getColour(totalReturn:string)
 
 export function PoolInfo(props:any) {
 
-    const [showStakingModal, setShowStakingModal] = useState(false)
-    const [showUnstakingModal, setShowUnstakingModal] = useState(false)
-
     const toggleWalletModal = useWalletModalToggle()
-
-    const handleDepositClick = useCallback(() => {
-    if (props.account) {
-        setShowStakingModal(true)
-    } else {
-        toggleWalletModal()
-    }
-    }, [props.account, toggleWalletModal])
     
     let data = usePoolInfo(props.address);
     const poolInfo = useMemo(() => {
@@ -226,14 +213,14 @@ export function PoolInfo(props:any) {
                                 {props.account && (
                                     <>
                                         <FirstRowButtonWrapper>
-                                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={handleDepositClick}>
-                                                {'Deposit'}
-                                            </ButtonPrimary>
-                                        </FirstRowButtonWrapper>
-                                        <FirstRowButtonWrapper>
-                                            <ButtonPrimary padding="8px" borderRadius="8px" onClick={() => setShowUnstakingModal(true)}>
-                                                {'Withdraw'}
-                                            </ButtonPrimary>
+                                        <ButtonPrimary padding="8px" borderRadius="8px" marginLeft="10px">
+                                            <StyledInternalLink
+                                                to={`/trade_pool/${props.address}`}
+                                                style={{ width: '50px', textDecoration: 'none', color: 'white' }}
+                                            >
+                                                {'Trade'}
+                                            </StyledInternalLink>
+                                        </ButtonPrimary>
                                         </FirstRowButtonWrapper>
                                         <FirstRowButtonWrapper>
                                             <ButtonPrimary padding="8px" borderRadius="8px">
@@ -338,20 +325,6 @@ export function PoolInfo(props:any) {
                     </ErrorBoundary>
                 </ItemWrapper>
             </div>
-
-            <StakingModal
-                isOpen={showStakingModal}
-                onDismiss={() => setShowStakingModal(false)}
-                poolAddress={props.address}
-                mcUSDBalance={props.mcUSDBalance}
-            />
-            <UnstakingModal
-                isOpen={showUnstakingModal}
-                onDismiss={() => setShowUnstakingModal(false)}
-                poolAddress={props.address}
-                tokenBalance={props.tokenBalance}
-                combinedPositions={combinedPositions}
-            />
         </>
     ) : (
         <NoResults>No results.</NoResults>
