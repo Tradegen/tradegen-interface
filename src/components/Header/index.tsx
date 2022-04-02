@@ -296,6 +296,11 @@ export default function Header() {
           >
             Investments
           </StyledNavLink>
+          {account && (
+            <StyledNavLink id="farm-nav-link" to={`/profile/${account}`}>
+              Profile
+            </StyledNavLink>
+          )}
           <StyledNavLink id="farm-nav-link" to="/farm">
             Farm
           </StyledNavLink>

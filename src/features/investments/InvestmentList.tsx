@@ -113,13 +113,13 @@ const DataText = styled(Flex)`
   }
 `
 
-const ListItem = ({ item, index }) => {
+const ListItem = ({ item, index, user }) => {
     return (
         <DashGrid style={{ height: '48px' }} focus={true}>
             <DataText area="name">{item.name}</DataText>
             <DataText area="type">{item.type}</DataText>
-            <DataText area="tvl">{formatNumber(Number(item.TVL) / 100, true, true, 16)}</DataText>
-            <DataText area="price">{formatNumber(Number(item.tokenPrice) / 100, true, true, 18)}</DataText>
+            <DataText area="tvl">{user ? item.type == 'Pool' ? Number(item.balance) / 100 : Number(item.balance) : formatNumber(Number(item.TVL) / 100, true, true, 16)}</DataText>
+            <DataText area="price">{user ? formatNumber(Number(item.USDBalance) / 100, true, true, 18) : formatNumber(Number(item.tokenPrice) / 100, true, true, 18)}</DataText>
             <DataText area="roi" style={{color:getColour(item.totalReturn)}}>{item.totalReturn}</DataText>
             <DataText>
                 <ButtonPrimary padding="8px" borderRadius="8px" width="80px" marginLeft="10px">
@@ -162,12 +162,6 @@ const PageButtons = styled.div`
   margin-bottom: 2em;
 `
 
-const ItemWrapper = styled.div`
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  min-width:1000px;
-`
-
 const Divider = styled(Box)`
   height: 1px;
   background-color: none;
@@ -178,34 +172,6 @@ const NoResults = styled.div`
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
   text-align: center;
-`
-
-const InvestmentCard = styled.div`
-  width: 100%;
-  background-color: rgba(86,86,86,0.2);
-  color: white;
-  text-decoration: none;
-  display: flex;
-  margin-top: 30px;
-  border: 1px solid #5271FF;
-  border-radius: 8px;
-  &:hover {
-    background-color: rgba(86,86,86,0.1)};
-    text-decoration: none;
-  }
-`
-
-const InvestmentCardContent = styled.div`
-  width: 19%;
-  text-align: center;
-`
-
-const TitleRow = styled.div`
-  width: 100%;
-  color: white;
-  display: flex;
-  background-color: none;
-  margin-top: 30px;
 `
 
 const FirstRow = styled.div`
@@ -235,12 +201,6 @@ const FirstRowRight = styled.div`
 
 const Buffer = styled.div`
   width: 33%;
-  background-color: none;
-  height: 15px;
-`
-
-const MiniBuffer = styled.div`
-  width: 10px;
   background-color: none;
   height: 15px;
 `
@@ -356,38 +316,42 @@ export function UserInvestments(props:any) {
         return data;
     }, [data]);
 
+    investments = investments.filter((x): x is UserInvestment => BigInt(x.balance) > BigInt(0));
+
     return investments ? (
-        <ItemWrapper>
-            {investments?.length === 0 ? (
-                <Loader style={{ margin: 'auto' }} />
-            ) : (
-            investments.filter((x): x is UserInvestment => x.balance >= BigInt(0)).map((investment:UserInvestment) => (
-                <ErrorBoundary key={investment.address}>
-                    <StyledInternalLink
-                        to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
-                        style={{ width: '100%', textDecoration: 'none' }}
-                    >
-                        <InvestmentCard>
-                            <InvestmentCardContent>
-                                <p>{investment.name}</p>
-                            </InvestmentCardContent>
-                            <InvestmentCardContent>
-                                <p>{investment.type}</p>
-                            </InvestmentCardContent>
-                            <InvestmentCardContent>
-                                <p>{investment.type == "Pool" ? formatBalance(investment.balance) : investment.balance.toString()}</p>
-                            </InvestmentCardContent>
-                            <InvestmentCardContent>
-                                <p>{formatNumber(Number(investment.USDBalance) / 100, true, true, 18)}</p>
-                            </InvestmentCardContent>
-                            <InvestmentCardContent>
-                                <p style={{color:getColour(investment.totalReturn)}}>{investment.totalReturn}</p>
-                            </InvestmentCardContent>
-                        </InvestmentCard>
-                    </StyledInternalLink>
-                </ErrorBoundary>
-            )))}
-        </ItemWrapper>
+        <PageWrapper>
+                <ListWrapper>
+                    <DashGrid center={true} style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem', fontWeight: '550', paddingTop: '20px' }}>
+                        <Flex alignItems="center" justifyContent="flexStart">
+                            <DataText area="name">Name</DataText>
+                        </Flex>
+                        <Flex alignItems="center">
+                            <DataText area="type">Type</DataText>
+                        </Flex>
+                        <Flex alignItems="center">
+                            <DataText area="price">Balance</DataText>
+                        </Flex>
+                        <Flex alignItems="center">
+                            <DataText area="value">Value</DataText>
+                        </Flex>
+                        <Flex alignItems="center">
+                            <DataText area="roi">ROI</DataText>
+                        </Flex>
+                    </DashGrid>
+                    <Divider />
+                    <List p={0}>
+                        {investments &&
+                            investments.map((item, index) => {
+                                return (
+                                    <ListItemWrapper>
+                                        <ListItem key={index} index={index + 1} item={item} user={true} />
+                                        <Divider />
+                                    </ListItemWrapper>
+                                )
+                            })}
+                    </List>
+                </ListWrapper>
+            </PageWrapper>
     ) : (
         <NoResults>No positions.</NoResults>
     )
@@ -404,38 +368,42 @@ export function ManagedInvestments(props:any) {
 
     console.log(investments);
 
+    investments = investments.filter((x): x is ManagedInvestment => x.manager == props.userAddress);
+
     return investments ? (
-        <ItemWrapper>
-            {investments?.length === 0 ? (
-                <Loader style={{ margin: 'auto' }} />
-            ) : (
-            investments.filter((x): x is ManagedInvestment => x.manager==props.userAddress).map((investment:ManagedInvestment) => (
-                <ErrorBoundary key={investment.address}>
-                    <StyledInternalLink
-                        to={(investment.type == "Pool" ? `/pool/${investment.address}` : `/NFTPool/${investment.address}`)}
-                        style={{ width: '100%', textDecoration: 'none' }}
-                    >
-                        <InvestmentCard>
-                            <InvestmentCardContent>
-                                <p>{investment.name}</p>
-                            </InvestmentCardContent>
-                            <InvestmentCardContent>
-                                <p>{investment.type}</p>
-                            </InvestmentCardContent>
-                            <InvestmentCardContent>
-                                <p>{formatNumber(Number(investment.TVL) / 100, true, true, 16)}</p>
-                            </InvestmentCardContent>
-                            <InvestmentCardContent>
-                                <p>{formatNumber(Number(investment.tokenPrice) / 100, true, true, 18)}/token</p>
-                            </InvestmentCardContent>
-                            <InvestmentCardContent>
-                                <p style={{color:getColour(investment.totalReturn)}}>{investment.totalReturn}</p>
-                            </InvestmentCardContent>
-                        </InvestmentCard>
-                    </StyledInternalLink>
-                </ErrorBoundary>
-            )))}
-        </ItemWrapper>
+        <PageWrapper>
+                <ListWrapper>
+                    <DashGrid center={true} style={{ height: 'fit-content', padding: '0 1.125rem 1rem 1.125rem', fontWeight: '550', paddingTop: '20px' }}>
+                        <Flex alignItems="center" justifyContent="flexStart">
+                            <DataText area="name">Name</DataText>
+                        </Flex>
+                        <Flex alignItems="center">
+                            <DataText area="type">Type</DataText>
+                        </Flex>
+                        <Flex alignItems="center">
+                            <DataText area="tvl">TVL</DataText>
+                        </Flex>
+                        <Flex alignItems="center">
+                            <DataText area="price">Price</DataText>
+                        </Flex>
+                        <Flex alignItems="center">
+                            <DataText area="roi">ROI</DataText>
+                        </Flex>
+                    </DashGrid>
+                    <Divider />
+                    <List p={0}>
+                        {investments &&
+                            investments.map((item, index) => {
+                                return (
+                                    <ListItemWrapper>
+                                        <ListItem key={index} index={index + 1} item={item} user={false} />
+                                        <Divider />
+                                    </ListItemWrapper>
+                                )
+                            })}
+                    </List>
+                </ListWrapper>
+            </PageWrapper>
     ) : (
         <NoResults>No positions.</NoResults>
     )
@@ -537,7 +505,7 @@ export function InvestmentList() {
                             investments.map((item, index) => {
                                 return (
                                     <ListItemWrapper>
-                                        <ListItem key={index} index={(page - 1) * itemMax + index + 1} item={item} />
+                                        <ListItem key={index} index={(page - 1) * itemMax + index + 1} item={item} user={false} />
                                         <Divider />
                                     </ListItemWrapper>
                                 )

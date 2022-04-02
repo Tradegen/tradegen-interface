@@ -12,14 +12,12 @@ import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
-import Earn from './Earn'
-import Stake from './Stake'
-import Manage from './Earn/Manage'
 import Pool from './UbeswapPool'
 import PoolPage from './Pool'
 import TradePoolPage from './Trade/TradePool'
 import ManagePoolPage from './Manage/ManagePool'
 import ManageNFTPoolPage from './Manage/ManageNFTPool'
+import ProfilePage from './Profile'
 import NFTPoolPage from './NFTPool'
 import TradeNFTPoolPage from './Trade/TradeNFTPool'
 import { RedirectPathToInvestmentsOnly } from './Swap/redirects'
@@ -113,6 +111,7 @@ export default function App() {
               <Route exact strict path="/NFTpool/:id" component={NFTPoolPage} />
               <Route exact strict path="/pool/:id" component={PoolPage} />
               <Route exact strict path="/investments" component={Investments} />
+              <Route exact strict path="/profile/:account" component={ProfilePage} />
               <Route component={RedirectPathToInvestmentsOnly} />
             </Switch>
           </ErrorBoundary>

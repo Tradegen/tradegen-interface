@@ -204,7 +204,7 @@ export function useUserInvestments(userAddress:string): UserInvestment[] {
       name: poolNames[i],
       type: "Pool",
       address: poolAddresses[i],
-      balance: (!poolBalances[i]) ? BigInt(0) : BigInt(poolBalances[i]),
+      balance: (!poolBalances[i]) ? BigInt(0) : BigInt(poolBalances[i]) / BigInt(1e16),
       USDBalance: (!poolUSDBalances[i]) ? BigInt(0) : BigInt(poolUSDBalances[i]) / BigInt(1e16),
       totalReturn: totalReturn
     });
@@ -231,7 +231,7 @@ export function useUserInvestments(userAddress:string): UserInvestment[] {
 
     investments.push({
       name: NFTPoolNames[i],
-      type: "NFT Pool",
+      type: "Capped Pool",
       address: NFTPoolAddresses[i],
       balance: (!NFTPoolBalances[i]) ? BigInt(0) : BigInt(NFTPoolBalances[i]),
       USDBalance: (!NFTPoolUSDBalances[i]) ? BigInt(0) : BigInt(NFTPoolUSDBalances[i]) / BigInt(1e16),
@@ -318,7 +318,7 @@ export function useManagedInvestments(): ManagedInvestment[] {
 
     investments.push({
       name: NFTPoolNames[i],
-      type: "NFT Pool",
+      type: "Capped Pool",
       address: NFTPoolAddresses[i],
       TVL: (!NFTPoolValues[i]) ? BigInt(0) : BigInt(NFTPoolValues[i]) / BigInt(1e16),
       tokenPrice: (NFTPoolTokenPrices[i] === null) ? BigInt(0) : BigInt(NFTPoolTokenPrices[i]) / BigInt(1e16),
